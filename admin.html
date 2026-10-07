@@ -150,7 +150,10 @@
                 <!-- Admin Navigation Tabs -->
                 <nav class="hidden md:flex items-center space-x-1">
                     <button onclick="switchTab('tracking')" id="nav-tracking" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all bg-slate-800 text-amber-300 border border-slate-700 shadow-inner">
-                        <i class="fa-solid fa-list-check mr-1.5 text-amber-400"></i> Faculty Tracker (Pending)
+                        <i class="fa-solid fa-list-check mr-1.5 text-amber-400"></i> Faculty Tracker
+                    </button>
+                    <button onclick="switchTab('questions')" id="nav-questions" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
+                        <i class="fa-solid fa-pen-to-square mr-1.5 text-indigo-400"></i> Question Manager
                     </button>
                     <button onclick="switchTab('analytics')" id="nav-analytics" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
                         <i class="fa-solid fa-chart-pie mr-1.5 text-indigo-400"></i> Analytics Dashboard
@@ -203,7 +206,7 @@
                         <i class="fa-solid fa-file-excel text-emerald-400"></i>
                         <span>Export Pending List</span>
                     </button>
-                    <button onclick="document.getElementById('editFacultyModal').classList.remove('hidden')" class="px-4 py-2.5 bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center space-x-1.5 hover:shadow-md">
+                    <button onclick="openAddFacultyModal()" class="px-4 py-2.5 bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center space-x-1.5 hover:shadow-md">
                         <i class="fa-solid fa-user-plus"></i>
                         <span>Add Faculty</span>
                     </button>
@@ -327,6 +330,62 @@
                             <!-- Populated dynamically via JS -->
                         </tbody>
                     </table>
+                </div>
+        </section>
+
+        <!-- ==================== TAB: QUESTION MANAGER ==================== -->
+        <section id="tab-content-questions" class="tab-pane max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 hidden">
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div>
+                    <div class="flex items-center space-x-2 text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <span>Curriculum Audit Survey Configuration</span>
+                    </div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+                        Question & Evaluation Manager
+                    </h1>
+                    <p class="text-xs text-slate-500 mt-1">Add, edit, or remove evaluation criteria and survey questions across all 6 sections.</p>
+                </div>
+                <div>
+                    <button onclick="openQuestionModal()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Add New Question / Item
+                    </button>
+                </div>
+            </div>
+
+            <!-- Questions Category List -->
+            <div class="space-y-6">
+                <!-- Section 2: Overall Effectiveness -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-star text-amber-500"></i> Overall Curricular Effectiveness Items (5-Point Likert)
+                        </h3>
+                        <span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold" id="qCountEff">12 items</span>
+                    </div>
+                    <div class="divide-y divide-slate-100" id="qListEff"></div>
+                </div>
+
+                <!-- Section 2: OBE -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-bullseye text-indigo-500"></i> Outcome Based Education (OBE) Items
+                        </h3>
+                        <span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold" id="qCountObe">8 items</span>
+                    </div>
+                    <div class="divide-y divide-slate-100" id="qListObe"></div>
+                </div>
+
+                <!-- Section 3: Curriculum Structure -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-emerald-500"></i> Curriculum Component Adequacy Items
+                        </h3>
+                        <span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold" id="qCountStruct">8 items</span>
+                    </div>
+                    <div class="divide-y divide-slate-100" id="qListStruct"></div>
                 </div>
             </div>
         </section>
@@ -629,6 +688,7 @@
             }
 
             if (tabId === 'tracking') renderRosterTable();
+            if (tabId === 'questions') renderQuestionManager();
             if (tabId === 'analytics') renderAnalyticsDashboard();
             if (tabId === 'responses') renderResponsesTable();
             if (tabId === 'report') renderReportTable();
@@ -1066,8 +1126,161 @@
             }).join('');
         }
 
-        // Seed Sample Benchmark Data
-                function showToast(message, type = 'success') {
+        // Question Manager JS Logic
+        function renderQuestionManager() {
+            document.getElementById('qCountEff').innerText = `${effItems.length} items`;
+            document.getElementById('qListEff').innerHTML = effItems.map((item, idx) => `
+                <div class="py-3 flex items-center justify-between gap-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs">${idx + 1}</span>
+                        <span class="text-xs font-semibold text-slate-800">${item}</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="editQuestion('eff', ${idx})" class="p-1.5 text-slate-400 hover:text-amber-500 rounded-lg text-xs font-semibold transition" title="Edit">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button onclick="deleteQuestion('eff', ${idx})" class="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg text-xs font-semibold transition" title="Delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('qCountObe').innerText = `${obeItems.length} items`;
+            document.getElementById('qListObe').innerHTML = obeItems.map((item, idx) => `
+                <div class="py-3 flex items-center justify-between gap-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">${idx + 1}</span>
+                        <span class="text-xs font-semibold text-slate-800">${item}</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="editQuestion('obe', ${idx})" class="p-1.5 text-slate-400 hover:text-amber-500 rounded-lg text-xs font-semibold transition" title="Edit">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button onclick="deleteQuestion('obe', ${idx})" class="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg text-xs font-semibold transition" title="Delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('qCountStruct').innerText = `${structItems.length} items`;
+            document.getElementById('qListStruct').innerHTML = structItems.map((item, idx) => `
+                <div class="py-3 flex items-center justify-between gap-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-6 h-6 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">${idx + 1}</span>
+                        <span class="text-xs font-semibold text-slate-800">${item}</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="editQuestion('struct', ${idx})" class="p-1.5 text-slate-400 hover:text-amber-500 rounded-lg text-xs font-semibold transition" title="Edit">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button onclick="deleteQuestion('struct', ${idx})" class="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg text-xs font-semibold transition" title="Delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        let editingCategory = null;
+        let editingIndex = -1;
+
+        function openQuestionModal(cat = 'eff', idx = -1) {
+            editingCategory = cat;
+            editingIndex = idx;
+            document.getElementById('qModalCategory').value = cat;
+
+            if (idx >= 0) {
+                document.getElementById('qModalTitle').innerText = 'Edit Survey Item';
+                const arr = cat === 'eff' ? effItems : (cat === 'obe' ? obeItems : structItems);
+                document.getElementById('qModalText').value = arr[idx] || '';
+            } else {
+                document.getElementById('qModalTitle').innerText = 'Add New Survey Item';
+                document.getElementById('qModalText').value = '';
+            }
+            document.getElementById('questionModal').classList.remove('hidden');
+        }
+
+        function editQuestion(cat, idx) {
+            openQuestionModal(cat, idx);
+        }
+
+        function deleteQuestion(cat, idx) {
+            if (!confirm('Are you sure you want to delete this question item?')) return;
+            const arr = cat === 'eff' ? effItems : (cat === 'obe' ? obeItems : structItems);
+            arr.splice(idx, 1);
+            renderQuestionManager();
+            showToast('Question item removed successfully');
+        }
+
+        function saveQuestionItem() {
+            const cat = document.getElementById('qModalCategory').value;
+            const text = document.getElementById('qModalText').value.trim();
+
+            if (!text) {
+                alert('Question text cannot be empty');
+                return;
+            }
+
+            const arr = cat === 'eff' ? effItems : (cat === 'obe' ? obeItems : structItems);
+
+            if (editingIndex >= 0) {
+                arr[editingIndex] = text;
+                showToast('Question item updated successfully');
+            } else {
+                arr.push(text);
+                showToast('New question item added successfully');
+            }
+
+            renderQuestionManager();
+            document.getElementById('questionModal').classList.add('hidden');
+        }
+
+        function openAddFacultyModal() {
+            document.getElementById('facModalName').value = '';
+            document.getElementById('facModalEmail').value = '';
+            document.getElementById('facModalDesig').value = 'Assistant Professor';
+            initFacultyModalDepts();
+            document.getElementById('editFacultyModal').classList.remove('hidden');
+        }
+
+        function initFacultyModalDepts() {
+            const depts = Array.from(new Set(MASTER_FACULTY_ROSTER.map(f => f.department))).filter(Boolean).sort();
+            const sel = document.getElementById('facModalDept');
+            sel.innerHTML = '<option value="">Select Department...</option>';
+            depts.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.innerText = d;
+                sel.appendChild(opt);
+            });
+        }
+
+        function saveFacultyRosterMember() {
+            const name = document.getElementById('facModalName').value.trim();
+            const email = document.getElementById('facModalEmail').value.trim();
+            const dept = document.getElementById('facModalDept').value;
+            const desig = document.getElementById('facModalDesig').value;
+
+            if (!name || !dept) {
+                alert('Faculty Name and Department are required.');
+                return;
+            }
+
+            MASTER_FACULTY_ROSTER.push({
+                name,
+                email,
+                department: dept,
+                designation: desig
+            });
+
+            renderRosterTable();
+            document.getElementById('editFacultyModal').classList.add('hidden');
+            showToast(`Added ${name} to Master Roster!`);
+        }
+
+        function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             const bg = type === 'success' ? 'bg-emerald-700 text-white' : 'bg-rose-700 text-white';
@@ -1082,15 +1295,51 @@
     <div id="editFacultyModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
             <h3 class="font-bold text-lg text-slate-900 border-b pb-2">Manage Faculty Link</h3>
-            <p class="text-xs text-slate-500 pb-2">Add or sync faculty credentials below.</p>
-            <input type="text" placeholder="Full Name" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none">
-            <input type="email" placeholder="Institutional Email" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none">
-            <select class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none">
-                <option>Select Department...</option>
+            <p class="text-xs text-slate-500 pb-2">Add or update faculty roster credentials below.</p>
+            <input type="text" id="facModalName" placeholder="Full Name" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+            <input type="email" id="facModalEmail" placeholder="Institutional Email" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+            <select id="facModalDept" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white">
+                <option value="">Select Department...</option>
+            </select>
+            <select id="facModalDesig" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white">
+                <option value="Assistant Professor">Assistant Professor</option>
+                <option value="Associate Professor">Associate Professor</option>
+                <option value="Professor">Professor</option>
+                <option value="Head of Department">Head of Department</option>
             </select>
             <div class="flex justify-end space-x-2 pt-4">
                 <button onclick="document.getElementById('editFacultyModal').classList.add('hidden')" class="px-5 py-2.5 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-xl text-xs font-bold transition">Cancel</button>
-                <button onclick="alert('Saved to pending Firebase sync batch!'); document.getElementById('editFacultyModal').classList.add('hidden')" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold shadow-md transition">Save to Sync</button>
+                <button onclick="saveFacultyRosterMember()" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold shadow-md transition">Save Faculty</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question Add/Edit Modal -->
+    <div id="questionModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <h3 id="qModalTitle" class="font-bold text-base text-slate-900">Manage Survey Question</h3>
+                <button onclick="document.getElementById('questionModal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Target Evaluation Category</label>
+                    <select id="qModalCategory" class="w-full p-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-100 outline-none bg-white">
+                        <option value="eff">Overall Effectiveness (5-Point Likert)</option>
+                        <option value="obe">Outcome Based Education (OBE)</option>
+                        <option value="struct">Curriculum Structure & Components</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Question / Statement Text</label>
+                    <textarea id="qModalText" rows="3" placeholder="Enter evaluation statement..." class="w-full p-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-100 outline-none"></textarea>
+                </div>
+            </div>
+            <div class="flex justify-end space-x-2 pt-3 border-t border-slate-100">
+                <button onclick="document.getElementById('questionModal').classList.add('hidden')" class="px-4 py-2 bg-slate-100 text-slate-700 font-semibold text-xs rounded-xl">Cancel</button>
+                <button onclick="saveQuestionItem()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow">Save Question</button>
             </div>
         </div>
     </div>

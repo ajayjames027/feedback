@@ -661,12 +661,37 @@
                         <input type="text" name="iks_other" placeholder="Other modes..." class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-600">
                     </div>
 
-                    <!-- Courses to Revise -->
-                    <div class="space-y-2 pt-2">
-                        <label class="block text-sm font-semibold text-slate-800">
-                            Courses requiring revision (Code, Title, Semester, Reason):
-                        </label>
-                        <textarea name="courses_to_revise" rows="3" placeholder="Enter suggestions..." class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-600"></textarea>
+                    <!-- Courses to Revise (Section J1 Structured Input) -->
+                    <div class="space-y-3 pt-4 border-t border-slate-100" id="card-revision-courses">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-sm font-bold text-slate-800 flex items-center gap-2">
+                                <i class="fa-solid fa-table-list text-indigo-600"></i> J1. Identify the courses requiring revision
+                            </label>
+                            <button type="button" onclick="openRevisionModal()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-plus"></i> Add Course Proposal
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-500">Add courses where changes in code, title, semester, nature of change, or syllabus content are proposed.</p>
+
+                        <!-- Table display -->
+                        <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                        <th class="p-3">Course code & title</th>
+                                        <th class="p-3 text-center">Sem</th>
+                                        <th class="p-3">Nature of change</th>
+                                        <th class="p-3">Reason</th>
+                                        <th class="p-3 text-center w-16">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="revisionTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium">
+                                    <tr id="emptyRevisionRow">
+                                        <td colspan="5" class="p-4 text-center text-slate-400 italic">No course revision proposals added yet. Click "Add Course Proposal" above to add.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
@@ -690,16 +715,74 @@
 
     </div>
 
-    <!-- Success Screen View -->
-    <div id="successView" class="max-w-xl mx-auto space-y-6 hidden py-12">
-        <div class="portal-card p-8 text-center space-y-4">
-            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl">
-                <i class="fa-solid fa-circle-check"></i>
+    <!-- Course Revision Proposal Modal -->
+    <div id="revisionModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl border border-slate-100">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center space-x-2 text-indigo-900 font-bold text-base">
+                    <i class="fa-solid fa-file-pen text-indigo-600"></i>
+                    <span>J1. Course Revision Proposal</span>
+                </div>
+                <button type="button" onclick="closeRevisionModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
-            <h2 class="text-2xl font-bold text-slate-900">Feedback Submitted Successfully!</h2>
-            <p class="text-sm text-slate-600">Thank you for contributing to the 2025-26 Curricular Design and Development evaluation.</p>
-            <div class="pt-4">
-                <button onclick="window.location.reload()" class="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold text-xs shadow">Submit Another Response</button>
+
+            <div class="space-y-4 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Course Code & Title <span class="required-star">*</span></label>
+                    <input type="text" id="modalCourseTitle" placeholder="e.g. 23UCS101 - Programming in C" class="w-full p-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-100 outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Semester <span class="required-star">*</span></label>
+                        <select id="modalCourseSem" class="w-full p-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-100 outline-none bg-white">
+                            <option value="">Select Sem...</option>
+                            <option value="I">Semester I</option>
+                            <option value="II">Semester II</option>
+                            <option value="III">Semester III</option>
+                            <option value="IV">Semester IV</option>
+                            <option value="V">Semester V</option>
+                            <option value="VI">Semester VI</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Nature of Change <span class="required-star">*</span></label>
+                        <select id="modalCourseChange" class="w-full p-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-100 outline-none bg-white">
+                            <option value="Add">Add New Course</option>
+                            <option value="Remove">Remove Course</option>
+                            <option value="Revise" selected>Revise Syllabus Content</option>
+                            <option value="Replace">Replace Course</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Reason for Revision / Recommendation <span class="required-star">*</span></label>
+                    <textarea id="modalCourseReason" rows="3" placeholder="Explain the rationale for this change..." class="w-full p-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-100 outline-none"></textarea>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button type="button" onclick="closeRevisionModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition">Cancel</button>
+                <button type="button" onclick="saveCourseRevision()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-check"></i> Save Proposal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Duplicate Submission Alert Modal -->
+    <div id="duplicateAlertModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl border border-rose-100">
+            <div class="w-14 h-14 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto text-2xl">
+                <i class="fa-solid fa-user-lock"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900">Already Submitted</h3>
+            <p class="text-xs text-slate-600 leading-relaxed" id="duplicateAlertText">Feedback for this faculty member has already been recorded. Duplicate submissions are restricted.</p>
+            <div class="pt-2">
+                <button onclick="document.getElementById('duplicateAlertModal').classList.add('hidden')" class="px-6 py-2.5 bg-slate-900 text-white rounded-xl font-semibold text-xs shadow">OK, Understand</button>
             </div>
         </div>
     </div>
@@ -747,71 +830,119 @@
             });
         }
 
+        let currentMaxStepUnlocked = 1;
+        let courseRevisionsList = [];
+
         function onFacultySelectChange() {
             const selectEl = document.getElementById('facultyNameSelect');
             const selectedOpt = selectEl.options[selectEl.selectedIndex];
             if (!selectedOpt) return;
-            document.getElementById('facultyNameInput').value = selectedOpt.value;
-            document.getElementById('facultyEmailInput').value = selectedOpt.dataset.email || '';
+
+            const name = selectedOpt.value;
+            const dept = document.getElementById('deptSelect').value;
+            const email = selectedOpt.dataset.email || '';
+
+            // Check duplicate submission
+            if (checkDuplicateSubmission(name, dept, email)) {
+                document.getElementById('duplicateAlertText').innerText = `Feedback for ${name} (${dept}) has already been submitted and recorded. Multiple submissions for the same faculty profile are restricted.`;
+                document.getElementById('duplicateAlertModal').classList.remove('hidden');
+                selectEl.value = "";
+                document.getElementById('facultyMetaBadge').classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('facultyNameInput').value = name;
+            document.getElementById('facultyEmailInput').value = email;
             document.getElementById('facultyDesignation').innerText = selectedOpt.dataset.desig || '';
-            document.getElementById('facultyEmailText').innerText = selectedOpt.dataset.email || '';
+            document.getElementById('facultyEmailText').innerText = email || '';
             document.getElementById('facultyMetaBadge').classList.remove('hidden');
         }
 
-        function renderMatrixTables() {
-            document.getElementById('effTableBody').innerHTML = effItems.map((item, idx) => `
-                <tr>
-                    <td class="p-3 font-medium text-slate-800">${idx + 1}. ${item}</td>
-                    ${[1, 2, 3, 4, 5].map(score => `<td class="p-2 text-center"><input type="radio" name="eff_${idx + 1}" value="${score}" required></td>`).join('')}
-                </tr>
-            `).join('');
+        function checkDuplicateSubmission(name, dept, email) {
+            let responses = [];
+            try {
+                responses = JSON.parse(localStorage.getItem("sjc_feedback_responses") || "[]");
+            } catch(e) {}
 
-            document.getElementById('obeTableBody').innerHTML = obeItems.map((item, idx) => `
-                <tr>
-                    <td class="p-3 font-medium text-slate-800">${idx + 1}. ${item}</td>
-                    ${[1, 2, 3, 4, 5].map(score => `<td class="p-2 text-center"><input type="radio" name="obe_${idx + 1}" value="${score}" required></td>`).join('')}
-                </tr>
-            `).join('');
+            return responses.some(r => {
+                const matchEmail = email && r.faculty_email && r.faculty_email.toLowerCase() === email.toLowerCase();
+                const matchNameDept = r.faculty_name && r.department && 
+                                      r.faculty_name.toLowerCase() === name.toLowerCase() && 
+                                      r.department.toLowerCase() === dept.toLowerCase();
+                return matchEmail || matchNameDept;
+            });
+        }
 
-            document.getElementById('structTableBody').innerHTML = structItems.map((item, idx) => `
-                <tr>
-                    <td class="p-3 font-medium text-slate-800">${idx + 1}. ${item}</td>
-                    <td class="p-2 text-center"><input type="radio" name="struct_${idx + 1}" value="1" required></td>
-                    <td class="p-2 text-center"><input type="radio" name="struct_${idx + 1}" value="2"></td>
-                    <td class="p-2 text-center"><input type="radio" name="struct_${idx + 1}" value="3"></td>
-                    <td class="p-2 text-center"><input type="radio" name="struct_${idx + 1}" value="4"></td>
-                    <td class="p-2 text-center"><input type="radio" name="struct_${idx + 1}" value="N/A"></td>
-                </tr>
-            `).join('');
+        // --- Course Revision Modal Logic ---
+        function openRevisionModal() {
+            document.getElementById('modalCourseTitle').value = '';
+            document.getElementById('modalCourseSem').value = '';
+            document.getElementById('modalCourseChange').value = 'Revise';
+            document.getElementById('modalCourseReason').value = '';
+            document.getElementById('revisionModal').classList.remove('hidden');
+        }
 
-            document.getElementById('expTableBody').innerHTML = expItems.map((item, idx) => `
-                <tr>
-                    <td class="p-3 font-medium text-slate-800">${item}</td>
-                    ${[1, 2, 3, 4].map(score => `<td class="p-2 text-center"><input type="radio" name="exp_${idx + 1}" value="${score}" required></td>`).join('')}
-                </tr>
-            `).join('');
+        function closeRevisionModal() {
+            document.getElementById('revisionModal').classList.add('hidden');
+        }
 
-            document.getElementById('digTableBody').innerHTML = digItems.map((item, idx) => `
-                <tr>
-                    <td class="p-3 font-medium text-slate-800">${item}</td>
-                    ${[1, 2, 3, 4].map(score => `<td class="p-2 text-center"><input type="radio" name="dig_${idx + 1}" value="${score}" required></td>`).join('')}
-                </tr>
-            `).join('');
+        function saveCourseRevision() {
+            const title = document.getElementById('modalCourseTitle').value.trim();
+            const sem = document.getElementById('modalCourseSem').value;
+            const change = document.getElementById('modalCourseChange').value;
+            const reason = document.getElementById('modalCourseReason').value.trim();
 
-            document.getElementById('emergingCheckboxesContainer').innerHTML = emergingPool.map(item => `
-                <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer hover:bg-indigo-50/40">
-                    <input type="checkbox" name="emerging_areas" value="${item}" class="w-4 h-4 rounded text-indigo-600"> <span>${item}</span>
-                </label>
-            `).join('');
+            if (!title || !sem || !reason) {
+                alert('Please fill out all course proposal fields.');
+                return;
+            }
 
-            document.getElementById('stkTableBody').innerHTML = stakeholders.map((s, idx) => `
-                <tr>
-                    <td class="p-3 font-medium text-slate-800">${s}</td>
-                    ${[1, 2, 3, 4, 5].map(score => `<td class="p-2 text-center"><input type="radio" name="stk_${idx + 1}" value="${score}" required></td>`).join('')}
+            courseRevisionsList.push({ title, sem, change, reason });
+            renderRevisionTable();
+            closeRevisionModal();
+        }
+
+        function removeCourseRevision(idx) {
+            courseRevisionsList.splice(idx, 1);
+            renderRevisionTable();
+        }
+
+        function renderRevisionTable() {
+            const tbody = document.getElementById('revisionTableBody');
+            if (courseRevisionsList.length === 0) {
+                tbody.innerHTML = `
+                    <tr id="emptyRevisionRow">
+                        <td colspan="5" class="p-4 text-center text-slate-400 italic">No course revision proposals added yet. Click "Add Course Proposal" above to add.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = courseRevisionsList.map((item, idx) => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="p-3 font-semibold text-slate-900">${item.title}</td>
+                    <td class="p-3 text-center font-bold text-indigo-600">Sem ${item.sem}</td>
+                    <td class="p-3">
+                        <span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold ${
+                            item.change === 'Add' ? 'bg-emerald-100 text-emerald-800' :
+                            item.change === 'Remove' ? 'bg-rose-100 text-rose-800' :
+                            item.change === 'Replace' ? 'bg-amber-100 text-amber-800' :
+                            'bg-indigo-100 text-indigo-800'
+                        }">
+                            ${item.change}
+                        </span>
+                    </td>
+                    <td class="p-3 text-slate-600 max-w-xs truncate" title="${item.reason}">${item.reason}</td>
+                    <td class="p-3 text-center">
+                        <button type="button" onclick="removeCourseRevision(${idx})" class="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition" title="Remove">
+                            <i class="fa-solid fa-trash-can text-sm"></i>
+                        </button>
+                    </td>
                 </tr>
             `).join('');
         }
 
+        // --- Stepper Navigation & Locking ---
         function showStep(stepNum) {
             document.querySelectorAll('.form-section').forEach(sec => sec.classList.add('hidden'));
             const nxt = document.getElementById('form-section-' + stepNum);
@@ -820,9 +951,14 @@
             for (let i = 1; i <= 6; i++) {
                 const el = document.getElementById('stepper-' + i);
                 if (el) {
-                    el.classList.remove('active', 'completed');
-                    if (i === stepNum) el.classList.add('active');
-                    else if (i < stepNum) el.classList.add('completed');
+                    el.classList.remove('active', 'completed', 'opacity-50', 'cursor-not-allowed');
+                    if (i === stepNum) {
+                        el.classList.add('active');
+                    } else if (i < stepNum) {
+                        el.classList.add('completed');
+                    } else if (i > currentMaxStepUnlocked) {
+                        el.classList.add('opacity-50', 'cursor-not-allowed');
+                    }
                 }
             }
 
@@ -842,11 +978,18 @@
         }
 
         function goToStep(stepNum) {
+            if (stepNum > currentMaxStepUnlocked) {
+                alert(`Step ${stepNum} is locked. Please complete the current section and click 'Next Step' to proceed sequentially.`);
+                return;
+            }
             showStep(stepNum);
         }
 
         function nextStep(currentStep) {
             if (!validateStep(currentStep)) return;
+            if (currentStep >= currentMaxStepUnlocked) {
+                currentMaxStepUnlocked = currentStep + 1;
+            }
             showStep(currentStep + 1);
         }
 
@@ -863,7 +1006,7 @@
                 if (input.type === 'radio' || input.type === 'checkbox') continue;
                 if (!input.value.trim()) {
                     input.focus();
-                    alert('Please fill out all required fields.');
+                    alert('Please fill out all required fields in this section.');
                     return false;
                 }
             }
@@ -881,6 +1024,16 @@
         function submitFacultyFeedback(e) {
             e.preventDefault();
             const form = document.getElementById('facultyForm');
+
+            const facultyName = form.faculty_name ? form.faculty_name.value : document.getElementById('facultyNameSelect').value;
+            const dept = form.department ? form.department.value : '';
+            const email = form.faculty_email ? form.faculty_email.value : '';
+
+            if (checkDuplicateSubmission(facultyName, dept, email)) {
+                document.getElementById('duplicateAlertText').innerText = `Feedback for ${facultyName} (${dept}) has already been recorded.`;
+                document.getElementById('duplicateAlertModal').classList.remove('hidden');
+                return;
+            }
 
             const getCheckboxes = (name) => Array.from(form.querySelectorAll(`input[name="${name}"]:checked`)).map(c => c.value);
 
@@ -924,9 +1077,9 @@
             const payload = {
                 id: Date.now(),
                 timestamp: new Date().toISOString(),
-                department: form.department ? form.department.value : '',
-                faculty_name: form.faculty_name ? form.faculty_name.value : document.getElementById('facultyNameSelect').value,
-                faculty_email: form.faculty_email ? form.faculty_email.value : '',
+                department: dept,
+                faculty_name: facultyName,
+                faculty_email: email,
                 course_level: form.course_level ? form.course_level.value : '',
                 overall_effectiveness: overallEff,
                 obe_evaluation: obeEval,
@@ -948,7 +1101,7 @@
                 iks_effectiveness: form.iks_effectiveness ? form.iks_effectiveness.value : '',
                 iks_integration_modes: getCheckboxes('iks_integration_modes'),
                 iks_other: form.iks_other ? form.iks_other.value : '',
-                courses_to_revise: form.courses_to_revise ? form.courses_to_revise.value : ''
+                course_revisions: courseRevisionsList
             };
 
             // Save to localStorage as immediate offline cache
