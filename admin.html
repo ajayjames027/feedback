@@ -208,9 +208,7 @@
                         <span>Add Faculty</span>
                     </button>
 
-                    <button onclick="seedSampleBenchmarkData()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl border border-slate-200 transition" title="Add Sample Submissions">
-                        <i class="fa-solid fa-flask text-amber-600 mr-1"></i> Add Sample Data
-                    </button>
+                    
                 </div>
             </div>
 
@@ -647,10 +645,7 @@
         // Init
         document.addEventListener('DOMContentLoaded', () => {
             initDropdowns();
-            // Seed sample benchmark responses if empty
-            if (getStoredResponses().length === 0) {
-                seedSampleBenchmarkData(false);
-            }
+            
             renderRosterTable();
         });
 
@@ -1072,58 +1067,7 @@
         }
 
         // Seed Sample Benchmark Data
-        function seedSampleBenchmarkData(showNotification = true) {
-            const sampleResponses = [];
-            const samplePool = MASTER_FACULTY_ROSTER.slice(0, 48); // Pick 48 faculty across departments
-
-            samplePool.forEach(f => {
-                const eff = {};
-                effItems.forEach(item => eff[item] = ["3 - Moderately Effective", "4 - Effective", "5 - Highly Effective"][Math.floor(Math.random()*3)]);
-
-                const obe = {};
-                obeItems.forEach(item => obe[item] = [3, 4, 5][Math.floor(Math.random()*3)]);
-
-                const struct = {};
-                structItems.forEach(item => struct[item] = ["3 - Adequate", "4 - Highly Adequate", "2 - Needs Improvement"][Math.floor(Math.random()*3)]);
-
-                sampleResponses.push({
-                    id: Date.now() + Math.random(),
-                    timestamp: "2026-10-07 18:30:00",
-                    department: f.department,
-                    faculty_name: f.name,
-                    faculty_email: f.email,
-                    course_level: ["UG", "PG", "Both"][Math.floor(Math.random()*3)],
-                    overall_effectiveness: eff,
-                    obe_evaluation: obe,
-                    curriculum_structure: struct,
-                    overlapping_courses: Math.random() > 0.8 ? "YES" : "NO",
-                    overlapping_details: Math.random() > 0.8 ? "Sem 3 core unit overlaps with advanced elective." : "",
-                    multidisciplinary_rating: Math.floor(Math.random()*2) + 4,
-                    flexible_learning_paths: ["Academic Flexibility", "Credit Transfer"],
-                    electives_rating: "Good",
-                    experiential_learning: {},
-                    digital_learning: {},
-                    research_orientation: ["Faculty-Mentored Projects", "Research Methodology"],
-                    nep_challenges: "",
-                    emerging_areas: ["Artificial Intelligence and Generative AI", "Data Science and Big Data Analytics", "Cybersecurity and Digital Privacy"],
-                    nsqf_alignment: "4",
-                    stakeholder_sources: ["Student", "Alumni", "Employer"],
-                    stakeholder_needs: {},
-                    iks_effectiveness: 4,
-                    iks_integration_modes: ["Selected units in existing courses"],
-                    courses_to_revise: "Introduce hands-on industry application modules."
-                });
-            });
-
-            localStorage.setItem("sjc_faculty_feedback_records_2025", JSON.stringify(sampleResponses));
-            if (showNotification) {
-                showToast("Added 48 sample faculty benchmark responses!");
-                renderRosterTable();
-                renderAnalyticsDashboard();
-            }
-        }
-
-        function showToast(message, type = 'success') {
+                function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             const bg = type === 'success' ? 'bg-emerald-700 text-white' : 'bg-rose-700 text-white';
