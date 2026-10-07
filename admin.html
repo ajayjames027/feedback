@@ -1475,12 +1475,13 @@
 
         function downloadSingleResponsePDF() {
             if (!activeModalResponse) return;
-            const printWin = window.open('', '', 'width=900,height=900');
+            const printWin = window.open('', '_blank');
             printWin.document.write(`
+                <!DOCTYPE html>
                 <html>
                 <head>
                     <title>Faculty Response - ${activeModalResponse.faculty_name}</title>
-                    <script src="https://cdn.tailwindcss.com"></script>
+                    <script src="https://cdn.tailwindcss.com"><\/script>
                     <style>
                         body { font-family: sans-serif; padding: 20px; }
                         @media print { body { padding: 0; } }
@@ -1503,8 +1504,13 @@
                         Designed & Developed by Internal Quality Assurance Cell - St. Joseph's College (Autonomous)
                     </div>
                     <script>
-                        setTimeout(() => { window.print(); window.close(); }, 500);
-                    </script>
+                        window.onload = function() {
+                            setTimeout(() => {
+                                window.print();
+                                window.close();
+                            }, 300);
+                        };
+                    <\/script>
                 </body>
                 </html>
             `);
