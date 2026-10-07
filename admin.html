@@ -196,7 +196,11 @@
                 </div>
 
                 <!-- Quick Action Buttons -->
-                <div class="flex flex-wrap items-center gap-3">
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <button onclick="copyWhatsAppDefaulters()" class="px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center space-x-1.5">
+                        <i class="fa-brands fa-whatsapp text-sm"></i>
+                        <span>Copy WhatsApp Defaulter Summary</span>
+                    </button>
                     <button onclick="copyPendingEmails()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-xl shadow-sm transition flex items-center space-x-1.5">
                         <i class="fa-solid fa-envelope"></i>
                         <span>Copy Pending Emails (<span id="btnPendingCount">--</span>)</span>
@@ -205,12 +209,10 @@
                         <i class="fa-solid fa-file-excel text-emerald-400"></i>
                         <span>Export Pending List</span>
                     </button>
-                    <button onclick="openAddFacultyModal()" class="px-4 py-2.5 bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center space-x-1.5 hover:shadow-md">
-                        <i class="fa-solid fa-user-plus"></i>
+                    <button onclick="openAddFacultyModal()" class="px-4 py-2.5 bg-blue-900 hover:bg-blue-950 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center space-x-1.5 hover:shadow-md">
+                        <i class="fa-solid fa-user-plus text-amber-400"></i>
                         <span>Add Faculty</span>
                     </button>
-
-                    
                 </div>
             </div>
 
@@ -480,6 +482,34 @@
                     <div class="h-80 relative"><canvas id="chartEmerging"></canvas></div>
                 </div>
             </div>
+
+            <!-- In-Depth School-Wise & Curricular Overlap Insights -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-graduation-cap text-blue-900"></i> School-Wise Submission & Attainment Breakdown
+                        </h3>
+                        <span class="text-xs font-bold text-blue-900 bg-blue-50 px-2.5 py-1 rounded-full">6 Schools</span>
+                    </div>
+                    <div class="space-y-3" id="schoolAnalyticsList">
+                        <!-- Rendered via JS -->
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-copy text-rose-600"></i> Content Overlap & Redundancy Audit
+                        </h3>
+                        <span class="text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-1 rounded-full" id="anaOverlapBadge">0 Issues Logged</span>
+                    </div>
+                    <p class="text-xs text-slate-500">Summary of departments reporting repetitive course content across semesters or inter-departmental offerings:</p>
+                    <div class="max-h-72 overflow-y-auto space-y-2 pr-1" id="overlapAuditList">
+                        <!-- Rendered via JS -->
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- ==================== TAB 3: RESPONSES RECORD EXPLORER ==================== -->
@@ -507,11 +537,15 @@
                             <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
                                 <th class="p-3.5">ID</th>
                                 <th class="p-3.5">Timestamp</th>
+                                <th class="p-3.5">School</th>
                                 <th class="p-3.5">Department</th>
                                 <th class="p-3.5">Faculty Name</th>
                                 <th class="p-3.5">Level</th>
                                 <th class="p-3.5">Multidisciplinary</th>
-                                <th class="p-3.5">Overlaps</th>
+                                <th class="p-3.5 flex items-center gap-1">
+                                    <span>Overlaps</span>
+                                    <i class="fa-solid fa-circle-info text-slate-400 text-xs cursor-pointer" title="Indicates whether the faculty reported redundant syllabus content overlapping with other departments or school courses."></i>
+                                </th>
                                 <th class="p-3.5 text-right">Actions</th>
                             </tr>
                         </thead>
@@ -637,6 +671,25 @@
 
         let currentRosterStatus = 'ALL';
         let chartInstances = {};
+
+        const DEPARTMENT_SCHOOL_MAP = {
+            "Biological Sciences": ["Biochemistry", "Biotechnology", "Botany", "Environmental Sciences", "Phytochemistry", "Zoology"],
+            "Computing Sciences": ["Computer Science", "Data Science", "Information Technology", "Software Development"],
+            "Humanities": ["English", "French", "History", "Tamil", "Hindi"],
+            "Management Studies": ["Commerce", "Commerce CA", "Commerce CS", "Commerce Honours", "Management Studies", "BBA", "Corporate Secretaryship"],
+            "Physical Sciences": ["Chemistry", "Electronics", "Mathematics", "Physics", "Statistics"],
+            "Social Sciences": ["Economics", "Human Resource Management", "Psychology", "Social Work", "Counselling Psy", "Sociology"]
+        };
+
+        function getSchoolForDepartment(dept) {
+            if (!dept) return "School of General Sciences";
+            for (const [school, depts] of Object.entries(DEPARTMENT_SCHOOL_MAP)) {
+                if (depts.some(d => d.toLowerCase() === dept.toLowerCase())) {
+                    return "School of " + school;
+                }
+            }
+            return "School of Arts & Sciences";
+        }
 
         const effItems = [
             'Academically relevant', 'Meets current industry needs', 'Creates employability opportunities',
@@ -860,6 +913,49 @@
             }
         }
 
+        function copyWhatsAppDefaulters() {
+            const responses = getStoredResponses();
+            const submittedEmails = new Set(responses.map(r => (r.faculty_email || '').toLowerCase()).filter(Boolean));
+            const submittedNames = new Set(responses.map(r => `${(r.faculty_name||'').toLowerCase()}___${(r.department||'').toLowerCase()}`));
+
+            const pendingByDept = {};
+            MASTER_FACULTY_ROSTER.forEach(f => {
+                const isSubmitted = submittedEmails.has((f.email || '').toLowerCase()) || submittedNames.has(`${f.name.toLowerCase()}___${f.department.toLowerCase()}`);
+                if (!isSubmitted) {
+                    if (!pendingByDept[f.department]) pendingByDept[f.department] = [];
+                    pendingByDept[f.department].push(f.name);
+                }
+            });
+
+            const depts = Object.keys(pendingByDept).sort();
+            if (depts.length === 0) {
+                showToast("Great news! 100% submission achieved across all departments.", "success");
+                return;
+            }
+
+            let msg = `*IQAC FACULTY FEEDBACK 2025–26: PENDING DEFAULTER SUMMARY*\n`;
+            msg += `*St. Joseph's College (Autonomous), Tiruchirappalli*\n`;
+            msg += `--------------------------------------------------\n\n`;
+
+            depts.forEach(d => {
+                const school = getSchoolForDepartment(d);
+                const list = pendingByDept[d];
+                msg += `📌 *${d}* (${school})\n`;
+                msg += `Pending Count: ${list.length}\n`;
+                list.forEach((name, i) => {
+                    msg += `  ${i+1}. ${name}\n`;
+                });
+                msg += `\n`;
+            });
+
+            msg += `--------------------------------------------------\n`;
+            msg += `Kindly complete the feedback survey on priority: https://ajayjames027.github.io/feedback/\n`;
+            msg += `- IQAC & CDC Team`;
+
+            navigator.clipboard.writeText(msg);
+            showToast("WhatsApp Defaulter Summary copied to clipboard!", "success");
+        }
+
         function copyPendingEmails() {
             const responses = getStoredResponses();
             const submittedEmails = new Set(responses.map(r => (r.faculty_email || '').toLowerCase()).filter(Boolean));
@@ -886,9 +982,9 @@
 
             const pendingList = MASTER_FACULTY_ROSTER.filter(f => !submittedEmails.has((f.email||'').toLowerCase()) && !submittedNames.has(`${f.name.toLowerCase()}___${f.department.toLowerCase()}`));
 
-            let csv = "S.No,Department,Faculty Name,Designation,Shift,Email Address,Status\n";
+            let csv = "S.No,School,Department,Faculty Name,Designation,Shift,Email Address,Status\n";
             pendingList.forEach(f => {
-                csv += `"${f.s_no}","${f.department}","${f.name}","${f.designation}","${f.shift}","${f.email}","PENDING"\n`;
+                csv += `"${f.s_no}","${getSchoolForDepartment(f.department)}","${f.department}","${f.name}","${f.designation}","${f.shift}","${f.email}","PENDING"\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -1042,6 +1138,55 @@
                     scales: { x: { min: 0, max: 100, ticks: { callback: v => v + '%' } } }
                 }
             });
+
+            // 5. Populate School Analytics List
+            const schoolStats = {};
+            Object.keys(DEPARTMENT_SCHOOL_MAP).forEach(s => {
+                schoolStats["School of " + s] = { count: 0, depts: new Set() };
+            });
+            responses.forEach(r => {
+                const sName = getSchoolForDepartment(r.department);
+                if (!schoolStats[sName]) schoolStats[sName] = { count: 0, depts: new Set() };
+                schoolStats[sName].count++;
+                if (r.department) schoolStats[sName].depts.add(r.department);
+            });
+
+            const schoolContainer = document.getElementById('schoolAnalyticsList');
+            if (schoolContainer) {
+                schoolContainer.innerHTML = Object.entries(schoolStats).map(([sName, stat]) => `
+                    <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                        <div>
+                            <div class="font-bold text-xs text-slate-900">${sName}</div>
+                            <div class="text-[11px] text-slate-500">${stat.depts.size} active departments responding</div>
+                        </div>
+                        <div class="text-right">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-black ${stat.count > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}">${stat.count} Responses</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // 6. Populate Overlap & Redundancy Audit Log
+            const overlapList = responses.filter(r => r.overlapping_courses === 'YES' || (r.overlapping_details && r.overlapping_details.trim().length > 0));
+            const overlapBadge = document.getElementById('anaOverlapBadge');
+            if (overlapBadge) overlapBadge.innerText = `${overlapList.length} Issues Logged`;
+
+            const overlapContainer = document.getElementById('overlapAuditList');
+            if (overlapContainer) {
+                if (overlapList.length === 0) {
+                    overlapContainer.innerHTML = `<div class="p-4 text-center text-xs text-slate-400 font-medium">No course overlaps reported in the current selection.</div>`;
+                } else {
+                    overlapContainer.innerHTML = overlapList.map(r => `
+                        <div class="p-3 rounded-2xl bg-rose-50/60 border border-rose-200 space-y-1">
+                            <div class="flex items-center justify-between text-xs font-bold text-rose-900">
+                                <span>${r.department || 'Department'} • ${r.faculty_name}</span>
+                                <span class="px-2 py-0.5 rounded text-[10px] bg-rose-200 text-rose-900">${getSchoolForDepartment(r.department)}</span>
+                            </div>
+                            <p class="text-xs text-slate-700 leading-relaxed font-medium">${r.overlapping_details || 'Flagged as overlapping course content.'}</p>
+                        </div>
+                    `).join('');
+                }
+            }
         }
 
         // Responses Explorer Table
@@ -1057,6 +1202,7 @@
                 <tr class="hover:bg-slate-50/80 transition">
                     <td class="p-3.5 font-mono text-xs text-slate-400">#${i + 1}</td>
                     <td class="p-3.5 text-xs text-slate-500">${r.timestamp ? new Date(r.timestamp).toLocaleDateString() : '-'}</td>
+                    <td class="p-3.5 text-xs font-bold text-indigo-700 bg-indigo-50/50 rounded-lg">${getSchoolForDepartment(r.department)}</td>
                     <td class="p-3.5 font-semibold text-slate-900">${r.department || '-'}</td>
                     <td class="p-3.5 text-slate-700 font-medium">${r.faculty_name || '-'}</td>
                     <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700">${r.course_level || 'UG'}</span></td>
@@ -1148,9 +1294,9 @@
         function exportAllResponsesCSV() {
             const list = getStoredResponses();
             if (list.length === 0) { showToast("No responses to export"); return; }
-            let csv = "ID,Timestamp,Department,Faculty Name,Email,Level,Multidisciplinary,Overlaps,Overlapping Details,Revisions\n";
+            let csv = "ID,Timestamp,School,Department,Faculty Name,Email,Level,Multidisciplinary,Overlaps,Overlapping Details,Revisions\n";
             list.forEach((r, i) => {
-                csv += `"${i+1}","${r.timestamp}","${r.department}","${r.faculty_name}","${r.faculty_email}","${r.course_level}","${r.multidisciplinary_rating}","${r.overlapping_courses}","${r.overlapping_details||''}","${r.courses_to_revise||''}"\n`;
+                csv += `"${i+1}","${r.timestamp}","${getSchoolForDepartment(r.department)}","${r.department}","${r.faculty_name}","${r.faculty_email}","${r.course_level}","${r.multidisciplinary_rating}","${r.overlapping_courses}","${r.overlapping_details||''}","${r.courses_to_revise||''}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
