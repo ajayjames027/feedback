@@ -137,12 +137,15 @@
                 <div class="flex items-center space-x-4">
                     <img src="sjc-logo-small (1).png" alt="St. Joseph's College Logo" class="w-12 h-14 object-contain">
                     <div>
-                        <div class="font-bold text-sm tracking-tight text-blue-950 font-serif flex items-center space-x-2">
+                        <div class="font-bold text-sm tracking-tight text-blue-950 font-serif flex items-center gap-2">
                             <span>INTERNAL QUALITY ASSURANCE CELL (IQAC)</span>
-                            <span class="px-2 py-0.5 rounded bg-blue-100 text-blue-900 text-[10px] font-extrabold uppercase border border-blue-200">Admin Portal</span>
+                            <span class="px-2 py-0.5 rounded bg-blue-100 text-blue-900 text-[10px] font-extrabold uppercase tracking-wide border border-blue-200">Admin Portal</span>
                         </div>
-                        <div class="text-xs font-semibold text-amber-800">St. Joseph’s College (Autonomous), Tiruchirappalli</div>
-                        <div class="text-[11px] text-slate-500 font-medium">Teacher Feedback on Curricular Revision 2025–26</div>
+                        <div class="text-xs font-semibold text-slate-600 flex items-center gap-2">
+                            <span>St. Joseph’s College (Autonomous), Tiruchirappalli</span>
+                            <span class="text-slate-300">•</span>
+                            <span class="text-slate-500 font-medium">Teacher Feedback 2025–26</span>
+                        </div>
                     </div>
                 </div>
 
@@ -677,19 +680,20 @@
         let chartInstances = {};
 
         const DEPARTMENT_SCHOOL_MAP = {
-            "Biological Sciences": ["Biochemistry", "Biotechnology", "Botany", "Environmental Sciences", "Phytochemistry", "Zoology"],
-            "Computing Sciences": ["Computer Science", "Data Science", "Information Technology", "Software Development"],
-            "Humanities": ["English", "French", "History", "Tamil", "Hindi"],
-            "Management Studies": ["Commerce", "Commerce CA", "Commerce CS", "Commerce Honours", "Management Studies", "BBA", "Corporate Secretaryship"],
-            "Physical Sciences": ["Chemistry", "Electronics", "Mathematics", "Physics", "Statistics"],
-            "Social Sciences": ["Economics", "Human Resource Management", "Psychology", "Social Work", "Counselling Psy", "Sociology"]
+            "Biological Sciences (SBS)": ["Biochemistry", "Biotechnology", "Botany"],
+            "Computing Sciences (SCS)": ["Computer Science", "Data Science", "Information Technology", "Software Development"],
+            "Languages & Culture (SLC)": ["English", "French", "Hindi", "History", "Sanskrit", "Tamil"],
+            "Management Studies (SMS)": ["BBA", "Counselling Psy", "Economics", "HRM", "Physical Education", "Visual Communication"],
+            "Physical Sciences (SPS)": ["Chemistry", "Electronics", "Mathematics", "Physics", "Statistics"],
+            "Commerce & Optionals (SCO)": ["Commerce", "Commerce Business Analytics", "Commerce CA"],
+            "Interdisciplinary / Others": ["Human Excellence"]
         };
 
         function getSchoolForDepartment(dept) {
-            if (!dept) return "School of General Sciences";
+            if (!dept) return "General";
             for (const [school, depts] of Object.entries(DEPARTMENT_SCHOOL_MAP)) {
-                if (depts.some(d => d.toLowerCase() === dept.toLowerCase())) {
-                    return "School of " + school;
+                if (depts.some(d => d.toLowerCase() === dept.toLowerCase() || dept.toLowerCase().includes(d.toLowerCase()))) {
+                    return school;
                 }
             }
             return "School of Arts & Sciences";
