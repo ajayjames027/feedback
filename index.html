@@ -11,6 +11,11 @@
             theme: {
                 extend: {
                     colors: {
+                        gform: { purple: "#5746e3", terracotta: "#6366f1", bg: "#f0ebf8", card: "#ffffff", border: "#dadce0", accent: "#6366f1" }
+                    }
+                }
+                extend: {
+                    colors: {
                         gform: {
                             purple: '#5746e3',
                             terracotta: '#af4c10',
@@ -34,16 +39,49 @@
             font-family: 'Roboto', 'Google Sans', sans-serif;
             background-color: #f7ede7;
         }
+        /* Modern form card styles */
         .gform-card {
             background: #ffffff;
-            border-radius: 8px;
-            border: 1px solid #dadce0;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
             transition: all 0.2s ease;
+            position: relative;
         }
         .gform-card:focus-within {
-            border-color: #af4c10;
-            box-shadow: 0 1px 3px 0 rgba(175, 76, 16, 0.2);
+            border-color: #6366f1;
+            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.1), 0 2px 4px -1px rgba(99, 102, 241, 0.06);
         }
+        .gform-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: transparent;
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+            transition: background-color 0.2s ease;
+        }
+        .gform-card:focus-within::before {
+            background-color: #6366f1;
+        }
+        .stepper-active .stepper-icon {
+            background-color: #4f46e5;
+            color: white;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+        .stepper-active .stepper-text {
+            color: #4f46e5;
+        }
+        .stepper-completed .stepper-icon {
+            background-color: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+        .hidden { display: none !important; }
         .matrix-row:hover {
             background-color: #fff9f5;
         }
@@ -61,49 +99,81 @@
 
     <div class="max-w-3xl mx-auto space-y-4" id="mainContainer">
         
-        <!-- Google Form Style Top Header Card -->
-        <div class="gform-card overflow-hidden shadow-sm border-t-8 border-t-[#af4c10]">
-            <!-- Header Image / Accent Top Banner -->
-            <div class="h-32 md:h-40 bg-gradient-to-r from-[#af4c10] via-[#c45a17] to-[#5746e3] relative flex items-end p-6">
-                <div class="absolute inset-0 bg-black/10"></div>
-                <div class="relative z-10 text-white flex items-center space-x-3">
-                    <div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white text-2xl border border-white/30 shadow-inner">
-                        <i class="fa-solid fa-graduation-cap"></i>
-                    </div>
-                    <div>
-                        <div class="text-xs uppercase tracking-widest text-amber-200 font-bold">St. Joseph's College (Autonomous) • IQAC & CDC</div>
-                        <div class="text-sm font-medium text-white/90">Curriculum Feedback Portal</div>
-                    </div>
+        
+        <!-- Modern Header -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
+            <div class="h-2 relative bg-indigo-600"></div>
+            <div class="p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <div class="text-xs font-bold text-indigo-600 tracking-wider uppercase mb-1">St. Joseph's College • IQAC</div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
+                        Curriculum Feedback 2025-26
+                    </h1>
+                    <p class="text-slate-500 text-sm mt-2 max-w-2xl">
+                        Kindly provide your valuable feedback based on the syllabus revision 2025 for both UG & PG.
+                    </p>
                 </div>
-            </div>
-
-            <!-- Title & Description Block -->
-            <div class="p-6 md:p-8 space-y-3">
-                <h1 class="text-2xl md:text-3xl font-normal text-[#202124] tracking-tight leading-snug">
-                    TEACHER FEEDBACK ON CURRICULAR DESIGN AND DEVELOPMENT: 2025-26
-                </h1>
-                
-                <div class="text-sm text-[#3c4043] leading-relaxed space-y-2 pt-2 border-t border-slate-100">
-                    <p>Dear Professor,</p>
-                    <p>Kindly provide your valuable feedback based on the syllabus revision 2025 for both UG & PG. Your valuable feedback and suggestions will help the Institution in strengthening and improving the next curriculum revision.</p>
-                </div>
-
-                <div class="pt-3 border-t border-slate-200 flex items-center justify-between text-xs text-[#d93025] font-medium">
-                    <span>* Indicates required question</span>
-                    <span class="text-slate-400 font-normal text-[11px]"><i class="fa-solid fa-lock mr-1"></i>Secure Faculty Form</span>
+                <div class="flex-shrink-0 flex items-center justify-center w-16 h-16 bg-indigo-50 text-indigo-600 rounded-full border border-indigo-100 shadow-inner">
+                    <i class="fa-solid fa-graduation-cap text-2xl"></i>
                 </div>
             </div>
         </div>
+        
+        <!-- Modern Stepper UI -->
+        <div class="bg-white rounded-lg p-4 shadow-sm border border-slate-200 mb-6 flex items-center justify-between overflow-x-auto gap-4" id="stepperNav">
 
-        <!-- Feedback Form View -->
-        <form id="facultyForm" onsubmit="submitFacultyFeedback(event)" class="space-y-4">
-            
-            <!-- Question 1: Department -->
+            <div class="flex items-center space-x-2 stepper-item" id="stepper-1">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-slate-100 text-slate-400 border border-slate-200 stepper-icon transition-all duration-300">
+                    1
+                </div>
+                <span class="text-xs font-semibold text-slate-500 whitespace-nowrap stepper-text transition-all duration-300">Basic Profile</span>
+            </div>
+
+            <div class="flex items-center space-x-2 stepper-item" id="stepper-2">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-slate-100 text-slate-400 border border-slate-200 stepper-icon transition-all duration-300">
+                    2
+                </div>
+                <span class="text-xs font-semibold text-slate-500 whitespace-nowrap stepper-text transition-all duration-300">Effectiveness & OBE</span>
+            </div>
+
+            <div class="flex items-center space-x-2 stepper-item" id="stepper-3">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-slate-100 text-slate-400 border border-slate-200 stepper-icon transition-all duration-300">
+                    3
+                </div>
+                <span class="text-xs font-semibold text-slate-500 whitespace-nowrap stepper-text transition-all duration-300">Learning Paths</span>
+            </div>
+
+            <div class="flex items-center space-x-2 stepper-item" id="stepper-4">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-slate-100 text-slate-400 border border-slate-200 stepper-icon transition-all duration-300">
+                    4
+                </div>
+                <span class="text-xs font-semibold text-slate-500 whitespace-nowrap stepper-text transition-all duration-300">Exp & Digital Learning</span>
+            </div>
+
+            <div class="flex items-center space-x-2 stepper-item" id="stepper-5">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-slate-100 text-slate-400 border border-slate-200 stepper-icon transition-all duration-300">
+                    5
+                </div>
+                <span class="text-xs font-semibold text-slate-500 whitespace-nowrap stepper-text transition-all duration-300">Modern Integration</span>
+            </div>
+
+            <div class="flex items-center space-x-2 stepper-item" id="stepper-6">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-slate-100 text-slate-400 border border-slate-200 stepper-icon transition-all duration-300">
+                    6
+                </div>
+                <span class="text-xs font-semibold text-slate-500 whitespace-nowrap stepper-text transition-all duration-300">Knowledge Systems</span>
+            </div>
+        </div>
+
+<!-- Feedback Form View -->
+        <form id="facultyForm" onsubmit="submitFacultyFeedback(event)" class="space-y-4">            <div class="form-section " id="form-section-1" data-step="1">
+                <div class="text-lg font-bold text-slate-800 mb-4 px-2">Basic Profile</div>
+<!-- Question 1: Department -->
             <div class="gform-card p-6 space-y-3" id="card-dept">
                 <label class="block text-base font-normal text-[#202124]">
                     Department <span class="required-star">*</span>
                 </label>
-                <select name="department" id="deptSelect" required onchange="onDepartmentChange()" class="w-full px-3.5 py-2.5 rounded border border-[#dadce0] bg-white text-sm text-[#202124] focus:outline-none focus:border-[#af4c10] focus:ring-1 focus:ring-[#af4c10] transition">
+                <select name="department" id="deptSelect" required onchange="onDepartmentChange()" class="w-full px-3.5 py-2.5 rounded border border-[#dadce0] bg-white text-sm text-[#202124] focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition">
                     <option value="" disabled selected>Choose Department</option>
                 </select>
             </div>
@@ -114,7 +184,7 @@
                     Name of the Teaching Staff <span class="required-star">*</span>
                 </label>
                 <div class="space-y-2">
-                    <select name="faculty_name_select" id="facultyNameSelect" required onchange="onFacultySelectChange()" class="w-full px-3.5 py-2.5 rounded border border-[#dadce0] bg-white text-sm text-[#202124] focus:outline-none focus:border-[#af4c10] focus:ring-1 focus:ring-[#af4c10] transition">
+                    <select name="faculty_name_select" id="facultyNameSelect" required onchange="onFacultySelectChange()" class="w-full px-3.5 py-2.5 rounded border border-[#dadce0] bg-white text-sm text-[#202124] focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition">
                         <option value="" disabled selected>-- Select department first --</option>
                     </select>
                     <div id="facultyMetaBadge" class="hidden text-xs bg-slate-50 text-slate-700 p-2.5 rounded border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
@@ -133,21 +203,28 @@
                 </label>
                 <div class="space-y-2.5 text-sm text-[#202124]">
                     <label class="flex items-center space-x-3 cursor-pointer py-1">
-                        <input type="radio" name="course_level" value="UG" required class="w-4 h-4 text-[#af4c10]">
+                        <input type="radio" name="course_level" value="UG" required class="w-4 h-4 text-indigo-600">
                         <span>UG</span>
                     </label>
                     <label class="flex items-center space-x-3 cursor-pointer py-1">
-                        <input type="radio" name="course_level" value="PG" class="w-4 h-4 text-[#af4c10]">
+                        <input type="radio" name="course_level" value="PG" class="w-4 h-4 text-indigo-600">
                         <span>PG</span>
                     </label>
                     <label class="flex items-center space-x-3 cursor-pointer py-1">
-                        <input type="radio" name="course_level" value="Both" class="w-4 h-4 text-[#af4c10]">
+                        <input type="radio" name="course_level" value="Both" class="w-4 h-4 text-indigo-600">
                         <span>Both</span>
                     </label>
                 </div>
             </div>
 
-            <!-- Question 4 & 5: Overall Effectiveness (Header + Grid) -->
+                            <div class="flex items-center justify-between pt-6 pb-4 px-2 border-t border-slate-100 mt-4">
+                    <div></div>
+                    <button type="button" onclick="nextStep(1)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded shadow-sm transition">Next Step</button>
+                </div>
+            </div>
+            <div class="form-section hidden" id="form-section-2" data-step="2">
+                <div class="text-lg font-bold text-slate-800 mb-4 px-2">Effectiveness & OBE</div>
+<!-- Question 4 & 5: Overall Effectiveness (Header + Grid) -->
             <div class="gform-card p-6 space-y-4" id="card-eff">
                 <div>
                     <h2 class="text-base font-normal text-[#202124]">
@@ -237,22 +314,29 @@
                 </div>
             </div>
 
-            <!-- Question 10 & 11: Overlapping Courses -->
+                            <div class="flex items-center justify-between pt-6 pb-4 px-2 border-t border-slate-100 mt-4">
+                    <button type="button" onclick="prevStep(2)" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded shadow-sm transition">Back</button>
+                    <button type="button" onclick="nextStep(2)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded shadow-sm transition">Next Step</button>
+                </div>
+            </div>
+            <div class="form-section hidden" id="form-section-3" data-step="3">
+                <div class="text-lg font-bold text-slate-800 mb-4 px-2">Learning Paths</div>
+<!-- Question 10 & 11: Overlapping Courses -->
             <div class="gform-card p-6 space-y-4" id="card-overlap">
                 <label class="block text-base font-normal text-[#202124]">
                     Are there any courses or units that are repeated, overlapping, outdated, or unnecessarily detailed across semesters? <span class="required-star">*</span>
                 </label>
                 <div class="space-y-2.5 text-sm text-[#202124]">
                     <label class="flex items-center space-x-3 cursor-pointer py-1">
-                        <input type="radio" name="overlapping_courses" value="YES" required onchange="document.getElementById('overlapTextBox').classList.remove('hidden')" class="w-4 h-4 text-[#af4c10]">
+                        <input type="radio" name="overlapping_courses" value="YES" required onchange="document.getElementById('overlapTextBox').classList.remove('hidden')" class="w-4 h-4 text-indigo-600">
                         <span>YES</span>
                     </label>
                     <label class="flex items-center space-x-3 cursor-pointer py-1">
-                        <input type="radio" name="overlapping_courses" value="NO" onchange="document.getElementById('overlapTextBox').classList.add('hidden')" class="w-4 h-4 text-[#af4c10]">
+                        <input type="radio" name="overlapping_courses" value="NO" onchange="document.getElementById('overlapTextBox').classList.add('hidden')" class="w-4 h-4 text-indigo-600">
                         <span>NO</span>
                     </label>
                     <label class="flex items-center space-x-3 cursor-pointer py-1">
-                        <input type="radio" name="overlapping_courses" value="NOT SURE" onchange="document.getElementById('overlapTextBox').classList.add('hidden')" class="w-4 h-4 text-[#af4c10]">
+                        <input type="radio" name="overlapping_courses" value="NOT SURE" onchange="document.getElementById('overlapTextBox').classList.add('hidden')" class="w-4 h-4 text-indigo-600">
                         <span>NOT SURE</span>
                     </label>
                 </div>
@@ -261,7 +345,7 @@
                     <label class="block text-xs font-medium text-slate-700 mb-1">
                         If Yes, please provide details (semester, course title, unit, specific recommendation):
                     </label>
-                    <textarea name="overlapping_details" rows="3" placeholder="Your answer" class="w-full px-3 py-2 border-b-2 border-slate-300 focus:border-[#af4c10] outline-none text-sm bg-transparent"></textarea>
+                    <textarea name="overlapping_details" rows="3" placeholder="Your answer" class="w-full px-3 py-2 border-b-2 border-slate-300 focus:border-indigo-600 outline-none text-sm bg-transparent"></textarea>
                 </div>
             </div>
 
@@ -289,11 +373,11 @@
                     Flexible Learning Path: Current curriculum supports (Select all that apply): <span class="required-star">*</span>
                 </label>
                 <div class="space-y-2.5 text-sm text-[#202124]">
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="flexible_learning_paths" value="MEME" class="w-4 h-4 rounded text-[#af4c10]"><span>MEME</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="flexible_learning_paths" value="Academic Flexibility" class="w-4 h-4 rounded text-[#af4c10]"><span>Academic Flexibility</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="flexible_learning_paths" value="Credit Transfer" class="w-4 h-4 rounded text-[#af4c10]"><span>Credit Transfer</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="flexible_learning_paths" value="Recognition of Credits earned through MOOCs" class="w-4 h-4 rounded text-[#af4c10]"><span>Recognition of Credits earned through MOOCs</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="flexible_learning_paths" value="None" class="w-4 h-4 rounded text-[#af4c10]"><span>None</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="flexible_learning_paths" value="MEME" class="w-4 h-4 rounded text-indigo-600"><span>MEME</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="flexible_learning_paths" value="Academic Flexibility" class="w-4 h-4 rounded text-indigo-600"><span>Academic Flexibility</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="flexible_learning_paths" value="Credit Transfer" class="w-4 h-4 rounded text-indigo-600"><span>Credit Transfer</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="flexible_learning_paths" value="Recognition of Credits earned through MOOCs" class="w-4 h-4 rounded text-indigo-600"><span>Recognition of Credits earned through MOOCs</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="flexible_learning_paths" value="None" class="w-4 h-4 rounded text-indigo-600"><span>None</span></label>
                 </div>
             </div>
 
@@ -303,14 +387,21 @@
                     Choice Based Learning: How do you rate the electives? <span class="required-star">*</span>
                 </label>
                 <div class="space-y-2.5 text-sm text-[#202124]">
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="radio" name="electives_rating" value="Very Good" required class="w-4 h-4 text-[#af4c10]"><span>Very Good</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="radio" name="electives_rating" value="Good" class="w-4 h-4 text-[#af4c10]"><span>Good</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="radio" name="electives_rating" value="Adequate" class="w-4 h-4 text-[#af4c10]"><span>Adequate</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="radio" name="electives_rating" value="Poor" class="w-4 h-4 text-[#af4c10]"><span>Poor</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="radio" name="electives_rating" value="Very Good" required class="w-4 h-4 text-indigo-600"><span>Very Good</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="radio" name="electives_rating" value="Good" class="w-4 h-4 text-indigo-600"><span>Good</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="radio" name="electives_rating" value="Adequate" class="w-4 h-4 text-indigo-600"><span>Adequate</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="radio" name="electives_rating" value="Poor" class="w-4 h-4 text-indigo-600"><span>Poor</span></label>
                 </div>
             </div>
 
-            <!-- Question 16: Experiential Learning Grid -->
+                            <div class="flex items-center justify-between pt-6 pb-4 px-2 border-t border-slate-100 mt-4">
+                    <button type="button" onclick="prevStep(3)" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded shadow-sm transition">Back</button>
+                    <button type="button" onclick="nextStep(3)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded shadow-sm transition">Next Step</button>
+                </div>
+            </div>
+            <div class="form-section hidden" id="form-section-4" data-step="4">
+                <div class="text-lg font-bold text-slate-800 mb-4 px-2">Exp & Digital Learning</div>
+<!-- Question 16: Experiential Learning Grid -->
             <div class="gform-card p-6 space-y-4" id="card-exp">
                 <div>
                     <h2 class="text-base font-normal text-[#202124]">
@@ -368,20 +459,27 @@
                     Research Orientation: Students are encouraged through (Select all that apply): <span class="required-star">*</span>
                 </label>
                 <div class="space-y-2.5 text-sm text-[#202124]">
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="research_orientation" value="Faculty-Mentored Projects" class="w-4 h-4 rounded text-[#af4c10]"><span>Faculty-Mentored Projects</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="research_orientation" value="Research Methodology" class="w-4 h-4 rounded text-[#af4c10]"><span>Research Methodology</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="research_orientation" value="Publications" class="w-4 h-4 rounded text-[#af4c10]"><span>Publications</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="research_orientation" value="Patent Awareness" class="w-4 h-4 rounded text-[#af4c10]"><span>Patent Awareness</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="research_orientation" value="Design Thinking" class="w-4 h-4 rounded text-[#af4c10]"><span>Design Thinking</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="research_orientation" value="Faculty-Mentored Projects" class="w-4 h-4 rounded text-indigo-600"><span>Faculty-Mentored Projects</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="research_orientation" value="Research Methodology" class="w-4 h-4 rounded text-indigo-600"><span>Research Methodology</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="research_orientation" value="Publications" class="w-4 h-4 rounded text-indigo-600"><span>Publications</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="research_orientation" value="Patent Awareness" class="w-4 h-4 rounded text-indigo-600"><span>Patent Awareness</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="research_orientation" value="Design Thinking" class="w-4 h-4 rounded text-indigo-600"><span>Design Thinking</span></label>
                 </div>
             </div>
 
-            <!-- Question 19: NEP Challenges -->
+                            <div class="flex items-center justify-between pt-6 pb-4 px-2 border-t border-slate-100 mt-4">
+                    <button type="button" onclick="prevStep(4)" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded shadow-sm transition">Back</button>
+                    <button type="button" onclick="nextStep(4)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded shadow-sm transition">Next Step</button>
+                </div>
+            </div>
+            <div class="form-section hidden" id="form-section-5" data-step="5">
+                <div class="text-lg font-bold text-slate-800 mb-4 px-2">Modern Integration</div>
+<!-- Question 19: NEP Challenges -->
             <div class="gform-card p-6 space-y-3">
                 <label class="block text-base font-normal text-[#202124]">
                     What are the major challenges faced in implementing NEP-related curricular components in your programme?
                 </label>
-                <textarea name="nep_challenges" rows="3" placeholder="Your answer" class="w-full px-3 py-2 border-b-2 border-slate-300 focus:border-[#af4c10] outline-none text-sm bg-transparent"></textarea>
+                <textarea name="nep_challenges" rows="3" placeholder="Your answer" class="w-full px-3 py-2 border-b-2 border-slate-300 focus:border-indigo-600 outline-none text-sm bg-transparent"></textarea>
             </div>
 
             <!-- Question 21: Emerging Areas -->
@@ -393,7 +491,7 @@
                     <!-- Populated dynamically via JS -->
                 </div>
                 <div class="pt-2">
-                    <input type="text" name="emerging_other" placeholder="Other:" class="w-full px-3 py-1.5 border-b border-slate-300 focus:border-[#af4c10] outline-none text-sm bg-transparent">
+                    <input type="text" name="emerging_other" placeholder="Other:" class="w-full px-3 py-1.5 border-b border-slate-300 focus:border-indigo-600 outline-none text-sm bg-transparent">
                 </div>
             </div>
 
@@ -417,7 +515,7 @@
                 <label class="block text-base font-normal text-[#202124]">
                     Which courses could be redesigned as NSQF-aligned courses?
                 </label>
-                <input type="text" name="nsqf_courses" placeholder="Your answer" class="w-full px-3 py-2 border-b-2 border-slate-300 focus:border-[#af4c10] outline-none text-sm bg-transparent">
+                <input type="text" name="nsqf_courses" placeholder="Your answer" class="w-full px-3 py-2 border-b-2 border-slate-300 focus:border-indigo-600 outline-none text-sm bg-transparent">
             </div>
 
             <!-- Question 26: Stakeholder Sources -->
@@ -426,16 +524,23 @@
                     What sources of stakeholder feedback does your department take before revision? (Select all that apply) <span class="required-star">*</span>
                 </label>
                 <div class="space-y-2.5 text-sm text-[#202124]">
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Student" class="w-4 h-4 rounded text-[#af4c10]"><span>Student</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Alumni" class="w-4 h-4 rounded text-[#af4c10]"><span>Alumni</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Employer" class="w-4 h-4 rounded text-[#af4c10]"><span>Employer</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Industry expert consultations" class="w-4 h-4 rounded text-[#af4c10]"><span>Industry expert consultations</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Board of Studies discussions" class="w-4 h-4 rounded text-[#af4c10]"><span>Board of Studies discussions</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Other" class="w-4 h-4 rounded text-[#af4c10]"><span>Other</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Student" class="w-4 h-4 rounded text-indigo-600"><span>Student</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Alumni" class="w-4 h-4 rounded text-indigo-600"><span>Alumni</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Employer" class="w-4 h-4 rounded text-indigo-600"><span>Employer</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Industry expert consultations" class="w-4 h-4 rounded text-indigo-600"><span>Industry expert consultations</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Board of Studies discussions" class="w-4 h-4 rounded text-indigo-600"><span>Board of Studies discussions</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Other" class="w-4 h-4 rounded text-indigo-600"><span>Other</span></label>
                 </div>
             </div>
 
-            <!-- Question 27: Stakeholder Needs Matrix -->
+                            <div class="flex items-center justify-between pt-6 pb-4 px-2 border-t border-slate-100 mt-4">
+                    <button type="button" onclick="prevStep(5)" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded shadow-sm transition">Back</button>
+                    <button type="button" onclick="nextStep(5)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded shadow-sm transition">Next Step</button>
+                </div>
+            </div>
+            <div class="form-section hidden" id="form-section-6" data-step="6">
+                <div class="text-lg font-bold text-slate-800 mb-4 px-2">Knowledge Systems</div>
+<!-- Question 27: Stakeholder Needs Matrix -->
             <div class="gform-card p-6 space-y-4" id="card-stakeholder-grid">
                 <div>
                     <h2 class="text-base font-normal text-[#202124]">
@@ -486,13 +591,13 @@
                     How should IKS be integrated into Curriculum? (Select all that apply) <span class="required-star">*</span>
                 </label>
                 <div class="space-y-2.5 text-sm text-[#202124]">
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="iks_integration_modes" value="Dedicated courses" class="w-4 h-4 rounded text-[#af4c10]"><span>Dedicated courses</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="iks_integration_modes" value="Selected units in existing courses" class="w-4 h-4 rounded text-[#af4c10]"><span>Selected units in existing courses</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="iks_integration_modes" value="Certificate Courses" class="w-4 h-4 rounded text-[#af4c10]"><span>Certificate Courses</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="iks_integration_modes" value="Projects" class="w-4 h-4 rounded text-[#af4c10]"><span>Projects</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="iks_integration_modes" value="Interdisciplinary activities" class="w-4 h-4 rounded text-[#af4c10]"><span>Interdisciplinary activities</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="iks_integration_modes" value="Dedicated courses" class="w-4 h-4 rounded text-indigo-600"><span>Dedicated courses</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="iks_integration_modes" value="Selected units in existing courses" class="w-4 h-4 rounded text-indigo-600"><span>Selected units in existing courses</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="iks_integration_modes" value="Certificate Courses" class="w-4 h-4 rounded text-indigo-600"><span>Certificate Courses</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="iks_integration_modes" value="Projects" class="w-4 h-4 rounded text-indigo-600"><span>Projects</span></label>
+                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="iks_integration_modes" value="Interdisciplinary activities" class="w-4 h-4 rounded text-indigo-600"><span>Interdisciplinary activities</span></label>
                     <div class="pt-2">
-                        <input type="text" name="iks_other" placeholder="Other:" class="w-full px-3 py-1.5 border-b border-slate-300 focus:border-[#af4c10] outline-none text-sm bg-transparent">
+                        <input type="text" name="iks_other" placeholder="Other:" class="w-full px-3 py-1.5 border-b border-slate-300 focus:border-indigo-600 outline-none text-sm bg-transparent">
                     </div>
                 </div>
             </div>
@@ -502,27 +607,15 @@
                 <label class="block text-base font-normal text-[#202124]">
                     Identify the courses requiring revision (Course code, title, semester, nature of change, reason):
                 </label>
-                <textarea name="courses_to_revise" rows="3" placeholder="Your answer" class="w-full px-3 py-2 border-b-2 border-slate-300 focus:border-[#af4c10] outline-none text-sm bg-transparent"></textarea>
+                <textarea name="courses_to_revise" rows="3" placeholder="Your answer" class="w-full px-3 py-2 border-b-2 border-slate-300 focus:border-indigo-600 outline-none text-sm bg-transparent"></textarea>
             </div>
 
-            <!-- Question 33: Any other recommendations -->
-            <div class="gform-card p-6 space-y-3">
-                <label class="block text-base font-normal text-[#202124]">
-                    Any other recommendations:
-                </label>
-                <textarea name="other_recommendations" rows="3" placeholder="Your answer" class="w-full px-3 py-2 border-b-2 border-slate-300 focus:border-[#af4c10] outline-none text-sm bg-transparent"></textarea>
+                            <div class="flex items-center justify-between pt-6 pb-4 px-2 border-t border-slate-100 mt-4">
+                    <button type="button" onclick="prevStep(6)" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded shadow-sm transition">Back</button>
+                    <button type="submit" id="submitBtn" class="px-7 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm rounded shadow-sm transition">Submit</button>
+                </div>
             </div>
-
-            <!-- Submission Bar -->
-            <div class="flex items-center justify-between pt-4 pb-12">
-                <button type="submit" id="submitBtn" class="px-7 py-2.5 bg-[#af4c10] hover:bg-[#943e0c] text-white font-medium text-sm rounded shadow-sm hover:shadow transition">
-                    Submit
-                </button>
-                <button type="button" onclick="clearForm()" class="text-xs text-[#af4c10] hover:underline font-medium">
-                    Clear form
-                </button>
-            </div>
-        </form>
+</form>
 
         <!-- Google Form Style Footer -->
         <div class="text-center text-xs text-[#5f6368] space-y-1 pb-10">
@@ -554,7 +647,7 @@
                     <p>Your response has been safely stored in the institutional repository.</p>
                 </div>
                 <div class="pt-2">
-                    <button onclick="window.location.reload()" class="text-xs text-[#af4c10] hover:underline font-medium">
+                    <button onclick="window.location.reload()" class="text-xs text-indigo-600 hover:underline font-medium">
                         Submit another response
                     </button>
                 </div>
@@ -573,7 +666,7 @@
                 Please answer all required questions before submitting.
             </p>
             <div class="flex justify-end">
-                <button onclick="document.getElementById('errorModal').classList.add('hidden')" class="px-4 py-1.5 bg-[#af4c10] text-white rounded text-xs font-semibold">
+                <button onclick="document.getElementById('errorModal').classList.add('hidden')" class="px-4 py-1.5 bg-indigo-600 text-white rounded text-xs font-semibold">
                     OK
                 </button>
             </div>
@@ -638,6 +731,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             initDepartmentOptions();
             renderMatrixTables();
+            updateStepperStatus(1);
         });
 
         function initDepartmentOptions() {
@@ -755,7 +849,7 @@
             // 6. Emerging Checkboxes
             document.getElementById('emergingCheckboxesContainer').innerHTML = emergingPool.map(item => `
                 <label class="flex items-center space-x-3 cursor-pointer py-1">
-                    <input type="checkbox" name="emerging_areas" value="${item}" class="w-4 h-4 rounded text-[#af4c10]">
+                    <input type="checkbox" name="emerging_areas" value="${item}" class="w-4 h-4 rounded text-indigo-600">
                     <span>${item}</span>
                 </label>
             `).join('');
@@ -916,6 +1010,66 @@
             document.getElementById('errorMessage').innerText = msg;
             document.getElementById('errorModal').classList.remove('hidden');
         }
-    </script>
+    
+        // Section Navigation Logic
+        const totalSteps = 6;
+        
+        function updateStepperStatus(currentStep) {
+            for (let i = 1; i <= totalSteps; i++) {
+                const el = document.getElementById('stepper-' + i);
+                if(el){
+                    el.classList.remove('stepper-active', 'stepper-completed');
+                    
+                    if (i === currentStep) {
+                        el.classList.add('stepper-active');
+                    } else if (i < currentStep) {
+                        el.classList.add('stepper-completed');
+                    }
+                }
+            }
+        }
+        
+        function showStep(stepNum) {
+            document.querySelectorAll('.form-section').forEach(sec => sec.classList.add('hidden'));
+            const nxt = document.getElementById('form-section-' + stepNum);
+            if(nxt) nxt.classList.remove('hidden');
+            updateStepperStatus(stepNum);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function nextStep(currentStep) {
+            if (!validateStep(currentStep)) return;
+            showStep(currentStep + 1);
+        }
+
+        function prevStep(currentStep) {
+            showStep(currentStep - 1);
+        }
+
+        function validateStep(stepNum) {
+            const section = document.getElementById('form-section-' + stepNum);
+            if(!section) return true;
+            
+            const reqInputs = section.querySelectorAll('input[required], select[required], textarea[required]');
+            for (const input of reqInputs) {
+                if (input.type === 'radio' || input.type === 'checkbox') continue;
+                if (!input.value.trim()) {
+                    input.focus();
+                    showModalError('Please ensure all required fields are filled.');
+                    return false;
+                }
+            }
+            
+            const radioGroups = new Set(Array.from(section.querySelectorAll('input[type="radio"][required]')).map(el => el.name));
+            for (const name of radioGroups) {
+                if (!section.querySelector(`input[name="${name}"]:checked`)) {
+                    showModalError(`Please answer all required questions.`);
+                    section.querySelector(`input[name="${name}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return false;
+                }
+            }
+            return true;
+        }
+</script>
 </body>
 </html>
