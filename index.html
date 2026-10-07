@@ -134,51 +134,64 @@
     <!-- Main Container -->
     <div class="max-w-4xl mx-auto space-y-6" id="mainContainer">
         
-        <!-- Header Banner -->
+        <!-- Header Banner with College Logo -->
         <header class="portal-card p-6 md:p-8 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white relative overflow-hidden rounded-2xl border-none">
             <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
             <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <div>
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold tracking-wide uppercase mb-3 backdrop-blur-md border border-indigo-500/30">
-                        <i class="fa-solid fa-building-columns"></i> St. Joseph's College (Autonomous) • IQAC
+                <div class="flex items-start md:items-center gap-4">
+                    <img src="sjc-logo-small (1).png" alt="St. Joseph's College Logo" class="w-16 h-16 md:w-20 md:h-20 object-contain p-1.5 bg-white/10 rounded-2xl border border-white/20 shadow-lg flex-shrink-0">
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold tracking-wide uppercase mb-2 backdrop-blur-md border border-indigo-500/30">
+                            <i class="fa-solid fa-building-columns"></i> St. Joseph's College (Autonomous) • IQAC
+                        </div>
+                        <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
+                            Curriculum Feedback Portal <span class="text-indigo-400">2025-26</span>
+                        </h1>
+                        <p class="text-slate-300 text-xs md:text-sm mt-1 max-w-2xl leading-relaxed">
+                            Comprehensive Evaluation & Feedback on Syllabus Revision for UG & PG Programmes.
+                        </p>
                     </div>
-                    <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
-                        Curriculum Feedback Portal <span class="text-indigo-400">2025-26</span>
-                    </h1>
-                    <p class="text-slate-300 text-sm mt-2 max-w-2xl leading-relaxed">
-                        Comprehensive Evaluation & Feedback on Syllabus Revision for UG & PG Programmes.
-                    </p>
                 </div>
-                <div class="hidden md:flex flex-shrink-0 items-center justify-center w-16 h-16 bg-indigo-600/30 text-indigo-300 rounded-2xl border border-indigo-400/20 shadow-inner">
+                <div class="hidden lg:flex flex-shrink-0 items-center justify-center w-16 h-16 bg-indigo-600/30 text-indigo-300 rounded-2xl border border-indigo-400/20 shadow-inner">
                     <i class="fa-solid fa-graduation-cap text-3xl"></i>
                 </div>
             </div>
         </header>
 
-        <!-- Stepper Navigation Bar -->
+        <!-- Stepper Navigation Bar with Lock Status Indicators -->
         <nav class="portal-card p-3 overflow-x-auto flex items-center gap-2 no-scrollbar" id="stepperNav">
-            <button type="button" onclick="goToStep(1)" class="step-pill active flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-transparent text-xs font-semibold whitespace-nowrap cursor-pointer" id="stepper-1">
+            <button type="button" onclick="goToStep(1)" class="step-pill active flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-transparent text-xs font-semibold whitespace-nowrap cursor-pointer transition" id="stepper-1">
                 <span class="step-num w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold">1</span>
                 <span>Basic Profile</span>
             </button>
-            <button type="button" onclick="goToStep(2)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer" id="stepper-2">
-                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">2</span>
+            <button type="button" onclick="goToStep(2)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-2">
+                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">
+                    <i class="fa-solid fa-lock text-[9px]"></i>
+                </span>
                 <span>Effectiveness & OBE</span>
             </button>
-            <button type="button" onclick="goToStep(3)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer" id="stepper-3">
-                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">3</span>
+            <button type="button" onclick="goToStep(3)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-3">
+                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">
+                    <i class="fa-solid fa-lock text-[9px]"></i>
+                </span>
                 <span>Learning Paths</span>
             </button>
-            <button type="button" onclick="goToStep(4)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer" id="stepper-4">
-                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">4</span>
+            <button type="button" onclick="goToStep(4)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-4">
+                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">
+                    <i class="fa-solid fa-lock text-[9px]"></i>
+                </span>
                 <span>Exp & Digital Learning</span>
             </button>
-            <button type="button" onclick="goToStep(5)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer" id="stepper-5">
-                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">5</span>
+            <button type="button" onclick="goToStep(5)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-5">
+                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">
+                    <i class="fa-solid fa-lock text-[9px]"></i>
+                </span>
                 <span>Modern Integration</span>
             </button>
-            <button type="button" onclick="goToStep(6)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer" id="stepper-6">
-                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">6</span>
+            <button type="button" onclick="goToStep(6)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-6">
+                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">
+                    <i class="fa-solid fa-lock text-[9px]"></i>
+                </span>
                 <span>Knowledge Systems</span>
             </button>
         </nav>
@@ -789,13 +802,44 @@
 
     <!-- JavaScript Logic -->
     <script>
-        const effItems = ['Academically relevant', 'Meets current industry needs', 'Creates employability opportunities', 'Prepares students for higher education', 'Encourages research practices', 'Prepares entrepreneurs', 'Incorporates Emerging Developments', 'Provides Practical Hands-on Training', 'Promotes critical thinking', 'Content appropriately distributed across semesters', 'Provides interdisciplinary learning', 'Text & Reference Books updated (last 5 yrs)'];
-        const obeItems = ['Programme Outcomes clearly defined', 'PSOs reflect specialization', 'COs measurable and level-appropriate', 'COs mapped to POs and PSOs', 'Outcomes communicated to students', 'Teaching methods aligned with COs', 'Assessment measures CO attainment', 'CO Attainment analyzed for improvement'];
-        const structItems = ['Theory Courses', 'Practical Courses', 'Project, Internship and Research', 'Discipline Specific / Open Electives', 'Skill / Ability Enhancement Courses', 'Credit distribution across components', 'Balance between foundational and advanced', 'Inter-disciplinary course combinations'];
+        const effItems = [
+            'B1. Academically relevant',
+            'B2. Meets current industry needs',
+            'B3. Creates employability opportunities',
+            'B4. Prepares students for higher edn. and competitive exams',
+            'B4. Encourages research practices',
+            'B5. Prepares entrepreneurs',
+            'B6. Incorporates Emerging Developments in the Discipline',
+            'B7. Provides adequate Practical, Hands-on Training and Industrial Exposure',
+            'B8. Promotes critical thinking, problem-solving & creativity.',
+            'B9. Content is appropriately distributed across semesters.',
+            'B10. Provides opportunities for interdisciplinary learning.',
+            'B11. Text and Reference Books are included within the period of last 5 years'
+        ];
+        const obeItems = [
+            'C1. Programme Outcomes (POs) are clearly defined',
+            'C2. PSOs reflects specialization & career expectations',
+            'C3. COs are measurable & appropriate to the course level',
+            'C4. COs are appropriately mapped to POs and PSOs.',
+            'C5. Outcomes are clearly communicated to the students',
+            'C6. Teaching-learning methods are aligned with the intended COs and cognitive levels.',
+            'C7. Assessment methods effectively measure the attainment of COs.',
+            'C8. CO Attainment data are analysed and used to improve course content, teaching and assessment.'
+        ];
+        const structItems = [
+            'D1. Theory Courses',
+            'D2. Practical Courses',
+            'D3. Project, Internship and Research',
+            'D4. Discipline Specific / Open Electives (DSEs)',
+            'D5. Skill / Ability Enhancement Courses (SECs)',
+            'D6. Credit distrib. across theory, practical, proj. & intern components.',
+            'D7. Balance between foundational, advanced and specialization courses',
+            'D8. Opportunities for inter & multi-disciplinary course combinations.'
+        ];
         const expItems = ['Internship', 'Field Visit', 'Case Study', 'Problem-Based Learning', 'Project-Based Learning', 'Community Engagement', 'Simulations', 'Industry-mentored Projects'];
-        const digItems = ['SWAYAM/NPTEL', 'Institutional LMS', 'Other MOOCs', 'Virtual Labs', 'Blended Learning'];
-        const emergingPool = ['AI & Generative AI', 'Data Science & Analytics', 'Cybersecurity', 'Cloud Computing & IoT', 'Automation & Robotics', 'Sustainability', 'Entrepreneurship', 'Digital Ethics'];
-        const stakeholders = ['Students', 'Alumni', 'Employers', 'Parents', 'Industry Experts'];
+        const digItems = ['SWAYAM/NPTEL', 'Through Institutional LMS (JosTEL)', 'Other MOOCs', 'Virtual Labs', 'Blended Learning'];
+        const emergingPool = ['Artificial Intelligence and Generative AI', 'Data Science and Big Data Analytics', 'Computational Biology', 'Climate Change', 'Cybersecurity and Digital Privacy', 'Cloud Computing, Internet of Things and Smart Systems', 'Automation and Robotics', 'Sustainability and Green Technologies', 'Entrepreneurship, Innovation and Start-up Skills', 'Digital Ethics, Governance and Responsible Technology'];
+        const stakeholders = ['H1. Students', 'H2. Alumni', 'H3. Employers', 'H4. Parents', 'H5. Industry Experts'];
 
         document.addEventListener('DOMContentLoaded', () => {
             initDepartmentOptions();
@@ -952,12 +996,16 @@
                 const el = document.getElementById('stepper-' + i);
                 if (el) {
                     el.classList.remove('active', 'completed', 'opacity-50', 'cursor-not-allowed');
+                    const numSpan = el.querySelector('.step-num');
                     if (i === stepNum) {
                         el.classList.add('active');
-                    } else if (i < stepNum) {
-                        el.classList.add('completed');
-                    } else if (i > currentMaxStepUnlocked) {
+                        if (numSpan) numSpan.innerHTML = `${i}`;
+                    } else if (i < stepNum || i <= currentMaxStepUnlocked) {
+                        if (i < stepNum) el.classList.add('completed');
+                        if (numSpan) numSpan.innerHTML = i < stepNum ? `<i class="fa-solid fa-check text-[10px]"></i>` : `${i}`;
+                    } else {
                         el.classList.add('opacity-50', 'cursor-not-allowed');
+                        if (numSpan) numSpan.innerHTML = `<i class="fa-solid fa-lock text-[9px]"></i>`;
                     }
                 }
             }
