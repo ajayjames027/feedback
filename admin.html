@@ -634,11 +634,6 @@
                                 <th class="p-3.5">Department</th>
                                 <th class="p-3.5">Faculty Name</th>
                                 <th class="p-3.5">Level</th>
-                                <th class="p-3.5">Multidisciplinary</th>
-                                <th class="p-3.5 flex items-center gap-1">
-                                    <span>Overlaps</span>
-                                    <i class="fa-solid fa-circle-info text-slate-400 text-xs cursor-pointer" title="Indicates whether the faculty reported redundant syllabus content overlapping with other departments or school courses."></i>
-                                </th>
                                 <th class="p-3.5 text-right">Actions</th>
                             </tr>
                         </thead>
@@ -1296,20 +1291,18 @@
             const list = getStoredResponses();
             const tbody = document.getElementById('responsesTableBody');
             if (list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-400">No responses recorded yet.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">No responses recorded yet.</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = list.map((r, i) => `
                 <tr class="hover:bg-slate-50/80 transition">
                     <td class="p-3.5 font-mono text-xs text-slate-400">#${i + 1}</td>
-                    <td class="p-3.5 text-xs text-slate-500">${r.timestamp ? new Date(r.timestamp).toLocaleDateString() : '-'}</td>
+                    <td class="p-3.5 text-xs text-slate-600 font-medium">${r.timestamp ? (isNaN(Date.parse(r.timestamp)) ? r.timestamp : new Date(r.timestamp).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' })) : '-'}</td>
                     <td class="p-3.5 text-xs font-bold text-indigo-700 bg-indigo-50/50 rounded-lg">${getSchoolForDepartment(r.department)}</td>
                     <td class="p-3.5 font-semibold text-slate-900">${r.department || '-'}</td>
                     <td class="p-3.5 text-slate-700 font-medium">${r.faculty_name || '-'}</td>
                     <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700">${r.course_level || 'UG'}</span></td>
-                    <td class="p-3.5 font-bold text-amber-600">${r.multidisciplinary_rating || '-'} / 5</td>
-                    <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${r.overlapping_courses === 'YES' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-50 text-emerald-700'}">${r.overlapping_courses || 'NO'}</span></td>
                     <td class="p-3.5 text-right">
                         <div class="flex items-center justify-end space-x-1.5">
                             <button onclick="viewSingleResponse(${i})" class="px-3 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-lg text-xs font-semibold border border-brand-200 transition flex items-center gap-1">

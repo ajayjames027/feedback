@@ -1406,7 +1406,7 @@
 
             const payload = {
                 id: Date.now(),
-                timestamp: new Date().toISOString(),
+                timestamp: new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }),
                 department: dept,
                 faculty_name: facultyName,
                 faculty_email: email,
