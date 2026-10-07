@@ -113,7 +113,7 @@
                 <h2 class="text-2xl font-black text-slate-900">Admin Login</h2>
             </div>
             
-            <div class="space-y-4">
+            <form onsubmit="event.preventDefault(); attemptLogin();" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Username</label>
                     <input type="text" id="adminUser" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition outline-none text-slate-900" placeholder="admin">
@@ -122,9 +122,8 @@
                     <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Password</label>
                     <input type="password" id="adminPass" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition outline-none text-slate-900" placeholder="••••••••">
                 </div>
-            </div>
-            <p id="loginError" class="text-xs text-rose-500 font-bold hidden text-center">Invalid username or password.</p>
-            <button onclick="attemptLogin()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg transition">Access Dashboard</button>
+                <button type="submit" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg transition">Access Dashboard</button>
+            </form>
         </div>
     </div>
 
@@ -740,8 +739,8 @@
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+    <!-- Toast Container (Top Right Corner) -->
+    <div id="toastContainer" class="fixed top-5 right-5 z-[300] flex flex-col space-y-2 pointer-events-none"></div>
 
     <script>
         // Auth Logic
@@ -753,8 +752,9 @@
                 document.getElementById('adminLoginModal').classList.add('hidden');
                 document.body.style.overflow = '';
                 sessionStorage.setItem('admin_auth', 'true');
+                showToast('Welcome back, Admin! Logged in successfully.', 'success');
             } else {
-                document.getElementById('loginError').classList.remove('hidden');
+                showToast('Invalid username or password. Please try again.', 'error');
             }
         }
         
