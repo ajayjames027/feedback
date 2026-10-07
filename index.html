@@ -885,11 +885,11 @@
             <div class="text-slate-500">Submission Timestamp: <span class="font-semibold text-slate-800" id="successTimestamp"></span></div>
             <div class="text-slate-500">Faculty Reference ID: <span class="font-mono font-bold text-indigo-600" id="successRefId"></span></div>
         </div>
-        <div>
-            <button onclick="window.close()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs shadow-lg transition flex items-center gap-2 mx-auto">
+        <div class="space-y-2">
+            <button onclick="closeCurrentTab()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs shadow-lg transition flex items-center gap-2 mx-auto">
                 <i class="fa-solid fa-xmark"></i> <span>Close Tab</span>
             </button>
-            <p class="text-[11px] text-slate-400 mt-2">(Click to close the tab automatically)</p>
+            <p id="closeMsg" class="text-[11px] text-slate-400 mt-2">(Click to close the tab automatically)</p>
         </div>
     </div>
 
@@ -1465,6 +1465,23 @@
             document.getElementById('successRefId').innerText = 'SJC-FB-' + Math.floor(100000 + Math.random() * 900000);
             document.getElementById('successView').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function closeCurrentTab() {
+            window.close();
+            // Modern browser security fallback: if window was not opened via script
+            setTimeout(() => {
+                window.open('', '_self', '');
+                window.close();
+            }, 100);
+
+            // Additional fallback message if browser blocks self-closing
+            setTimeout(() => {
+                const msg = document.getElementById('closeMsg');
+                if (msg) {
+                    msg.innerHTML = '<span class="text-amber-600 font-semibold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Response Saved! Your browser blocked auto-close. You can safely close this tab manually (Ctrl+W / Cmd+W).</span>';
+                }
+            }, 300);
         }
     </script>
 </body>
