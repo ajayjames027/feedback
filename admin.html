@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IQAC & CDC Administrator Portal • Curricular Feedback 2025-26</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        admin: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            500: '#0f172a',
+                            600: '#1e293b',
+                            700: '#334155',
+                            800: '#1e1b4b',
+                            900: '#0f172a'
+                        },
+                        brand: {
+                            50: '#fdf6f0',
+                            100: '#fbe9db',
+                            500: '#af4c10',
+                            600: '#943e0c',
+                            700: '#793108'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Master Roster Data -->
+    <script src="faculty_roster_data.js"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased">
+    
+    <!-- Admin Top Header -->
+    <header class="bg-slate-900 text-white shadow-xl sticky top-0 z-50 border-b border-slate-800 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-brand-600 flex items-center justify-center text-white shadow-md">
+                        <i class="fa-solid fa-chart-line text-lg"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-base tracking-tight flex items-center space-x-2">
+                            <span>IQAC & CDC Administrator Portal</span>
+                            <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-extrabold uppercase border border-amber-500/30">Admin Only</span>
+                        </div>
+                        <div class="text-xs text-slate-400">Teacher Feedback & Curricular Revision 2025-26</div>
+                    </div>
+                </div>
+
+                <!-- Admin Navigation Tabs -->
+                <nav class="hidden md:flex items-center space-x-1">
+                    <button onclick="switchTab('tracking')" id="nav-tracking" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all bg-slate-800 text-amber-300 border border-slate-700 shadow-inner">
+                        <i class="fa-solid fa-list-check mr-1.5 text-amber-400"></i> Faculty Tracker (Pending)
+                    </button>
+                    <button onclick="switchTab('analytics')" id="nav-analytics" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
+                        <i class="fa-solid fa-chart-pie mr-1.5 text-indigo-400"></i> Analytics Dashboard
+                    </button>
+                    <button onclick="switchTab('responses')" id="nav-responses" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
+                        <i class="fa-solid fa-database mr-1.5 text-emerald-400"></i> Response Records
+                    </button>
+                    <button onclick="switchTab('report')" id="nav-report" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
+                        <i class="fa-solid fa-file-contract mr-1.5 text-rose-400"></i> IQAC Report
+                    </button>
+                </nav>
+
+                <!-- Action Utilities -->
+                <div class="flex items-center space-x-2">
+                    <a href="index.html" target="_blank" class="hidden sm:inline-flex items-center px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-xl border border-slate-700 text-slate-200 transition" title="Open Faculty Feedback Form">
+                        <i class="fa-solid fa-arrow-up-right-from-square mr-1.5 text-slate-400"></i> Faculty Form
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container (Dynamic Tabs) -->
+    <main class="flex-grow">
+        
+        <!-- ==================== TAB 1: FACULTY TRACKER ==================== -->
+        <section id="tab-content-tracking" class="tab-pane max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+            <!-- Header -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div>
+                    <div class="flex items-center space-x-2 text-xs font-bold text-amber-600 uppercase tracking-wider mb-1">
+                        <i class="fa-solid fa-users-viewfinder"></i>
+                        <span>Institutional Compliance Monitor</span>
+                    </div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+                        Faculty Submission Roster & Pending Tracker
+                    </h1>
+                    <p class="text-xs md:text-sm text-slate-500 mt-1">
+                        Monitor submission status for all <strong>319 teaching staff members</strong> across 33 academic departments
+                    </p>
+                </div>
+
+                <!-- Quick Action Buttons -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="copyPendingEmails()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-xl shadow-sm transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-envelope"></i>
+                        <span>Copy Pending Emails (<span id="btnPendingCount">--</span>)</span>
+                    </button>
+                    <button onclick="exportPendingCSV()" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-xl shadow-sm transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-file-excel text-emerald-400"></i>
+                        <span>Export Pending List</span>
+                    </button>
+                    <button onclick="seedSampleBenchmarkData()" class="px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl border border-slate-200 transition" title="Add Sample Submissions">
+                        <i class="fa-solid fa-flask text-amber-600 mr-1"></i> Add Sample Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Faculty</span>
+                        <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-chalkboard-user"></i></div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="text-3xl font-black text-slate-900" id="kpiTotalFaculty">319</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Faculty_2026_2027 Roster</div>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Submitted</span>
+                        <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-circle-check"></i></div>
+                    </div>
+                    <div class="mt-3">
+                        <div id="kpiSubmitted" class="text-3xl font-black text-emerald-600">0</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Responses recorded</div>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500"></div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-600">Yet to Submit (Pending)</span>
+                        <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-clock"></i></div>
+                    </div>
+                    <div class="mt-3">
+                        <div id="kpiPending" class="text-3xl font-black text-amber-600">319</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Action required</div>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Turnout Rate</span>
+                        <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-percent"></i></div>
+                    </div>
+                    <div class="mt-3">
+                        <div id="kpiTurnout" class="text-3xl font-black text-indigo-600">0%</div>
+                        <div class="text-[11px] text-slate-500 mt-0.5">Institutional completion</div>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 h-1 bg-indigo-500"></div>
+                </div>
+            </div>
+
+            <!-- Department Breakdown Grid -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-chart-column text-brand-600"></i>
+                        <h3 class="font-bold text-slate-800 text-base">Department-Wise Submission Progress</h3>
+                    </div>
+                    <span class="text-xs text-slate-500 font-medium" id="deptCountLabel">33 Departments</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-72 overflow-y-auto pr-1" id="deptProgressGrid">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </div>
+
+            <!-- Roster Table -->
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden space-y-4 p-6">
+                <!-- Filters -->
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                    <div class="flex items-center bg-slate-100 p-1 rounded-xl text-xs font-bold">
+                        <button onclick="setRosterFilterStatus('ALL')" id="tab-all" class="px-3 py-1.5 rounded-lg bg-white shadow-sm text-slate-900 transition">
+                            All Faculty (<span id="tabCountAll">319</span>)
+                        </button>
+                        <button onclick="setRosterFilterStatus('PENDING')" id="tab-pending" class="px-3 py-1.5 rounded-lg text-amber-700 hover:text-amber-900 transition">
+                            Pending (<span id="tabCountPending">319</span>)
+                        </button>
+                        <button onclick="setRosterFilterStatus('SUBMITTED')" id="tab-submitted" class="px-3 py-1.5 rounded-lg text-emerald-700 hover:text-emerald-900 transition">
+                            Submitted (<span id="tabCountSubmitted">0</span>)
+                        </button>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+                        <div class="relative w-full sm:w-56">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                            <input type="text" id="rosterSearch" oninput="renderRosterTable()" placeholder="Search name / email..." class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-amber-500">
+                        </div>
+                        <select id="rosterDeptSelect" onchange="renderRosterTable()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700">
+                            <option value="All">All Departments</option>
+                        </select>
+                        <select id="rosterShiftSelect" onchange="renderRosterTable()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700">
+                            <option value="All">All Shifts</option>
+                            <option value="I">Shift I</option>
+                            <option value="II">Shift II</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto rounded-2xl border border-slate-100">
+                    <table class="w-full text-left text-xs md:text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                                <th class="p-3 w-12 text-center">S.No</th>
+                                <th class="p-3">Department</th>
+                                <th class="p-3">Teaching Staff Name</th>
+                                <th class="p-3">Designation</th>
+                                <th class="p-3 text-center">Shift</th>
+                                <th class="p-3">Email Address</th>
+                                <th class="p-3 text-center">Status</th>
+                                <th class="p-3 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rosterTableBody" class="divide-y divide-slate-100 font-medium text-slate-700">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: ANALYTICS DASHBOARD ==================== -->
+        <section id="tab-content-analytics" class="tab-pane max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 hidden">
+            <!-- Analytics Filter Bar -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div>
+                    <div class="flex items-center space-x-2 text-xs font-bold text-brand-600 uppercase tracking-wider mb-1">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Curricular Intelligence & Attainment Engine</span>
+                    </div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+                        Teacher Feedback Analytics & Evaluation
+                    </h1>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
+                    <select id="analyticsDeptSelect" onchange="renderAnalyticsDashboard()" class="bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700">
+                        <option value="All">All Departments (Aggregate)</option>
+                    </select>
+                    <select id="analyticsLevelSelect" onchange="renderAnalyticsDashboard()" class="bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700">
+                        <option value="All">All Levels</option>
+                        <option value="UG">UG Only</option>
+                        <option value="PG">PG Only</option>
+                        <option value="Both">Both (UG & PG)</option>
+                    </select>
+                    <button onclick="renderAnalyticsDashboard()" class="p-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs transition">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Analytics KPIs -->
+            <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Respondents</span>
+                    <div class="text-2xl md:text-3xl font-black text-slate-900 mt-2" id="kpiAnaTotal">0</div>
+                    <div class="text-[11px] text-slate-500 mt-0.5">Faculty feedback records</div>
+                    <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Effectiveness</span>
+                    <div class="text-2xl md:text-3xl font-black text-emerald-600 mt-2" id="kpiAnaEff">0%</div>
+                    <div class="text-[11px] text-slate-500 mt-0.5" id="kpiAnaEffAvg">0 / 5.0 score</div>
+                    <div class="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500"></div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">OBE Attainment</span>
+                    <div class="text-2xl md:text-3xl font-black text-indigo-600 mt-2" id="kpiAnaObe">0%</div>
+                    <div class="text-[11px] text-slate-500 mt-0.5">PO-PSO-CO alignment</div>
+                    <div class="absolute bottom-0 left-0 right-0 h-1 bg-indigo-500"></div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">NEP Flexibility</span>
+                    <div class="text-2xl md:text-3xl font-black text-amber-600 mt-2" id="kpiAnaMulti">0 / 5</div>
+                    <div class="text-[11px] text-slate-500 mt-0.5">Multidisciplinary rating</div>
+                    <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden col-span-2 lg:col-span-1">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">IKS Rating</span>
+                    <div class="text-2xl md:text-3xl font-black text-rose-600 mt-2" id="kpiAnaIks">0 / 5</div>
+                    <div class="text-[11px] text-slate-500 mt-0.5">Indian Knowledge Systems</div>
+                    <div class="absolute bottom-0 left-0 right-0 h-1 bg-rose-500"></div>
+                </div>
+            </div>
+
+            <!-- Charts Row 1 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="font-bold text-slate-800 text-base">Curricular Effectiveness Dimensions (12 Items)</h3>
+                    <div class="h-80 relative"><canvas id="chartEff"></canvas></div>
+                </div>
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="font-bold text-slate-800 text-base">Outcome Based Education (OBE) Radar</h3>
+                    <div class="h-80 relative"><canvas id="chartObe"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Charts Row 2 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="font-bold text-slate-800 text-base">Curriculum Balance (Theory, Practicals, Projects, Electives)</h3>
+                    <div class="h-80 relative"><canvas id="chartStruct"></canvas></div>
+                </div>
+                <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 space-y-4">
+                    <h3 class="font-bold text-slate-800 text-base">Emerging Areas & Future Skills Demand Ranking</h3>
+                    <div class="h-80 relative"><canvas id="chartEmerging"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 3: RESPONSES RECORD EXPLORER ==================== -->
+        <section id="tab-content-responses" class="tab-pane max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 hidden">
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Response Record Explorer</h1>
+                    <p class="text-xs text-slate-500 mt-1">Granular faculty feedback log</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="exportAllResponsesCSV()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold shadow-sm transition">
+                        <i class="fa-solid fa-file-csv mr-1"></i> Download CSV
+                    </button>
+                    <button onclick="exportAllResponsesJSON()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold border border-slate-300 transition">
+                        <i class="fa-solid fa-code mr-1"></i> Export JSON
+                    </button>
+                </div>
+            </div>
+
+            <!-- Responses Table -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs md:text-sm">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                                <th class="p-3.5">ID</th>
+                                <th class="p-3.5">Timestamp</th>
+                                <th class="p-3.5">Department</th>
+                                <th class="p-3.5">Faculty Name</th>
+                                <th class="p-3.5">Level</th>
+                                <th class="p-3.5">Multidisciplinary</th>
+                                <th class="p-3.5">Overlaps</th>
+                                <th class="p-3.5 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="responsesTableBody" class="divide-y divide-slate-100 font-medium text-slate-700">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 4: IQAC REPORT ==================== -->
+        <section id="tab-content-report" class="tab-pane max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 hidden">
+            <div class="flex justify-end no-print">
+                <button onclick="window.print()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-print"></i>
+                    <span>Print / Save PDF Report</span>
+                </button>
+            </div>
+
+            <div class="bg-white rounded-3xl p-8 md:p-12 shadow-md border border-slate-200 space-y-8 text-slate-900" id="reportPrintableArea">
+                <div class="border-b-2 border-slate-900 pb-6 text-center space-y-2">
+                    <div class="text-xs font-bold tracking-widest text-slate-500 uppercase">INTERNAL QUALITY ASSURANCE CELL (IQAC) & CURRICULUM DEVELOPMENT CELL (CDC)</div>
+                    <h1 class="text-xl md:text-2xl font-black uppercase tracking-tight text-slate-900">
+                        COMPREHENSIVE TEACHER FEEDBACK & CURRICULAR AUDIT REPORT
+                    </h1>
+                    <div class="text-xs font-semibold text-slate-600">ACADEMIC YEAR 2025-26 • EVALUATION OF SYLLABUS REVISION (UG & PG)</div>
+                </div>
+
+                <div class="space-y-4">
+                    <h2 class="text-base font-extrabold uppercase tracking-wide border-b border-slate-200 pb-1.5 text-slate-800">1. Executive Summary</h2>
+                    <p class="text-xs text-slate-700 leading-relaxed text-justify" id="reportSummaryParagraph">
+                        Feedback evaluation synthesized across teaching staff members.
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    <h2 class="text-base font-extrabold uppercase tracking-wide border-b border-slate-200 pb-1.5 text-slate-800">2. Overall Effectiveness Mean Scores</h2>
+                    <div class="overflow-x-auto border border-slate-300 rounded-xl">
+                        <table class="w-full text-left text-xs border-collapse" id="reportEffTable">
+                            <thead>
+                                <tr class="bg-slate-100 font-bold border-b border-slate-300">
+                                    <th class="p-2 border-r border-slate-300 w-12 text-center">S.No</th>
+                                    <th class="p-2 border-r border-slate-300">Dimension</th>
+                                    <th class="p-2 text-center border-r border-slate-300 w-24">Mean (/5.0)</th>
+                                    <th class="p-2 text-center w-24">Attainment %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reportEffBody" class="divide-y divide-slate-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Sign-off Block -->
+                <div class="pt-12 border-t-2 border-slate-300 grid grid-cols-3 gap-8 text-center text-xs">
+                    <div><div class="font-bold text-slate-900 uppercase">Coordinator</div><div class="text-slate-500">Curriculum Development Cell</div></div>
+                    <div><div class="font-bold text-slate-900 uppercase">Director</div><div class="text-slate-500">IQAC</div></div>
+                    <div><div class="font-bold text-slate-900 uppercase">Principal / Dean</div><div class="text-slate-500">Academic Affairs</div></div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Response Detail Modal -->
+    <div id="detailModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-6 bg-slate-900 text-white flex items-center justify-between">
+                <div>
+                    <h3 id="modalFacultyName" class="font-bold text-lg">Faculty Name</h3>
+                    <p id="modalMeta" class="text-xs text-slate-400">Department • Level</p>
+                </div>
+                <button onclick="document.getElementById('detailModal').classList.add('hidden')" class="text-slate-400 hover:text-white p-2 rounded-xl text-lg">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="modalContent" class="p-6 space-y-4 overflow-y-auto text-xs md:text-sm"></div>
+            <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+                <button onclick="document.getElementById('detailModal').classList.add('hidden')" class="px-5 py-2 bg-slate-800 text-white font-semibold text-xs rounded-xl">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Copy Modal -->
+    <div id="emailCopyModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center space-x-2 text-emerald-600 font-bold text-base">
+                <i class="fa-solid fa-circle-check text-xl"></i>
+                <span>Pending Faculty Emails Copied!</span>
+            </div>
+            <p class="text-xs text-slate-600">Copied email addresses for all pending faculty members to your clipboard.</p>
+            <textarea id="copiedEmailsBox" rows="4" readonly class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-mono text-slate-700"></textarea>
+            <div class="flex justify-end">
+                <button onclick="document.getElementById('emailCopyModal').classList.add('hidden')" class="px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <script>
+        let currentRosterStatus = 'ALL';
+        let chartInstances = {};
+
+        const effItems = [
+            'Academically relevant', 'Meets current industry needs', 'Creates employability opportunities',
+            'Prepares students for higher education and competitive exams', 'Encourages research practices',
+            'Prepares entrepreneurs', 'Incorporates Emerging Developments in the Discipline',
+            'Provides adequate Practical, Hands-on Training and Industrial Exposure',
+            'Promotes critical thinking, problem-solving and creativity',
+            'Content is appropriately distributed across semesters',
+            'Provides opportunities for interdisciplinary learning',
+            'Text and Reference Books are included within the period of last 5 years'
+        ];
+
+        const obeItems = [
+            'Programme Outcomes are clearly defined', 'PSOs reflect specialization and career expectations',
+            'COs are measurable and appropriate to the course level', 'COs are appropriately mapped to POs and PSOs',
+            'Outcomes are clearly communicated to the students',
+            'Teaching-learning methods are aligned with intended COs and cognitive levels',
+            'Assessment methods effectively measure attainment of COs',
+            'CO Attainment data are analyzed and used to improve course content, teaching and assessment'
+        ];
+
+        const structItems = [
+            'Theory Courses', 'Practical Courses', 'Project, Internship and Research',
+            'Discipline Specific / Open Electives', 'Skill / Ability Enhancement Courses',
+            'Credit distribution across components', 'Balance between foundational, advanced and specialization courses',
+            'Opportunities for inter and multi-disciplinary course combinations'
+        ];
+
+        const emergingPool = [
+            'Artificial Intelligence and Generative AI', 'Data Science and Big Data Analytics',
+            'Cybersecurity and Digital Privacy', 'Cloud Computing, Internet of Things and Smart Systems',
+            'Automation and Robotics', 'Sustainability and Green Technologies',
+            'Entrepreneurship, Innovation and Start-up Skills', 'Digital Ethics, Governance and Responsible Technology',
+            'Climate Change'
+        ];
+
+        // Switch Tabs
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('nav button').forEach(el => {
+                el.className = "px-3.5 py-2 rounded-xl text-xs font-semibold transition-all text-slate-300 hover:bg-slate-800 hover:text-white";
+            });
+
+            document.getElementById(`tab-content-${tabId}`)?.classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.className = "px-3.5 py-2 rounded-xl text-xs font-semibold transition-all bg-slate-800 text-amber-300 border border-slate-700 shadow-inner";
+            }
+
+            if (tabId === 'tracking') renderRosterTable();
+            if (tabId === 'analytics') renderAnalyticsDashboard();
+            if (tabId === 'responses') renderResponsesTable();
+            if (tabId === 'report') renderReportTable();
+        }
+
+        function getStoredResponses() {
+            const raw = localStorage.getItem("sjc_faculty_feedback_records_2025");
+            if (raw) {
+                try { return JSON.parse(raw); } catch(e) { return []; }
+            }
+            return [];
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            initDropdowns();
+            // Seed sample benchmark responses if empty
+            if (getStoredResponses().length === 0) {
+                seedSampleBenchmarkData(false);
+            }
+            renderRosterTable();
+        });
+
+        function initDropdowns() {
+            const depts = Array.from(new Set(MASTER_FACULTY_ROSTER.map(f => f.department))).filter(Boolean).sort();
+            const rosterSelect = document.getElementById('rosterDeptSelect');
+            const anaSelect = document.getElementById('analyticsDeptSelect');
+
+            depts.forEach(d => {
+                const opt1 = document.createElement('option');
+                opt1.value = d; opt1.innerText = d;
+                rosterSelect.appendChild(opt1);
+
+                const opt2 = document.createElement('option');
+                opt2.value = d; opt2.innerText = d;
+                anaSelect.appendChild(opt2);
+            });
+        }
+
+        // Roster Table & Progress
+        function setRosterFilterStatus(status) {
+            currentRosterStatus = status;
+            document.getElementById('tab-all').className = status === 'ALL' ? 'px-3 py-1.5 rounded-lg bg-white shadow-sm text-slate-900 font-bold' : 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900';
+            document.getElementById('tab-pending').className = status === 'PENDING' ? 'px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold shadow-sm' : 'px-3 py-1.5 rounded-lg text-amber-700 hover:text-amber-900';
+            document.getElementById('tab-submitted').className = status === 'SUBMITTED' ? 'px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold shadow-sm' : 'px-3 py-1.5 rounded-lg text-emerald-700 hover:text-emerald-900';
+            renderRosterTable();
+        }
+
+        function renderRosterTable() {
+            const responses = getStoredResponses();
+            const submittedEmails = new Set(responses.map(r => (r.faculty_email || '').toLowerCase()).filter(Boolean));
+            const submittedNames = new Set(responses.map(r => `${(r.faculty_name||'').toLowerCase()}___${(r.department||'').toLowerCase()}`));
+
+            let rosterWithStatus = MASTER_FACULTY_ROSTER.map(f => {
+                const isSubmitted = submittedEmails.has((f.email || '').toLowerCase()) || submittedNames.has(`${f.name.toLowerCase()}___${f.department.toLowerCase()}`);
+                return { ...f, status: isSubmitted ? 'SUBMITTED' : 'PENDING' };
+            });
+
+            const total = rosterWithStatus.length;
+            const submitted = rosterWithStatus.filter(f => f.status === 'SUBMITTED').length;
+            const pending = total - submitted;
+            const rate = total > 0 ? Math.round((submitted / total) * 100) : 0;
+
+            document.getElementById('kpiTotalFaculty').innerText = total;
+            document.getElementById('kpiSubmitted').innerText = submitted;
+            document.getElementById('kpiPending').innerText = pending;
+            document.getElementById('kpiTurnout').innerText = rate + '%';
+            document.getElementById('btnPendingCount').innerText = pending;
+            document.getElementById('tabCountAll').innerText = total;
+            document.getElementById('tabCountPending').innerText = pending;
+            document.getElementById('tabCountSubmitted').innerText = submitted;
+
+            // Department Progress Grid
+            const depts = Array.from(new Set(MASTER_FACULTY_ROSTER.map(f => f.department))).filter(Boolean).sort();
+            const deptStats = depts.map(d => {
+                const list = rosterWithStatus.filter(f => f.department === d);
+                const sub = list.filter(f => f.status === 'SUBMITTED').length;
+                const dRate = list.length > 0 ? Math.round((sub / list.length) * 100) : 0;
+                return { department: d, total: list.length, submitted: sub, rate: dRate };
+            });
+
+            document.getElementById('deptProgressGrid').innerHTML = deptStats.map(d => `
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50/80 hover:bg-slate-100 transition space-y-1.5">
+                    <div class="flex items-center justify-between text-xs font-bold text-slate-800">
+                        <span class="truncate max-w-[170px]" title="${d.department}">${d.department}</span>
+                        <span class="${d.rate === 100 ? 'text-emerald-600' : d.rate >= 50 ? 'text-blue-600' : 'text-amber-600'}">${d.submitted}/${d.total} (${d.rate}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                        <div class="h-full rounded-full ${d.rate === 100 ? 'bg-emerald-500' : d.rate >= 50 ? 'bg-blue-500' : 'bg-amber-500'}" style="width: ${d.rate}%"></div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Filter Table
+            const query = document.getElementById('rosterSearch').value.toLowerCase().trim();
+            const selectedDept = document.getElementById('rosterDeptSelect').value;
+            const selectedShift = document.getElementById('rosterShiftSelect').value;
+
+            let filtered = rosterWithStatus;
+
+            if (currentRosterStatus !== 'ALL') {
+                filtered = filtered.filter(f => f.status === currentRosterStatus);
+            }
+            if (selectedDept !== 'All') {
+                filtered = filtered.filter(f => f.department === selectedDept);
+            }
+            if (selectedShift !== 'All') {
+                filtered = filtered.filter(f => f.shift === selectedShift);
+            }
+            if (query) {
+                filtered = filtered.filter(f =>
+                    f.name.toLowerCase().includes(query) ||
+                    f.department.toLowerCase().includes(query) ||
+                    f.email.toLowerCase().includes(query) ||
+                    f.designation.toLowerCase().includes(query)
+                );
+            }
+
+            const tbody = document.getElementById('rosterTableBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-400">No faculty matching criteria.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(f => `
+                <tr class="hover:bg-slate-50/80 transition">
+                    <td class="p-3 text-center font-mono text-xs text-slate-400">${f.s_no || '-'}</td>
+                    <td class="p-3 font-semibold text-slate-900">${f.department}</td>
+                    <td class="p-3 text-slate-800 font-medium">${f.name}</td>
+                    <td class="p-3 text-xs text-slate-500">${f.designation || '-'}</td>
+                    <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-slate-700">Shift ${f.shift || 'I'}</span></td>
+                    <td class="p-3 font-mono text-xs text-slate-500">${f.email || '-'}</td>
+                    <td class="p-3 text-center">
+                        ${f.status === 'SUBMITTED' 
+                            ? `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200 inline-flex items-center space-x-1"><i class="fa-solid fa-check"></i><span>Submitted</span></span>`
+                            : `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200 inline-flex items-center space-x-1"><i class="fa-solid fa-hourglass-half"></i><span>Pending</span></span>`
+                        }
+                    </td>
+                    <td class="p-3 text-right">
+                        <button onclick="copySingleEmail('${f.email}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold border border-slate-300 transition" title="Copy Email">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function copySingleEmail(email) {
+            if (!email) { showToast("No email on record for this faculty", "error"); return; }
+            navigator.clipboard.writeText(email);
+            showToast("Copied: " + email);
+        }
+
+        function copyPendingEmails() {
+            const responses = getStoredResponses();
+            const submittedEmails = new Set(responses.map(r => (r.faculty_email || '').toLowerCase()).filter(Boolean));
+            const submittedNames = new Set(responses.map(r => `${(r.faculty_name||'').toLowerCase()}___${(r.department||'').toLowerCase()}`));
+
+            const pendingEmails = MASTER_FACULTY_ROSTER
+                .filter(f => !submittedEmails.has((f.email||'').toLowerCase()) && !submittedNames.has(`${f.name.toLowerCase()}___${f.department.toLowerCase()}`))
+                .map(f => f.email).filter(Boolean);
+
+            if (pendingEmails.length === 0) {
+                showToast("All faculty have submitted!");
+                return;
+            }
+            const text = pendingEmails.join(", ");
+            navigator.clipboard.writeText(text);
+            document.getElementById('copiedEmailsBox').value = text;
+            document.getElementById('emailCopyModal').classList.remove('hidden');
+        }
+
+        function exportPendingCSV() {
+            const responses = getStoredResponses();
+            const submittedEmails = new Set(responses.map(r => (r.faculty_email || '').toLowerCase()).filter(Boolean));
+            const submittedNames = new Set(responses.map(r => `${(r.faculty_name||'').toLowerCase()}___${(r.department||'').toLowerCase()}`));
+
+            const pendingList = MASTER_FACULTY_ROSTER.filter(f => !submittedEmails.has((f.email||'').toLowerCase()) && !submittedNames.has(`${f.name.toLowerCase()}___${f.department.toLowerCase()}`));
+
+            let csv = "S.No,Department,Faculty Name,Designation,Shift,Email Address,Status\n";
+            pendingList.forEach(f => {
+                csv += `"${f.s_no}","${f.department}","${f.name}","${f.designation}","${f.shift}","${f.email}","PENDING"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'pending_faculty_list.csv';
+            a.click();
+        }
+
+        // Analytics Dashboard
+        function renderAnalyticsDashboard() {
+            let responses = getStoredResponses();
+            const dept = document.getElementById('analyticsDeptSelect').value;
+            const level = document.getElementById('analyticsLevelSelect').value;
+
+            if (dept !== 'All') responses = responses.filter(r => r.department === dept);
+            if (level !== 'All') responses = responses.filter(r => r.course_level === level);
+
+            document.getElementById('kpiAnaTotal').innerText = responses.length;
+
+            if (responses.length === 0) {
+                document.getElementById('kpiAnaEff').innerText = "0%";
+                document.getElementById('kpiAnaEffAvg').innerText = "0 / 5.0 score";
+                document.getElementById('kpiAnaObe').innerText = "0%";
+                document.getElementById('kpiAnaMulti').innerText = "0 / 5";
+                document.getElementById('kpiAnaIks').innerText = "0 / 5";
+                return;
+            }
+
+            // Compute Stats
+            const parseVal = v => {
+                if (!v) return 0;
+                const n = parseFloat(String(v)[0]);
+                return isNaN(n) ? 0 : n;
+            };
+
+            // Overall Effectiveness
+            const effMeans = effItems.map(item => {
+                const vals = responses.map(r => parseVal(r.overall_effectiveness?.[item])).filter(v => v > 0);
+                return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
+            });
+            const overallEffAvg = effMeans.length ? (effMeans.reduce((a, b) => a + b, 0) / effMeans.length) : 0;
+            const overallEffPct = Math.round((overallEffAvg / 5.0) * 100);
+
+            // OBE
+            const obeMeans = obeItems.map(item => {
+                const vals = responses.map(r => parseVal(r.obe_evaluation?.[item])).filter(v => v > 0);
+                return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
+            });
+            const overallObeAvg = obeMeans.length ? (obeMeans.reduce((a, b) => a + b, 0) / obeMeans.length) : 0;
+            const overallObePct = Math.round((overallObeAvg / 5.0) * 100);
+
+            // Multidisciplinary & IKS
+            const multiVals = responses.map(r => parseVal(r.multidisciplinary_rating)).filter(v => v > 0);
+            const multiAvg = multiVals.length ? (multiVals.reduce((a,b)=>a+b,0)/multiVals.length).toFixed(1) : 0;
+
+            const iksVals = responses.map(r => parseVal(r.iks_effectiveness)).filter(v => v > 0);
+            const iksAvg = iksVals.length ? (iksVals.reduce((a,b)=>a+b,0)/iksVals.length).toFixed(1) : 0;
+
+            document.getElementById('kpiAnaEff').innerText = overallEffPct + "%";
+            document.getElementById('kpiAnaEffAvg').innerText = overallEffAvg.toFixed(2) + " / 5.0 score";
+            document.getElementById('kpiAnaObe').innerText = overallObePct + "%";
+            document.getElementById('kpiAnaMulti').innerText = multiAvg + " / 5";
+            document.getElementById('kpiAnaIks').innerText = iksAvg + " / 5";
+
+            // Render Charts
+            Object.values(chartInstances).forEach(c => c.destroy());
+            chartInstances = {};
+
+            // 1. Effectiveness Bar
+            chartInstances.eff = new Chart(document.getElementById('chartEff'), {
+                type: 'bar',
+                data: {
+                    labels: effItems.map(l => l.length > 25 ? l.substring(0, 25) + '...' : l),
+                    datasets: [{
+                        label: 'Mean Rating (Max 5.0)',
+                        data: effMeans.map(v => v.toFixed(2)),
+                        backgroundColor: effMeans.map(v => v >= 4 ? 'rgba(16, 185, 129, 0.8)' : v >= 3 ? 'rgba(245, 158, 11, 0.8)' : 'rgba(239, 68, 68, 0.8)'),
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { min: 0, max: 5 }, y: { ticks: { font: { size: 9 } } } }
+                }
+            });
+
+            // 2. OBE Radar
+            chartInstances.obe = new Chart(document.getElementById('chartObe'), {
+                type: 'radar',
+                data: {
+                    labels: ['PO Clarity', 'PSO Spec.', 'CO Measurable', 'CO-PO Map', 'Communication', 'T-L Align', 'Assess Attain', 'Attain Data'],
+                    datasets: [{
+                        label: 'OBE Score (1-5)',
+                        data: obeMeans.map(v => v.toFixed(2)),
+                        backgroundColor: 'rgba(87, 70, 227, 0.2)',
+                        borderColor: 'rgb(87, 70, 227)',
+                        pointBackgroundColor: 'rgb(87, 70, 227)',
+                        borderWidth: 2
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 5 } } }
+            });
+
+            // 3. Structure Bar
+            const structMeans = structItems.map(item => {
+                const vals = responses.map(r => parseVal(r.curriculum_structure?.[item])).filter(v => v > 0);
+                return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
+            });
+            chartInstances.struct = new Chart(document.getElementById('chartStruct'), {
+                type: 'bar',
+                data: {
+                    labels: structItems.map(l => l.length > 20 ? l.substring(0, 20) + '...' : l),
+                    datasets: [{
+                        label: 'Adequacy (1-4)',
+                        data: structMeans.map(v => v.toFixed(2)),
+                        backgroundColor: 'rgba(175, 76, 16, 0.75)',
+                        borderRadius: 6
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 4 } } }
+            });
+
+            // 4. Emerging Bar
+            const counts = {};
+            emergingPool.forEach(e => counts[e] = 0);
+            responses.forEach(r => {
+                (r.emerging_areas || []).forEach(a => { if (counts[a] !== undefined) counts[a]++; });
+            });
+            const topEmerging = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+            chartInstances.emerging = new Chart(document.getElementById('chartEmerging'), {
+                type: 'bar',
+                data: {
+                    labels: topEmerging.map(([k]) => k.length > 25 ? k.substring(0, 25) + '...' : k),
+                    datasets: [{
+                        label: '% Faculty Demand',
+                        data: topEmerging.map(([_, v]) => responses.length ? Math.round((v / responses.length)*100) : 0),
+                        backgroundColor: 'rgba(147, 51, 234, 0.75)',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { min: 0, max: 100, ticks: { callback: v => v + '%' } } }
+                }
+            });
+        }
+
+        // Responses Explorer Table
+        function renderResponsesTable() {
+            const list = getStoredResponses();
+            const tbody = document.getElementById('responsesTableBody');
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-400">No responses recorded yet.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map((r, i) => `
+                <tr class="hover:bg-slate-50/80 transition">
+                    <td class="p-3.5 font-mono text-xs text-slate-400">#${i + 1}</td>
+                    <td class="p-3.5 text-xs text-slate-500">${r.timestamp || '-'}</td>
+                    <td class="p-3.5 font-semibold text-slate-900">${r.department}</td>
+                    <td class="p-3.5 text-slate-700">${r.faculty_name}</td>
+                    <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700">${r.course_level}</span></td>
+                    <td class="p-3.5 font-bold text-amber-600">${r.multidisciplinary_rating || '-'} / 5</td>
+                    <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${r.overlapping_courses === 'YES' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-50 text-emerald-700'}">${r.overlapping_courses}</span></td>
+                    <td class="p-3.5 text-right">
+                        <button onclick="viewSingleResponse(${i})" class="px-3 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-lg text-xs font-semibold border border-brand-200 transition">View Details</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function viewSingleResponse(idx) {
+            const r = getStoredResponses()[idx];
+            if (!r) return;
+
+            document.getElementById('modalFacultyName').innerText = r.faculty_name;
+            document.getElementById('modalMeta').innerText = `${r.department} • Level: ${r.course_level} • Email: ${r.faculty_email || 'N/A'}`;
+
+            document.getElementById('modalContent').innerHTML = `
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                    <h4 class="font-bold text-slate-800 mb-2">Overall Effectiveness Ratings:</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        ${Object.entries(r.overall_effectiveness || {}).map(([k, v]) => `
+                            <div class="flex justify-between p-2 rounded bg-white border border-slate-200/60">
+                                <span class="text-slate-600">${k}:</span>
+                                <strong class="text-slate-900 ml-2">${v}</strong>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+                ${r.overlapping_details ? `<div class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs"><strong>Overlap Reported:</strong> ${r.overlapping_details}</div>` : ''}
+                ${r.courses_to_revise ? `<div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs"><strong>Proposed Revisions:</strong> ${r.courses_to_revise}</div>` : ''}
+            `;
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function exportAllResponsesCSV() {
+            const list = getStoredResponses();
+            if (list.length === 0) { showToast("No responses to export"); return; }
+            let csv = "ID,Timestamp,Department,Faculty Name,Email,Level,Multidisciplinary,Overlaps,Overlapping Details,Revisions\n";
+            list.forEach((r, i) => {
+                csv += `"${i+1}","${r.timestamp}","${r.department}","${r.faculty_name}","${r.faculty_email}","${r.course_level}","${r.multidisciplinary_rating}","${r.overlapping_courses}","${r.overlapping_details||''}","${r.courses_to_revise||''}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = 'faculty_feedback_responses.csv'; a.click();
+        }
+
+        function exportAllResponsesJSON() {
+            const list = getStoredResponses();
+            const blob = new Blob([JSON.stringify(list, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = 'faculty_feedback_raw.json'; a.click();
+        }
+
+        // Report Table
+        function renderReportTable() {
+            const responses = getStoredResponses();
+            document.getElementById('reportSummaryParagraph').innerText = `This comprehensive analytical audit synthesizes structured feedback collected from ${responses.length} faculty members regarding the 2025-26 Curricular Design and Development across 33 academic programmes in St. Joseph's College (Autonomous).`;
+
+            const parseVal = v => {
+                if (!v) return 0;
+                const n = parseFloat(String(v)[0]);
+                return isNaN(n) ? 0 : n;
+            };
+
+            document.getElementById('reportEffBody').innerHTML = effItems.map((item, idx) => {
+                const vals = responses.map(r => parseVal(r.overall_effectiveness?.[item])).filter(v => v > 0);
+                const mean = vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
+                const pct = Math.round((mean / 5.0) * 100);
+                return `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-2 text-center border-r border-slate-200 font-mono">${idx + 1}</td>
+                        <td class="p-2 border-r border-slate-200 font-medium">${item}</td>
+                        <td class="p-2 text-center border-r border-slate-200 font-bold">${mean.toFixed(2)}</td>
+                        <td class="p-2 text-center font-bold text-emerald-700">${pct}%</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Seed Sample Benchmark Data
+        function seedSampleBenchmarkData(showNotification = true) {
+            const sampleResponses = [];
+            const samplePool = MASTER_FACULTY_ROSTER.slice(0, 48); // Pick 48 faculty across departments
+
+            samplePool.forEach(f => {
+                const eff = {};
+                effItems.forEach(item => eff[item] = ["3 - Moderately Effective", "4 - Effective", "5 - Highly Effective"][Math.floor(Math.random()*3)]);
+
+                const obe = {};
+                obeItems.forEach(item => obe[item] = [3, 4, 5][Math.floor(Math.random()*3)]);
+
+                const struct = {};
+                structItems.forEach(item => struct[item] = ["3 - Adequate", "4 - Highly Adequate", "2 - Needs Improvement"][Math.floor(Math.random()*3)]);
+
+                sampleResponses.push({
+                    id: Date.now() + Math.random(),
+                    timestamp: "2026-10-07 18:30:00",
+                    department: f.department,
+                    faculty_name: f.name,
+                    faculty_email: f.email,
+                    course_level: ["UG", "PG", "Both"][Math.floor(Math.random()*3)],
+                    overall_effectiveness: eff,
+                    obe_evaluation: obe,
+                    curriculum_structure: struct,
+                    overlapping_courses: Math.random() > 0.8 ? "YES" : "NO",
+                    overlapping_details: Math.random() > 0.8 ? "Sem 3 core unit overlaps with advanced elective." : "",
+                    multidisciplinary_rating: Math.floor(Math.random()*2) + 4,
+                    flexible_learning_paths: ["Academic Flexibility", "Credit Transfer"],
+                    electives_rating: "Good",
+                    experiential_learning: {},
+                    digital_learning: {},
+                    research_orientation: ["Faculty-Mentored Projects", "Research Methodology"],
+                    nep_challenges: "",
+                    emerging_areas: ["Artificial Intelligence and Generative AI", "Data Science and Big Data Analytics", "Cybersecurity and Digital Privacy"],
+                    nsqf_alignment: "4",
+                    stakeholder_sources: ["Student", "Alumni", "Employer"],
+                    stakeholder_needs: {},
+                    iks_effectiveness: 4,
+                    iks_integration_modes: ["Selected units in existing courses"],
+                    courses_to_revise: "Introduce hands-on industry application modules."
+                });
+            });
+
+            localStorage.setItem("sjc_faculty_feedback_records_2025", JSON.stringify(sampleResponses));
+            if (showNotification) {
+                showToast("Added 48 sample faculty benchmark responses!");
+                renderRosterTable();
+                renderAnalyticsDashboard();
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const bg = type === 'success' ? 'bg-emerald-700 text-white' : 'bg-rose-700 text-white';
+            toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl flex items-center space-x-2 text-xs font-semibold pointer-events-auto transition-all transform duration-300`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-check"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }
+    </script>
+</body>
+</html>
