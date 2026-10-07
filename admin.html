@@ -693,9 +693,13 @@
         }
 
         function getStoredResponses() {
-            const raw = localStorage.getItem("sjc_faculty_feedback_records_2025");
-            if (raw) {
-                try { return JSON.parse(raw); } catch(e) { return []; }
+            const rawNew = localStorage.getItem("sjc_feedback_responses");
+            if (rawNew) {
+                try { return JSON.parse(rawNew); } catch(e) {}
+            }
+            const rawOld = localStorage.getItem("sjc_faculty_feedback_records_2025");
+            if (rawOld) {
+                try { return JSON.parse(rawOld); } catch(e) {}
             }
             return [];
         }
@@ -1041,17 +1045,37 @@
             tbody.innerHTML = list.map((r, i) => `
                 <tr class="hover:bg-slate-50/80 transition">
                     <td class="p-3.5 font-mono text-xs text-slate-400">#${i + 1}</td>
-                    <td class="p-3.5 text-xs text-slate-500">${r.timestamp || '-'}</td>
-                    <td class="p-3.5 font-semibold text-slate-900">${r.department}</td>
-                    <td class="p-3.5 text-slate-700">${r.faculty_name}</td>
-                    <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700">${r.course_level}</span></td>
+                    <td class="p-3.5 text-xs text-slate-500">${r.timestamp ? new Date(r.timestamp).toLocaleDateString() : '-'}</td>
+                    <td class="p-3.5 font-semibold text-slate-900">${r.department || '-'}</td>
+                    <td class="p-3.5 text-slate-700 font-medium">${r.faculty_name || '-'}</td>
+                    <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700">${r.course_level || 'UG'}</span></td>
                     <td class="p-3.5 font-bold text-amber-600">${r.multidisciplinary_rating || '-'} / 5</td>
-                    <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${r.overlapping_courses === 'YES' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-50 text-emerald-700'}">${r.overlapping_courses}</span></td>
+                    <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${r.overlapping_courses === 'YES' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-50 text-emerald-700'}">${r.overlapping_courses || 'NO'}</span></td>
                     <td class="p-3.5 text-right">
-                        <button onclick="viewSingleResponse(${i})" class="px-3 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-lg text-xs font-semibold border border-brand-200 transition">View Details</button>
+                        <div class="flex items-center justify-end space-x-1.5">
+                            <button onclick="viewSingleResponse(${i})" class="px-3 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-lg text-xs font-semibold border border-brand-200 transition flex items-center gap-1">
+                                <i class="fa-solid fa-eye text-xs"></i> <span>View</span>
+                            </button>
+                            <button onclick="deleteSingleResponse(${i})" class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg text-xs font-semibold transition" title="Delete Response">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `).join('');
+        }
+
+        function deleteSingleResponse(idx) {
+            const list = getStoredResponses();
+            const r = list[idx];
+            if (!r) return;
+            if (!confirm(`Are you sure you want to delete the feedback response recorded for ${r.faculty_name} (${r.department})?`)) return;
+
+            list.splice(idx, 1);
+            localStorage.setItem("sjc_feedback_responses", JSON.stringify(list));
+            renderResponsesTable();
+            renderRosterTable();
+            showToast('Response deleted successfully.');
         }
 
         function viewSingleResponse(idx) {
@@ -1061,20 +1085,51 @@
             document.getElementById('modalFacultyName').innerText = r.faculty_name;
             document.getElementById('modalMeta').innerText = `${r.department} • Level: ${r.course_level} • Email: ${r.faculty_email || 'N/A'}`;
 
+            const formatDict = (obj) => {
+                if (!obj || Object.keys(obj).length === 0) return '<em class="text-slate-400">None</em>';
+                return `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">` +
+                    Object.entries(obj).map(([k, v]) => `
+                        <div class="flex justify-between p-2 rounded bg-white border border-slate-200/60 text-xs">
+                            <span class="text-slate-600 truncate mr-2" title="${k}">${k}:</span>
+                            <strong class="text-slate-900">${v}</strong>
+                        </div>
+                    `).join('') + `</div>`;
+            };
+
+            const revs = (r.course_revisions || []).map(c => `
+                <tr class="border-b border-slate-100">
+                    <td class="p-2 font-semibold">${c.title}</td>
+                    <td class="p-2 text-center">${c.sem}</td>
+                    <td class="p-2">${c.change}</td>
+                    <td class="p-2 text-slate-500">${c.reason}</td>
+                </tr>
+            `).join('');
+
             document.getElementById('modalContent').innerHTML = `
-                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                    <h4 class="font-bold text-slate-800 mb-2">Overall Effectiveness Ratings:</h4>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                        ${Object.entries(r.overall_effectiveness || {}).map(([k, v]) => `
-                            <div class="flex justify-between p-2 rounded bg-white border border-slate-200/60">
-                                <span class="text-slate-600">${k}:</span>
-                                <strong class="text-slate-900 ml-2">${v}</strong>
-                            </div>
-                        `).join('')}
+                <div class="space-y-4">
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-2">Overall Effectiveness Ratings</h4>
+                        ${formatDict(r.overall_effectiveness)}
                     </div>
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-2">OBE Evaluation</h4>
+                        ${formatDict(r.obe_evaluation)}
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                        <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-2">Curriculum Structure Balance</h4>
+                        ${formatDict(r.curriculum_structure)}
+                    </div>
+                    ${r.overlapping_details ? `<div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs"><strong>Overlap Details:</strong> ${r.overlapping_details}</div>` : ''}
+                    ${revs ? `
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                            <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider">Course Revision Proposals</h4>
+                            <table class="w-full text-left text-xs bg-white rounded-xl overflow-hidden border border-slate-200">
+                                <thead><tr class="bg-slate-100 text-slate-600 font-bold"><th class="p-2">Course</th><th class="p-2 text-center">Sem</th><th class="p-2">Change</th><th class="p-2">Reason</th></tr></thead>
+                                <tbody>${revs}</tbody>
+                            </table>
+                        </div>
+                    ` : ''}
                 </div>
-                ${r.overlapping_details ? `<div class="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs"><strong>Overlap Reported:</strong> ${r.overlapping_details}</div>` : ''}
-                ${r.courses_to_revise ? `<div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs"><strong>Proposed Revisions:</strong> ${r.courses_to_revise}</div>` : ''}
             `;
             document.getElementById('detailModal').classList.remove('hidden');
         }

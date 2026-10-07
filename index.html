@@ -721,11 +721,28 @@
 
         </form>
 
-        <!-- Footer -->
-        <footer class="text-center py-6 text-xs text-slate-500 font-medium">
-            St. Joseph's College (Autonomous) • Internal Quality Assurance Cell (IQAC)
-        </footer>
+    </div>
 
+    <!-- Submission Success Confirmation View -->
+    <div id="successView" class="hidden max-w-2xl mx-auto py-12 px-6 text-center portal-card space-y-6">
+        <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-4xl shadow-inner">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div class="space-y-2">
+            <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Feedback Submitted Successfully!</h2>
+            <p class="text-sm text-slate-600 max-w-md mx-auto">
+                Thank you for contributing to the St. Joseph's College Curriculum Revision Process for 2025-26. Your response has been securely recorded.
+            </p>
+        </div>
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 inline-block text-left text-xs space-y-1">
+            <div class="text-slate-500">Submission Timestamp: <span class="font-semibold text-slate-800" id="successTimestamp"></span></div>
+            <div class="text-slate-500">Faculty Reference ID: <span class="font-mono font-bold text-indigo-600" id="successRefId"></span></div>
+        </div>
+        <div>
+            <button onclick="window.location.reload()" class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs shadow-lg transition">
+                <i class="fa-solid fa-rotate-right mr-1.5"></i> Submit Another Response
+            </button>
+        </div>
     </div>
 
     <!-- Course Revision Proposal Modal -->
@@ -1013,10 +1030,12 @@
             if (stepNum > 1) {
                 const name = document.getElementById('facultyNameInput').value;
                 const dept = document.getElementById('deptSelect').value;
+                const desig = document.getElementById('facultyDesignation').innerText;
                 if (name && dept) {
                     document.getElementById('stickyFacultyDetails').classList.remove('hidden');
                     document.getElementById('stickyName').innerText = name;
                     document.getElementById('stickyDept').innerText = dept;
+                    document.getElementById('stickyDesig').innerText = desig || 'Faculty';
                 }
             } else {
                 document.getElementById('stickyFacultyDetails').classList.add('hidden');
@@ -1177,6 +1196,8 @@
 
         function showSuccessView() {
             document.getElementById('mainContainer').classList.add('hidden');
+            document.getElementById('successTimestamp').innerText = new Date().toLocaleString();
+            document.getElementById('successRefId').innerText = 'SJC-FB-' + Math.floor(100000 + Math.random() * 900000);
             document.getElementById('successView').classList.remove('hidden');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
