@@ -170,6 +170,10 @@
                     <a href="index.html" target="_blank" class="hidden sm:inline-flex items-center px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-xs font-bold rounded-xl text-white shadow transition" title="Open Faculty Feedback Form">
                         <i class="fa-solid fa-up-right-from-square mr-1.5 text-amber-400"></i> Faculty Survey Form
                     </a>
+                    <button onclick="adminLogout()" class="px-3.5 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 hover:text-rose-800 border border-rose-200 text-xs font-bold rounded-xl shadow-sm transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Logout</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1424,12 +1428,19 @@
             showToast('Question item removed successfully');
         }
 
+        function adminLogout() {
+            sessionStorage.removeItem('admin_auth');
+            document.getElementById('adminLoginModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            showToast('Logged out successfully', 'info');
+        }
+
         function saveQuestionItem() {
             const cat = document.getElementById('qModalCategory').value;
             const text = document.getElementById('qModalText').value.trim();
 
             if (!text) {
-                alert('Question text cannot be empty');
+                showToast('Question text cannot be empty', 'error');
                 return;
             }
 
@@ -1437,10 +1448,10 @@
 
             if (editingIndex >= 0) {
                 arr[editingIndex] = text;
-                showToast('Question item updated successfully');
+                showToast('Question item updated successfully', 'success');
             } else {
                 arr.push(text);
-                showToast('New question item added successfully');
+                showToast('New question item added successfully', 'success');
             }
 
             renderQuestionManager();
@@ -1458,6 +1469,7 @@
         function initFacultyModalDepts() {
             const depts = Array.from(new Set(MASTER_FACULTY_ROSTER.map(f => f.department))).filter(Boolean).sort();
             const sel = document.getElementById('facModalDept');
+            if (!sel) return;
             sel.innerHTML = '<option value="">Select Department...</option>';
             depts.forEach(d => {
                 const opt = document.createElement('option');
@@ -1474,7 +1486,7 @@
             const desig = document.getElementById('facModalDesig').value;
 
             if (!name || !dept) {
-                alert('Faculty Name and Department are required.');
+                showToast('Faculty Name and Department are required.', 'error');
                 return;
             }
 
@@ -1487,15 +1499,25 @@
 
             renderRosterTable();
             document.getElementById('editFacultyModal').classList.add('hidden');
-            showToast(`Added ${name} to Master Roster!`);
+            showToast(`Added ${name} to Master Roster!`, 'success');
         }
 
         function showToast(message, type = 'success') {
             const container = document.getElementById('toastContainer');
+            if (!container) return;
             const toast = document.createElement('div');
-            const bg = type === 'success' ? 'bg-emerald-700 text-white' : 'bg-rose-700 text-white';
-            toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl flex items-center space-x-2 text-xs font-semibold pointer-events-auto transition-all transform duration-300`;
-            toast.innerHTML = `<i class="fa-solid fa-circle-check"></i><span>${message}</span>`;
+            const bg = type === 'error' 
+                ? 'bg-rose-900 text-white border border-rose-700' 
+                : type === 'info'
+                ? 'bg-slate-900 text-white border border-slate-700'
+                : 'bg-emerald-800 text-white border border-emerald-600';
+            const icon = type === 'error' 
+                ? 'fa-triangle-exclamation text-amber-400' 
+                : type === 'info'
+                ? 'fa-circle-info text-blue-400'
+                : 'fa-circle-check text-emerald-300';
+            toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl flex items-center space-x-2.5 text-xs font-semibold pointer-events-auto transition-all transform duration-300 backdrop-blur-md`;
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 3500);
         }
