@@ -1,0 +1,125 @@
+=== PARAGRAPHS ===
+IQAC Faculty Survey on Curriculum Revision: 2025-26 
+Section A: Faculty Profile
+A1. Department: 				A2. Name of the Faculty:
+Section B: Overall Effectiveness of Current Curriculum 
+Scale: 5-Highly Effective/4-Effective/3-Moderately Effective/2-Less Effective/1- Not Effective
+Section C: Outcome Based Education (OBE)
+Section D: Curriculum Structure: Is the curriculum balanced?
+Scale:4-HighlyAdequate/3-Adeauate/2-Needs Improvement/1-Inadequate/N/A-Not Applicable
+Are there any courses or units that are repeated, overlapping, outdated, or unnecessarily detailed across semesters? – YES/NO/NOT SURE
+If Yes, provide the semester, course title, unit, specific recommendation
+Section E: NEP Components
+E1. Multidisciplinary Learning
+Is adequate opportunity available for students to study courses outside their discipline? 						★★★★★
+E2. Flexible Learning Path Current curriculum supports
+□ MEME	□ Academic Flexibility □ Credit Transfer   
+□ Recognition of Credits earned through MOOCs 	□ None
+E3. Choice Based Learning Electives are Very Good/Good/Adequate / Poor
+E4. Experiential Learning How effectively are the following incorporated?
+E5. Digital Learning Effective Integration of                                             
+E6. Research Orientation Students are encouraged through
+□ Faculty-Mentored Projects	□ Research Methodology		□ Publications
+□ Patent Awareness		□ Design Thinking		
+E7. What are the major challenges faced in implementing NEP-related curricular components in your programme?
+Section F: Emerging Trends, Future Skills and Industry Readiness
+F1. Which emerging areas should receive greater emphasis in the curriculum? (Select all that apply)
+Artificial Intelligence and Generative AI
+Data Science and Big Data Analytics
+Computational Biology
+Climate Change
+Cybersecurity and Digital Privacy
+Cloud Computing, Internet of Things and Smart Systems
+Automation and Robotics
+Sustainability and Green Technologies
+Entrepreneurship, Innovation and Start-up Skills
+Digital Ethics, Governance and Responsible Technology
+Other (specify)
+Section G: NSQF Alignment
+G1. Do learning outcomes are aligned with industry competencies?  1-5/N.A
+G2. Which courses could be redesigned as NSQF-aligned courses?
+Section H: Stakeholder Expectations (Based on their Feedback)
+H1. What sources of stakeholder feedback your department takes before revision?
+  Student 	  Alumni 	  Employer   Industry expert consultations
+  Board of Studies discussions	  Other (specify)
+H2. Based on your knowledge and available feedback, to what extent does the current curriculum address the needs of each stakeholder?
+Section I: Indian Knowledge Systems (IKS)
+I1. How effectively are Indian Knowledge Systems integrated? 1–5
+I2. How IKS should be integrated into Curriculum? 
+ Dedicated courses    Selected units in existing courses
+ Certificate Courses  Projects  Interdisciplinary activities
+Section J: Open-ended Suggestions
+J1. Identify the courses requiring revision
+J2. Any other recommendations. 
+****
+
+=== TABLES ===
+
+--- TABLE 0 ---
+Description | Rating (1 to 5)
+B1. Academically relevant | 
+B2. Meets current industry needs | 
+B3. Creates employability opportunities | 
+B4. Prepares students for higher edn. and competitive exams | 
+B4. Encourages research practices | 
+B5. Prepares entrepreneurs | 
+B6. Incorporates Emerging Developments in the Discipline | 
+B7. Provides adequate Practical, Hands-on Training and Industrial Exposure | 
+B8. Promotes critical thinking, problem-solving & creativity. | 
+B9. Content is appropriately distributed across semesters. | 
+B10. Provides opportunities for interdisciplinary learning. | 
+
+--- TABLE 1 ---
+Description | Rating (1 to 5)
+C1. Programme Outcomes (POs) are clearly defined | 
+C2. PSOs reflects specialization & career expectations | 
+C3. COs are measurable & appropriate to the course level | 
+C4. COs are appropriately mapped to POs and PSOs. | 
+C5. Outcomes are clearly communicated to the students | 
+C6. Teaching-learning methods are aligned with the intended         COs and cognitive levels. | 
+C7. Assessment methods effectively measure the attainment of COs. | 
+C8. CO Attainment data are analysed and used to improve course content, teaching and assessment. | 
+
+--- TABLE 2 ---
+Component | Response  (4/3/2/1/NA)
+D1. Theory Courses | 
+D2. Practical Courses | 
+D3. Project, Internship and Research | 
+D4. Discipline Specific / Open Electives (DSEs) | 
+D5. Skill / Ability Enhancement Courses (SECs) | 
+D6. Credit distrib. across theory, practical, proj. & intern components. | 
+D7. Balance between foundational, advanced and specialization courses | 
+D8. Opportunities for inter & multi-disciplinary course combinations. | 
+
+--- TABLE 3 ---
+Component | Rating
+Internship | 
+Field Visit | 
+Case Study | 
+Problem-Based Learning | 
+Project-Based Learning | 
+Community Engagement | 
+Simulations | 
+Industry-mentored Projects | 
+
+--- TABLE 4 ---
+Component | Rating
+SWAYAM/NPTEL | 
+Through Institutional LMS (JosTEL) | 
+Other MOOCs | 
+Virtual Labs | 
+Blended Learning | 
+
+--- TABLE 5 ---
+Stakeholder | Curriculum reflects their needs (Rate 1 to 5)
+H1. Students | 
+H2. Alumni | 
+H3. Employers | 
+H4. Parents | 
+H5. Industry Experts | 
+
+--- TABLE 6 ---
+Course code & title | Sem | Nature of change | Reason
+
+--- TABLE 7 ---
+ |  | Add/Remove/ Revise/Replace | 

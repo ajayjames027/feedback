@@ -158,41 +158,65 @@
             </div>
         </header>
 
-        <!-- Stepper Navigation Bar with Lock Status Indicators -->
+        <!-- Stepper Navigation Bar with Lock Status Indicators (10 Sections A-J) -->
         <nav class="portal-card p-3 overflow-x-auto flex items-center gap-2 no-scrollbar" id="stepperNav">
-            <button type="button" onclick="goToStep(1)" class="step-pill active flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-transparent text-xs font-semibold whitespace-nowrap cursor-pointer transition" id="stepper-1">
-                <span class="step-num w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold">1</span>
-                <span>Sec A: Profile</span>
+            <button type="button" onclick="goToStep(1)" class="step-pill active flex items-center gap-2 px-3.5 py-2 rounded-xl border border-transparent text-xs font-semibold whitespace-nowrap cursor-pointer transition" id="stepper-1">
+                <span class="step-num w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold">A</span>
+                <span>Section A: Faculty Profile</span>
             </button>
-            <button type="button" onclick="goToStep(2)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-2">
+            <button type="button" onclick="goToStep(2)" class="step-pill flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-2">
                 <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">
                     <i class="fa-solid fa-lock text-[9px]"></i>
                 </span>
-                <span>Sec B, C, D: Effectiveness & Structure</span>
+                <span>Section B: Overall Effectiveness of Current Curriculum</span>
             </button>
-            <button type="button" onclick="goToStep(3)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-3">
+            <button type="button" onclick="goToStep(3)" class="step-pill flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-3">
                 <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">
                     <i class="fa-solid fa-lock text-[9px]"></i>
                 </span>
-                <span>Sec E: Learning Paths & Overlaps</span>
+                <span>Section C: Outcome Based Education (OBE)</span>
             </button>
-            <button type="button" onclick="goToStep(4)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-4">
+            <button type="button" onclick="goToStep(4)" class="step-pill flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-4">
                 <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">
                     <i class="fa-solid fa-lock text-[9px]"></i>
                 </span>
-                <span>Sec E & F: Experiential & Digital</span>
+                <span>Section D: Curriculum Structure Balance</span>
             </button>
-            <button type="button" onclick="goToStep(5)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-5">
+            <button type="button" onclick="goToStep(5)" class="step-pill flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-5">
                 <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">
                     <i class="fa-solid fa-lock text-[9px]"></i>
                 </span>
-                <span>Sec F, G, H: NEP, NSQF & Stakeholders</span>
+                <span>Section E: NEP Components & Learning Paths</span>
             </button>
-            <button type="button" onclick="goToStep(6)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-6">
+            <button type="button" onclick="goToStep(6)" class="step-pill flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-6">
                 <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">
                     <i class="fa-solid fa-lock text-[9px]"></i>
                 </span>
-                <span>Sec I & J: IKS & Revision Suggestions</span>
+                <span>Section F: Emerging Trends, Future Skills & Industry Readiness</span>
+            </button>
+            <button type="button" onclick="goToStep(7)" class="step-pill flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-7">
+                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">
+                    <i class="fa-solid fa-lock text-[9px]"></i>
+                </span>
+                <span>Section G: NSQF Alignment</span>
+            </button>
+            <button type="button" onclick="goToStep(8)" class="step-pill flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-8">
+                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">
+                    <i class="fa-solid fa-lock text-[9px]"></i>
+                </span>
+                <span>Section H: Stakeholder Expectations</span>
+            </button>
+            <button type="button" onclick="goToStep(9)" class="step-pill flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-9">
+                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">
+                    <i class="fa-solid fa-lock text-[9px]"></i>
+                </span>
+                <span>Section I: Indian Knowledge Systems (IKS)</span>
+            </button>
+            <button type="button" onclick="goToStep(10)" class="step-pill flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer transition opacity-50 cursor-not-allowed" id="stepper-10">
+                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">
+                    <i class="fa-solid fa-lock text-[9px]"></i>
+                </span>
+                <span>Section J: Open-ended Suggestions & Revision</span>
             </button>
         </nav>
 
@@ -280,13 +304,14 @@
                 </div>
             </div>
 
-            <!-- SECTION 2: Effectiveness & OBE -->
+            <!-- SECTION B: Overall Effectiveness -->
             <div class="form-section hidden space-y-6" id="form-section-2" data-step="2">
                 <div class="portal-card p-6 md:p-8 space-y-6">
                     <div class="border-b border-slate-100 pb-4">
                         <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-chart-line text-indigo-600"></i> Overall Effectiveness & OBE Evaluation
+                            <i class="fa-solid fa-chart-line text-indigo-600"></i> Section B: Overall Effectiveness of Current Curriculum
                         </h2>
+                        <p class="text-xs text-slate-500 mt-1">Evaluate the curricular dimensions of the existing syllabus.</p>
                     </div>
 
                     <!-- Overall Effectiveness -->
@@ -311,9 +336,31 @@
                             </table>
                         </div>
                     </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center justify-between pt-4">
+                    <button type="button" onclick="prevStep(2)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
+                    </button>
+                    <button type="button" onclick="nextStep(2)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
+                        <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION C: Outcome Based Education (OBE) -->
+            <div class="form-section hidden space-y-6" id="form-section-3" data-step="3">
+                <div class="portal-card p-6 md:p-8 space-y-6">
+                    <div class="border-b border-slate-100 pb-4">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-bullseye text-indigo-600"></i> Section C: Outcome Based Education (OBE) Evaluation
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">Assess the clarity and alignment of Programme & Course Outcomes.</p>
+                    </div>
 
                     <!-- OBE Evaluation -->
-                    <div class="space-y-3 pt-4" id="card-obe">
+                    <div class="space-y-3" id="card-obe">
                         <label class="block text-sm font-semibold text-slate-800">
                             Outcome Based Education (OBE) Evaluation <span class="required-star">*</span>
                         </label>
@@ -333,9 +380,31 @@
                             </table>
                         </div>
                     </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center justify-between pt-4">
+                    <button type="button" onclick="prevStep(3)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
+                    </button>
+                    <button type="button" onclick="nextStep(3)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
+                        <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION D: Curriculum Structure -->
+            <div class="form-section hidden space-y-6" id="form-section-4" data-step="4">
+                <div class="portal-card p-6 md:p-8 space-y-6">
+                    <div class="border-b border-slate-100 pb-4">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-indigo-600"></i> Section D: Curriculum Structure Balance
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">Rate whether components are adequately balanced.</p>
+                    </div>
 
                     <!-- Curriculum Structure Balance -->
-                    <div class="space-y-3 pt-4" id="card-struct">
+                    <div class="space-y-3" id="card-struct">
                         <label class="block text-sm font-semibold text-slate-800">
                             Curriculum Structure Balance <span class="required-star">*</span>
                         </label>
@@ -359,22 +428,23 @@
 
                 <!-- Navigation Controls -->
                 <div class="flex items-center justify-between pt-4">
-                    <button type="button" onclick="prevStep(2)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
+                    <button type="button" onclick="prevStep(4)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
                         <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
                     </button>
-                    <button type="button" onclick="nextStep(2)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
+                    <button type="button" onclick="nextStep(4)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
                         <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- SECTION 3: Learning Paths -->
-            <div class="form-section hidden space-y-6" id="form-section-3" data-step="3">
+            <!-- SECTION E: NEP Components & Learning Paths -->
+            <div class="form-section hidden space-y-6" id="form-section-5" data-step="5">
                 <div class="portal-card p-6 md:p-8 space-y-6">
                     <div class="border-b border-slate-100 pb-4">
                         <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-route text-indigo-600"></i> Course Content & Learning Paths
+                            <i class="fa-solid fa-route text-indigo-600"></i> Section E: NEP Components & Learning Paths
                         </h2>
+                        <p class="text-xs text-slate-500 mt-1">Overlapping courses, multidisciplinary opportunities & flexible learning paths.</p>
                     </div>
 
                     <!-- Overlapping Courses -->
@@ -449,26 +519,35 @@
                             <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50"><input type="radio" name="electives_rating" value="Poor" class="mr-2"> Poor</label>
                         </div>
                     </div>
+
+                    <!-- NEP Challenges -->
+                    <div class="space-y-2 pt-2">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Major challenges faced in implementing NEP-related curricular components:
+                        </label>
+                        <textarea name="nep_challenges" rows="3" placeholder="Enter details..." class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-600"></textarea>
+                    </div>
                 </div>
 
                 <!-- Navigation Controls -->
                 <div class="flex items-center justify-between pt-4">
-                    <button type="button" onclick="prevStep(3)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
+                    <button type="button" onclick="prevStep(5)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
                         <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
                     </button>
-                    <button type="button" onclick="nextStep(3)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
+                    <button type="button" onclick="nextStep(5)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
                         <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- SECTION 4: Experiential & Digital Learning -->
-            <div class="form-section hidden space-y-6" id="form-section-4" data-step="4">
+            <!-- SECTION F: Emerging Trends, Future Skills & Industry Readiness -->
+            <div class="form-section hidden space-y-6" id="form-section-6" data-step="6">
                 <div class="portal-card p-6 md:p-8 space-y-6">
                     <div class="border-b border-slate-100 pb-4">
                         <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-laptop-code text-indigo-600"></i> Experiential & Digital Learning Integration
+                            <i class="fa-solid fa-laptop-code text-indigo-600"></i> Section F: Emerging Trends, Future Skills and Industry Readiness
                         </h2>
+                        <p class="text-xs text-slate-500 mt-1">Experiential learning, digital tools & research orientation.</p>
                     </div>
 
                     <!-- Experiential Grid -->
@@ -533,43 +612,36 @@
                             </label>
                         </div>
                     </div>
-                </div>
-
-                <!-- Navigation Controls -->
-                <div class="flex items-center justify-between pt-4">
-                    <button type="button" onclick="prevStep(4)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
-                        <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
-                    </button>
-                    <button type="button" onclick="nextStep(4)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
-                        <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- SECTION 5: Modern Integration & NSQF -->
-            <div class="form-section hidden space-y-6" id="form-section-5" data-step="5">
-                <div class="portal-card p-6 md:p-8 space-y-6">
-                    <div class="border-b border-slate-100 pb-4">
-                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-lightbulb text-indigo-600"></i> Modern Integration, NEP & NSQF Alignment
-                        </h2>
-                    </div>
-
-                    <!-- NEP Challenges -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-semibold text-slate-800">
-                            Major challenges faced in implementing NEP-related curricular components:
-                        </label>
-                        <textarea name="nep_challenges" rows="3" placeholder="Enter details..." class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-600"></textarea>
-                    </div>
 
                     <!-- Emerging Areas -->
-                    <div class="space-y-3" id="card-emerging">
+                    <div class="space-y-3 pt-4" id="card-emerging">
                         <label class="block text-sm font-semibold text-slate-800">
                             Emerging areas to receive greater emphasis (Select all that apply) <span class="required-star">*</span>
                         </label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm" id="emergingCheckboxesContainer"></div>
                         <input type="text" name="emerging_other" placeholder="Other emerging areas..." class="w-full mt-2 p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-600">
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center justify-between pt-4">
+                    <button type="button" onclick="prevStep(6)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
+                    </button>
+                    <button type="button" onclick="nextStep(6)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
+                        <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION G: NSQF Alignment -->
+            <div class="form-section hidden space-y-6" id="form-section-7" data-step="7">
+                <div class="portal-card p-6 md:p-8 space-y-6">
+                    <div class="border-b border-slate-100 pb-4">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-award text-indigo-600"></i> Section G: NSQF Alignment
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">National Skills Qualifications Framework alignment and industry competencies.</p>
                     </div>
 
                     <!-- NSQF Alignment -->
@@ -586,6 +658,28 @@
                             <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50"><input type="radio" name="nsqf_alignment" value="N.A." class="mr-1"> N/A</label>
                         </div>
                     </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center justify-between pt-4">
+                    <button type="button" onclick="prevStep(7)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
+                    </button>
+                    <button type="button" onclick="nextStep(7)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
+                        <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION H: Stakeholder Expectations -->
+            <div class="form-section hidden space-y-6" id="form-section-8" data-step="8">
+                <div class="portal-card p-6 md:p-8 space-y-6">
+                    <div class="border-b border-slate-100 pb-4">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-users text-indigo-600"></i> Section H: Stakeholder Expectations (Based on Feedback)
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">Sources of feedback and extent curriculum addresses stakeholder needs.</p>
+                    </div>
 
                     <!-- Stakeholder Sources -->
                     <div class="space-y-3" id="card-stakeholder-src">
@@ -599,30 +693,9 @@
                             <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer"><input type="checkbox" name="stakeholder_sources" value="Industry experts"> <span>Industry Experts</span></label>
                         </div>
                     </div>
-                </div>
-
-                <!-- Navigation Controls -->
-                <div class="flex items-center justify-between pt-4">
-                    <button type="button" onclick="prevStep(5)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
-                        <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
-                    </button>
-                    <button type="button" onclick="nextStep(5)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
-                        <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- SECTION 6: Knowledge Systems & Final Submission -->
-            <div class="form-section hidden space-y-6" id="form-section-6" data-step="6">
-                <div class="portal-card p-6 md:p-8 space-y-6">
-                    <div class="border-b border-slate-100 pb-4">
-                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-om text-indigo-600"></i> Indian Knowledge Systems & Final Review
-                        </h2>
-                    </div>
 
                     <!-- Stakeholder Needs Matrix -->
-                    <div class="space-y-3" id="card-stakeholder-grid">
+                    <div class="space-y-3 pt-4" id="card-stakeholder-grid">
                         <label class="block text-sm font-semibold text-slate-800">
                             Extents curriculum addresses needs of stakeholders <span class="required-star">*</span>
                         </label>
@@ -642,9 +715,31 @@
                             </table>
                         </div>
                     </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center justify-between pt-4">
+                    <button type="button" onclick="prevStep(8)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
+                    </button>
+                    <button type="button" onclick="nextStep(8)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
+                        <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION I: Indian Knowledge Systems (IKS) -->
+            <div class="form-section hidden space-y-6" id="form-section-9" data-step="9">
+                <div class="portal-card p-6 md:p-8 space-y-6">
+                    <div class="border-b border-slate-100 pb-4">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-om text-indigo-600"></i> Section I: Indian Knowledge Systems (IKS)
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">Integration effectiveness and integration modes for IKS.</p>
+                    </div>
 
                     <!-- Indian Knowledge Systems (IKS) -->
-                    <div class="space-y-3 pt-4" id="card-iks">
+                    <div class="space-y-3" id="card-iks">
                         <label class="block text-sm font-semibold text-slate-800">
                             How effectively are Indian Knowledge Systems integrated? <span class="required-star">*</span>
                         </label>
@@ -662,7 +757,7 @@
                     </div>
 
                     <!-- IKS Modes -->
-                    <div class="space-y-3" id="card-iks-modes">
+                    <div class="space-y-3 pt-4" id="card-iks-modes">
                         <label class="block text-sm font-semibold text-slate-800">
                             How should IKS be integrated into Curriculum? <span class="required-star">*</span>
                         </label>
@@ -673,9 +768,31 @@
                         </div>
                         <input type="text" name="iks_other" placeholder="Other modes..." class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-600">
                     </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center justify-between pt-4">
+                    <button type="button" onclick="prevStep(9)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
+                    </button>
+                    <button type="button" onclick="nextStep(9)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
+                        <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION J: Open-ended Suggestions & Course Revision -->
+            <div class="form-section hidden space-y-6" id="form-section-10" data-step="10">
+                <div class="portal-card p-6 md:p-8 space-y-6">
+                    <div class="border-b border-slate-100 pb-4">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-pen-to-square text-indigo-600"></i> Section J: Open-ended Suggestions & Final Review
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">Course proposals for revision (J1) and additional recommendations (J2).</p>
+                    </div>
 
                     <!-- Courses to Revise (Section J1 Structured Input) -->
-                    <div class="space-y-3 pt-4 border-t border-slate-100" id="card-revision-courses">
+                    <div class="space-y-3" id="card-revision-courses">
                         <div class="flex items-center justify-between">
                             <label class="block text-sm font-bold text-slate-800 flex items-center gap-2">
                                 <i class="fa-solid fa-table-list text-indigo-600"></i> J1. Identify the courses requiring revision
@@ -706,6 +823,7 @@
                             </table>
                         </div>
                     </div>
+
                     <!-- Question J2: Any other recommendations -->
                     <div class="space-y-3 pt-4 border-t border-slate-100" id="card-other-recommendations">
                         <label class="block text-sm font-bold text-slate-800 flex items-center gap-2">
@@ -718,7 +836,7 @@
 
                 <!-- Navigation Controls -->
                 <div class="flex items-center justify-between pt-4">
-                    <button type="button" onclick="prevStep(6)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
+                    <button type="button" onclick="prevStep(10)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
                         <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
                     </button>
                     <button type="submit" id="submitBtn" class="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center gap-2">
@@ -1122,17 +1240,19 @@
             const nxt = document.getElementById('form-section-' + stepNum);
             if (nxt) nxt.classList.remove('hidden');
 
-            for (let i = 1; i <= 6; i++) {
+            const sectionLetters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+            for (let i = 1; i <= 10; i++) {
                 const el = document.getElementById('stepper-' + i);
                 if (el) {
                     el.classList.remove('active', 'completed', 'opacity-50', 'cursor-not-allowed');
                     const numSpan = el.querySelector('.step-num');
+                    const letter = sectionLetters[i - 1];
                     if (i === stepNum) {
                         el.classList.add('active');
-                        if (numSpan) numSpan.innerHTML = `${i}`;
+                        if (numSpan) numSpan.innerHTML = `${letter}`;
                     } else if (i < stepNum || i <= currentMaxStepUnlocked) {
                         if (i < stepNum) el.classList.add('completed');
-                        if (numSpan) numSpan.innerHTML = i < stepNum ? `<i class="fa-solid fa-check text-[10px]"></i>` : `${i}`;
+                        if (numSpan) numSpan.innerHTML = i < stepNum ? `<i class="fa-solid fa-check text-[10px]"></i>` : `${letter}`;
                     } else {
                         el.classList.add('opacity-50', 'cursor-not-allowed');
                         if (numSpan) numSpan.innerHTML = `<i class="fa-solid fa-lock text-[9px]"></i>`;
