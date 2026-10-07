@@ -369,37 +369,70 @@
 
             <!-- Questions Category List -->
             <div class="space-y-6">
-                <!-- Section 2: Overall Effectiveness -->
+                <!-- Section A: Faculty & Departmental Profile -->
                 <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
                     <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                         <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-                            <i class="fa-solid fa-star text-amber-500"></i> Overall Curricular Effectiveness Items (5-Point Likert)
+                            <i class="fa-solid fa-id-card text-blue-600"></i> Section A: Faculty & Departmental Profile Fields
                         </h3>
-                        <span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold" id="qCountEff">12 items</span>
+                        <span class="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold" id="qCountSecA">5 fields</span>
+                    </div>
+                    <div class="divide-y divide-slate-100" id="qListSecA"></div>
+                </div>
+
+                <!-- Section B: Overall Effectiveness -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-star text-amber-500"></i> Section B: Overall Curricular Effectiveness Items (5-Point Likert)
+                        </h3>
+                        <span class="px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold" id="qCountEff">12 items</span>
                     </div>
                     <div class="divide-y divide-slate-100" id="qListEff"></div>
                 </div>
 
-                <!-- Section 2: OBE -->
+                <!-- Section C: OBE -->
                 <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
                     <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                         <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-                            <i class="fa-solid fa-bullseye text-indigo-500"></i> Outcome Based Education (OBE) Items
+                            <i class="fa-solid fa-bullseye text-indigo-500"></i> Section C: Outcome Based Education (OBE) Items
                         </h3>
-                        <span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold" id="qCountObe">8 items</span>
+                        <span class="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold" id="qCountObe">8 items</span>
                     </div>
                     <div class="divide-y divide-slate-100" id="qListObe"></div>
                 </div>
 
-                <!-- Section 3: Curriculum Structure -->
+                <!-- Section D: Curriculum Structure -->
                 <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
                     <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                         <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
-                            <i class="fa-solid fa-layer-group text-emerald-500"></i> Curriculum Component Adequacy Items
+                            <i class="fa-solid fa-layer-group text-emerald-500"></i> Section D: Curriculum Component Adequacy Items
                         </h3>
-                        <span class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold" id="qCountStruct">8 items</span>
+                        <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold" id="qCountStruct">8 items</span>
                     </div>
                     <div class="divide-y divide-slate-100" id="qListStruct"></div>
+                </div>
+
+                <!-- Section E: Emerging Thrust Areas -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-lightbulb text-purple-500"></i> Section E: Emerging Discipline Topics Pool
+                        </h3>
+                        <span class="px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-bold" id="qCountEmerging">9 topics</span>
+                    </div>
+                    <div class="divide-y divide-slate-100" id="qListEmerging"></div>
+                </div>
+
+                <!-- Section J: Course Revision & Open Feedback -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-comment-dots text-rose-500"></i> Section J: Course Revisions & Recommendations
+                        </h3>
+                        <span class="px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 text-xs font-bold" id="qCountSecJ">2 modules</span>
+                    </div>
+                    <div class="divide-y divide-slate-100" id="qListSecJ"></div>
                 </div>
             </div>
         </section>
@@ -622,6 +655,11 @@
         </section>
 
     </main>
+
+    <!-- Institutional Footer -->
+    <footer class="mt-12 py-6 border-t border-slate-200 text-center text-xs text-slate-500 font-medium no-print">
+        Designed & Developed by Internal Quality Assurance Cell - St. Joseph's College (Autonomous), Tiruchirappalli
+    </footer>
 
     <!-- Response Detail Modal -->
     <div id="detailModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
@@ -1351,12 +1389,61 @@
         }
 
         // Question Manager JS Logic
+        const secAItems = [
+            'Faculty Name & Designation Profile',
+            'Department & School Affiliation',
+            'Syllabus Revision Academic Year',
+            'Level of Programme Taught (UG / PG)',
+            'Name of Course(s) / Papers Handled'
+        ];
+
+        const secJItems = [
+            'Specific Course Content Revisions & Recommended Changes',
+            'General Feedback, Institutional Support & Suggestions'
+        ];
+
+        function getQuestionCategoryArray(cat) {
+            switch (cat) {
+                case 'secA': return secAItems;
+                case 'eff': return effItems;
+                case 'obe': return obeItems;
+                case 'struct': return structItems;
+                case 'emerging': return emergingPool;
+                case 'secJ': return secJItems;
+                default: return effItems;
+            }
+        }
+
         function renderQuestionManager() {
+            // Render Section A
+            const elCountA = document.getElementById('qCountSecA');
+            const elListA = document.getElementById('qListSecA');
+            if (elCountA && elListA) {
+                elCountA.innerText = `${secAItems.length} fields`;
+                elListA.innerHTML = secAItems.map((item, idx) => `
+                    <div class="py-3 flex items-center justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-6 h-6 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs">${idx + 1}</span>
+                            <span class="text-xs font-semibold text-slate-800">${item}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="editQuestion('secA', ${idx})" class="p-1.5 text-slate-400 hover:text-amber-500 rounded-lg text-xs font-semibold transition" title="Edit">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="deleteQuestion('secA', ${idx})" class="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg text-xs font-semibold transition" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Render Section B (eff)
             document.getElementById('qCountEff').innerText = `${effItems.length} items`;
             document.getElementById('qListEff').innerHTML = effItems.map((item, idx) => `
                 <div class="py-3 flex items-center justify-between gap-4">
                     <div class="flex items-center space-x-3">
-                        <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-bold text-xs">${idx + 1}</span>
+                        <span class="w-6 h-6 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">${idx + 1}</span>
                         <span class="text-xs font-semibold text-slate-800">${item}</span>
                     </div>
                     <div class="flex items-center space-x-2">
@@ -1370,6 +1457,7 @@
                 </div>
             `).join('');
 
+            // Render Section C (obe)
             document.getElementById('qCountObe').innerText = `${obeItems.length} items`;
             document.getElementById('qListObe').innerHTML = obeItems.map((item, idx) => `
                 <div class="py-3 flex items-center justify-between gap-4">
@@ -1388,6 +1476,7 @@
                 </div>
             `).join('');
 
+            // Render Section D (struct)
             document.getElementById('qCountStruct').innerText = `${structItems.length} items`;
             document.getElementById('qListStruct').innerHTML = structItems.map((item, idx) => `
                 <div class="py-3 flex items-center justify-between gap-4">
@@ -1405,6 +1494,52 @@
                     </div>
                 </div>
             `).join('');
+
+            // Render Section E (emerging)
+            const elCountE = document.getElementById('qCountEmerging');
+            const elListE = document.getElementById('qListEmerging');
+            if (elCountE && elListE) {
+                elCountE.innerText = `${emergingPool.length} topics`;
+                elListE.innerHTML = emergingPool.map((item, idx) => `
+                    <div class="py-3 flex items-center justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-6 h-6 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center font-bold text-xs">${idx + 1}</span>
+                            <span class="text-xs font-semibold text-slate-800">${item}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="editQuestion('emerging', ${idx})" class="p-1.5 text-slate-400 hover:text-amber-500 rounded-lg text-xs font-semibold transition" title="Edit">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="deleteQuestion('emerging', ${idx})" class="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg text-xs font-semibold transition" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Render Section J (secJ)
+            const elCountJ = document.getElementById('qCountSecJ');
+            const elListJ = document.getElementById('qListSecJ');
+            if (elCountJ && elListJ) {
+                elCountJ.innerText = `${secJItems.length} modules`;
+                elListJ.innerHTML = secJItems.map((item, idx) => `
+                    <div class="py-3 flex items-center justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-6 h-6 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-xs">${idx + 1}</span>
+                            <span class="text-xs font-semibold text-slate-800">${item}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="editQuestion('secJ', ${idx})" class="p-1.5 text-slate-400 hover:text-amber-500 rounded-lg text-xs font-semibold transition" title="Edit">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="deleteQuestion('secJ', ${idx})" class="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg text-xs font-semibold transition" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
         }
 
         let editingCategory = null;
@@ -1417,7 +1552,7 @@
 
             if (idx >= 0) {
                 document.getElementById('qModalTitle').innerText = 'Edit Survey Item';
-                const arr = cat === 'eff' ? effItems : (cat === 'obe' ? obeItems : structItems);
+                const arr = getQuestionCategoryArray(cat);
                 document.getElementById('qModalText').value = arr[idx] || '';
             } else {
                 document.getElementById('qModalTitle').innerText = 'Add New Survey Item';
@@ -1432,7 +1567,7 @@
 
         function deleteQuestion(cat, idx) {
             if (!confirm('Are you sure you want to delete this question item?')) return;
-            const arr = cat === 'eff' ? effItems : (cat === 'obe' ? obeItems : structItems);
+            const arr = getQuestionCategoryArray(cat);
             arr.splice(idx, 1);
             renderQuestionManager();
             showToast('Question item removed successfully');
@@ -1454,7 +1589,7 @@
                 return;
             }
 
-            const arr = cat === 'eff' ? effItems : (cat === 'obe' ? obeItems : structItems);
+            const arr = getQuestionCategoryArray(cat);
 
             if (editingIndex >= 0) {
                 arr[editingIndex] = text;
@@ -1569,9 +1704,12 @@
                 <div>
                     <label class="block font-bold text-slate-700 mb-1">Target Evaluation Category</label>
                     <select id="qModalCategory" class="w-full p-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-100 outline-none bg-white">
-                        <option value="eff">Overall Effectiveness (5-Point Likert)</option>
-                        <option value="obe">Outcome Based Education (OBE)</option>
-                        <option value="struct">Curriculum Structure & Components</option>
+                        <option value="secA">Section A: Profile Fields</option>
+                        <option value="eff">Section B: Overall Effectiveness (5-Point Likert)</option>
+                        <option value="obe">Section C: Outcome Based Education (OBE)</option>
+                        <option value="struct">Section D: Curriculum Component Adequacy</option>
+                        <option value="emerging">Section E: Emerging Discipline Topics Pool</option>
+                        <option value="secJ">Section J: Course Revisions & Recommendations</option>
                     </select>
                 </div>
                 <div>
