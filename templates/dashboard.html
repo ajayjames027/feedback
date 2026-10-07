@@ -1,0 +1,557 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Curriculum Analytics & IQAC Dashboard (2025-26){% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    
+    <!-- Top Dashboard Header & Interactive Filters -->
+    <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+            <div class="flex items-center space-x-2 text-xs font-bold text-brand-600 uppercase tracking-wider mb-1">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Curricular Analytics & Intelligence Engine</span>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+                Teacher Feedback Analytics & Curricular Audit
+            </h1>
+            <p class="text-xs md:text-sm text-slate-500 mt-1">
+                Real-time statistical evaluation for Syllabus Revision 2025-26 • NAAC / NIRF / CDC Benchmark
+            </p>
+        </div>
+
+        <!-- Filter Controls -->
+        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
+            <!-- Department Filter -->
+            <div class="flex items-center space-x-1.5">
+                <label for="deptFilter" class="text-xs font-semibold text-slate-600">Dept:</label>
+                <select id="deptFilter" onchange="loadAnalytics()" class="bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-brand-500">
+                    <option value="All">All Departments (Aggregate)</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept }}">{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Course Level Filter -->
+            <div class="flex items-center space-x-1.5">
+                <label for="levelFilter" class="text-xs font-semibold text-slate-600">Level:</label>
+                <select id="levelFilter" onchange="loadAnalytics()" class="bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 focus:ring-2 focus:ring-brand-500">
+                    <option value="All">All Levels</option>
+                    <option value="UG">UG Only</option>
+                    <option value="PG">PG Only</option>
+                    <option value="Both">Both (UG & PG)</option>
+                </select>
+            </div>
+
+            <!-- Refresh Button -->
+            <button onclick="loadAnalytics()" class="p-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs transition" title="Refresh Live Data">
+                <i class="fa-solid fa-arrows-rotate" id="refreshIcon"></i>
+            </button>
+
+            <!-- Export Report -->
+            <a id="reportLink" href="{{ url_for('admin_report_view') }}" target="_blank" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-semibold shadow-sm transition flex items-center space-x-1">
+                <i class="fa-solid fa-print"></i>
+                <span>Print Report</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Empty State Warning (hidden by default) -->
+    <div id="noDataState" class="hidden bg-amber-50 border border-amber-200 rounded-3xl p-10 text-center space-y-4">
+        <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-2xl mx-auto flex items-center justify-center text-2xl">
+            <i class="fa-solid fa-inbox"></i>
+        </div>
+        <h3 class="text-xl font-bold text-slate-800">No Feedback Responses Found</h3>
+        <p class="text-sm text-slate-600 max-w-md mx-auto">
+            No feedback entries match the selected filters. You can submit a new response or generate sample faculty data.
+        </p>
+        <div class="flex justify-center space-x-3 pt-2">
+            <a href="{{ url_for('faculty_form_view') }}" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold shadow-md">Fill Form</a>
+            <button onclick="seedSampleData()" class="px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold">Add Sample Data</button>
+        </div>
+    </div>
+
+    <!-- Dashboard Content Container -->
+    <div id="dashboardDataContainer" class="space-y-8">
+        
+        <!-- TOP EXECUTIVE KPI CARDS -->
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6">
+            <!-- Total Responses -->
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Respondents</span>
+                    <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div id="kpiTotalResponses" class="text-2xl md:text-3xl font-black text-slate-900">--</div>
+                    <div class="text-[11px] text-slate-500 mt-0.5">Faculty submissions logged</div>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
+            </div>
+
+            <!-- Effectiveness Index -->
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Effectiveness</span>
+                    <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm font-bold">
+                        <i class="fa-solid fa-award"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div id="kpiOverallEff" class="text-2xl md:text-3xl font-black text-emerald-600">--</div>
+                    <div id="kpiOverallEffAvg" class="text-[11px] text-slate-500 mt-0.5">-- / 5.0 score</div>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500"></div>
+            </div>
+
+            <!-- OBE Alignment Score -->
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">OBE Alignment</span>
+                    <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm font-bold">
+                        <i class="fa-solid fa-bullseye"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div id="kpiObeScore" class="text-2xl md:text-3xl font-black text-indigo-600">--</div>
+                    <div class="text-[11px] text-slate-500 mt-0.5">PO-PSO-CO attainment</div>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-indigo-500"></div>
+            </div>
+
+            <!-- Multidisciplinary Opportunity -->
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">NEP Flexibility</span>
+                    <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm font-bold">
+                        <i class="fa-solid fa-arrows-split-up-and-left"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div id="kpiMultiRating" class="text-2xl md:text-3xl font-black text-amber-600">--</div>
+                    <div class="text-[11px] text-slate-500 mt-0.5">Multidisciplinary score</div>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
+            </div>
+
+            <!-- IKS Integration -->
+            <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm relative overflow-hidden col-span-2 lg:col-span-1">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500">IKS Rating</span>
+                    <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center text-sm font-bold">
+                        <i class="fa-solid fa-om"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <div id="kpiIksScore" class="text-2xl md:text-3xl font-black text-rose-600">--</div>
+                    <div class="text-[11px] text-slate-500 mt-0.5">Indian Knowledge Systems</div>
+                </div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-rose-500"></div>
+            </div>
+        </div>
+
+        <!-- ROW 1 CHARTS: OVERALL EFFECTIVENESS & OBE RADAR/BAR -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Overall Curriculum Effectiveness Chart -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">Curricular Effectiveness Dimensions</h3>
+                        <p class="text-xs text-slate-500">Average faculty rating per dimension (Scale: 1.0 - 5.0)</p>
+                    </div>
+                    <span class="px-2.5 py-1 bg-brand-50 text-brand-700 text-xs font-bold rounded-lg border border-brand-100">12 Indicators</span>
+                </div>
+                <div class="h-80 relative">
+                    <canvas id="effectivenessChart"></canvas>
+                </div>
+            </div>
+
+            <!-- OBE Alignment & Attainment Breakdown -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">Outcome Based Education (OBE) Evaluation</h3>
+                        <p class="text-xs text-slate-500">PO-PSO-CO mapping, clarity, assessment & attainment data</p>
+                    </div>
+                    <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-lg border border-indigo-100">OBE Matrix</span>
+                </div>
+                <div class="h-80 relative">
+                    <canvas id="obeRadarChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 2 CHARTS: CURRICULUM BALANCE & EMERGING TRENDS -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Curriculum Structure Balance -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">Curriculum Balance & Component Adequacy</h3>
+                        <p class="text-xs text-slate-500">Theory, Practical, Projects, Electives & Ability Enhancement (Scale 1-4)</p>
+                    </div>
+                    <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-100">Structure</span>
+                </div>
+                <div class="h-80 relative">
+                    <canvas id="structureChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Emerging Trends Demand Ranking -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">Emerging Areas & Future Skills Demand</h3>
+                        <p class="text-xs text-slate-500">High-priority fields voted by faculty for syllabus inclusion</p>
+                    </div>
+                    <span class="px-2.5 py-1 bg-purple-50 text-purple-700 text-xs font-bold rounded-lg border border-purple-100">Industry Skills</span>
+                </div>
+                <div class="h-80 relative">
+                    <canvas id="emergingChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 3: NEP EXPERIENTIAL PEDAGOGY & DIGITAL INTEGRATION & STAKEHOLDERS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Experiential Learning -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-3">
+                <div class="pb-2 border-b border-slate-100">
+                    <h3 class="font-bold text-slate-800 text-sm">Experiential Learning Matrix</h3>
+                    <p class="text-[11px] text-slate-500">Internships, field visits, simulations, PBL (Scale 1-4)</p>
+                </div>
+                <div class="h-64 relative">
+                    <canvas id="expChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Digital & MOOCs Integration -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-3">
+                <div class="pb-2 border-b border-slate-100">
+                    <h3 class="font-bold text-slate-800 text-sm">Digital Learning & MOOCs</h3>
+                    <p class="text-[11px] text-slate-500">SWAYAM/NPTEL, LMS, Virtual Labs, Blended</p>
+                </div>
+                <div class="h-64 relative">
+                    <canvas id="digitalChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Stakeholder Expectations -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200/80 space-y-3">
+                <div class="pb-2 border-b border-slate-100">
+                    <h3 class="font-bold text-slate-800 text-sm">Stakeholder Needs Addressed</h3>
+                    <p class="text-[11px] text-slate-500">Perception of how well each group's expectations are met</p>
+                </div>
+                <div class="h-64 relative">
+                    <canvas id="stakeholderChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 4: OVERLAPPING COURSES ALERT & COURSE REVISION WISHLIST -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Overlapping & Redundant Courses Audit -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-sm">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">Redundant / Overlapping Course Audit</h3>
+                            <p class="text-xs text-slate-500">Faculty reports of repeated or outdated syllabus units</p>
+                        </div>
+                    </div>
+                    <span id="overlapBadge" class="px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-bold rounded-lg border border-amber-200">0 Flags</span>
+                </div>
+                <div id="overlapListContainer" class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Course Revision Wishlist -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200/80 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">
+                            <i class="fa-solid fa-file-pen"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-base">Proposed Course Redesigns & Additions</h3>
+                            <p class="text-xs text-slate-500">Specific course codes & requested syllabus revisions</p>
+                        </div>
+                    </div>
+                    <span id="revisionBadge" class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200">0 Proposals</span>
+                </div>
+                <div id="revisionListContainer" class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Chart instances store
+    let charts = {};
+
+    function destroyCharts() {
+        Object.keys(charts).forEach(key => {
+            if (charts[key]) charts[key].destroy();
+        });
+        charts = {};
+    }
+
+    async function loadAnalytics() {
+        const dept = document.getElementById('deptFilter').value;
+        const level = document.getElementById('levelFilter').value;
+        const icon = document.getElementById('refreshIcon');
+        icon?.classList.add('fa-spin');
+
+        // Update print report link
+        document.getElementById('reportLink').href = `/admin/report?department=${encodeURIComponent(dept)}&course_level=${encodeURIComponent(level)}`;
+
+        try {
+            const res = await fetch(`/api/analytics?department=${encodeURIComponent(dept)}&course_level=${encodeURIComponent(level)}`);
+            const data = await res.json();
+            
+            icon?.classList.remove('fa-spin');
+
+            if (!data.has_data || data.total_responses === 0) {
+                document.getElementById('dashboardDataContainer').classList.add('hidden');
+                document.getElementById('noDataState').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('noDataState').classList.add('hidden');
+            document.getElementById('dashboardDataContainer').classList.remove('hidden');
+
+            // Render KPIs
+            document.getElementById('kpiTotalResponses').innerText = data.total_responses;
+            document.getElementById('kpiOverallEff').innerText = data.overall_eff_index + '%';
+            document.getElementById('kpiOverallEffAvg').innerText = data.overall_eff_avg + ' / 5.0 rating';
+            document.getElementById('kpiObeScore').innerText = data.overall_obe_index + '%';
+            document.getElementById('kpiMultiRating').innerText = data.multi_avg + ' / 5.0';
+            document.getElementById('kpiIksScore').innerText = data.iks_avg + ' / 5.0';
+
+            destroyCharts();
+
+            // 1. Effectiveness Horizontal Bar Chart
+            const effLabels = Object.keys(data.effectiveness_stats);
+            const effValues = effLabels.map(k => data.effectiveness_stats[k].average);
+            
+            charts.eff = new Chart(document.getElementById('effectivenessChart'), {
+                type: 'bar',
+                data: {
+                    labels: effLabels.map(l => l.length > 30 ? l.substring(0, 30) + '...' : l),
+                    datasets: [{
+                        label: 'Average Rating (out of 5.0)',
+                        data: effValues,
+                        backgroundColor: effValues.map(v => v >= 4.0 ? 'rgba(16, 185, 129, 0.8)' : v >= 3.0 ? 'rgba(245, 158, 11, 0.8)' : 'rgba(239, 68, 68, 0.8)'),
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { min: 0, max: 5, grid: { color: '#f1f5f9' } },
+                        y: { ticks: { font: { size: 10 } }, grid: { display: false } }
+                    }
+                }
+            });
+
+            // 2. OBE Radar Chart
+            const obeLabels = Object.keys(data.obe_stats);
+            const obeValues = obeLabels.map(k => data.obe_stats[k].average);
+
+            charts.obe = new Chart(document.getElementById('obeRadarChart'), {
+                type: 'radar',
+                data: {
+                    labels: [
+                        'PO Clarity', 'PSO Alignment', 'Measurable COs', 'CO-PO Mapping',
+                        'Communication', 'T-L Alignment', 'Assess Attainment', 'Attainment Analysis'
+                    ],
+                    datasets: [{
+                        label: 'OBE Quality Score (1-5)',
+                        data: obeValues,
+                        backgroundColor: 'rgba(87, 70, 227, 0.2)',
+                        borderColor: 'rgb(87, 70, 227)',
+                        pointBackgroundColor: 'rgb(87, 70, 227)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: { min: 0, max: 5, ticks: { stepSize: 1 } }
+                    }
+                }
+            });
+
+            // 3. Curriculum Structure Bar Chart
+            const structLabels = Object.keys(data.struct_stats);
+            const structValues = structLabels.map(k => data.struct_stats[k].average);
+
+            charts.struct = new Chart(document.getElementById('structureChart'), {
+                type: 'bar',
+                data: {
+                    labels: structLabels.map(l => l.length > 25 ? l.substring(0, 25) + '...' : l),
+                    datasets: [{
+                        label: 'Adequacy Rating (1-4)',
+                        data: structValues,
+                        backgroundColor: 'rgba(175, 76, 16, 0.75)',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { min: 0, max: 4, grid: { color: '#f1f5f9' } },
+                        x: { ticks: { font: { size: 9 } } }
+                    }
+                }
+            });
+
+            // 4. Emerging Trends Chart
+            const topEmerging = data.emerging_ranking.slice(0, 7);
+            charts.emerging = new Chart(document.getElementById('emergingChart'), {
+                type: 'bar',
+                data: {
+                    labels: topEmerging.map(e => e.area.length > 25 ? e.area.substring(0, 25) + '...' : e.area),
+                    datasets: [{
+                        label: '% of Faculty Requesting',
+                        data: topEmerging.map(e => e.percentage),
+                        backgroundColor: 'rgba(147, 51, 234, 0.75)',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { min: 0, max: 100, ticks: { callback: v => v + '%' } },
+                        y: { ticks: { font: { size: 9 } } }
+                    }
+                }
+            });
+
+            // 5. Experiential Learning Chart
+            const expLabels = Object.keys(data.exp_stats);
+            charts.exp = new Chart(document.getElementById('expChart'), {
+                type: 'bar',
+                data: {
+                    labels: expLabels.map(l => l.length > 15 ? l.substring(0, 15) + '..' : l),
+                    datasets: [{
+                        data: Object.values(data.exp_stats),
+                        backgroundColor: 'rgba(14, 165, 233, 0.8)',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { min: 0, max: 4, ticks: { stepSize: 1 } },
+                        x: { ticks: { font: { size: 9 }, maxRotation: 45 } }
+                    }
+                }
+            });
+
+            // 6. Digital Learning Chart
+            const digLabels = Object.keys(data.digital_stats);
+            charts.dig = new Chart(document.getElementById('digitalChart'), {
+                type: 'bar',
+                data: {
+                    labels: digLabels.map(l => l.length > 15 ? l.substring(0, 15) + '..' : l),
+                    datasets: [{
+                        data: Object.values(data.digital_stats),
+                        backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { min: 0, max: 4, ticks: { stepSize: 1 } },
+                        x: { ticks: { font: { size: 9 }, maxRotation: 45 } }
+                    }
+                }
+            });
+
+            // 7. Stakeholders Chart
+            const stkLabels = Object.keys(data.stakeholder_needs_stats);
+            charts.stk = new Chart(document.getElementById('stakeholderChart'), {
+                type: 'bar',
+                data: {
+                    labels: stkLabels,
+                    datasets: [{
+                        data: Object.values(data.stakeholder_needs_stats),
+                        backgroundColor: 'rgba(236, 72, 153, 0.8)',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { min: 0, max: 5, ticks: { stepSize: 1 } },
+                        x: { ticks: { font: { size: 10 } } }
+                    }
+                }
+            });
+
+            // 8. Populate Overlap Comments Container
+            const overlapContainer = document.getElementById('overlapListContainer');
+            document.getElementById('overlapBadge').innerText = `${data.overlap_comments.length} Flags`;
+            if (data.overlap_comments.length === 0) {
+                overlapContainer.innerHTML = '<div class="text-xs text-slate-400 p-4 text-center">No overlapping courses reported for current filter.</div>';
+            } else {
+                overlapContainer.innerHTML = data.overlap_comments.map(c => `
+                    <div class="p-3 rounded-xl bg-amber-50/60 border border-amber-200/80 text-xs">
+                        <div class="font-bold text-amber-900">${c.department} • <span class="font-normal text-slate-600">${c.faculty}</span></div>
+                        <div class="text-slate-700 mt-1">${c.details}</div>
+                    </div>
+                `).join('');
+            }
+
+            // 9. Populate Course Revision Container
+            const revisionContainer = document.getElementById('revisionListContainer');
+            document.getElementById('revisionBadge').innerText = `${data.course_revision_list.length} Proposals`;
+            if (data.course_revision_list.length === 0) {
+                revisionContainer.innerHTML = '<div class="text-xs text-slate-400 p-4 text-center">No specific course redesigns submitted for current filter.</div>';
+            } else {
+                revisionContainer.innerHTML = data.course_revision_list.map(r => `
+                    <div class="p-3 rounded-xl bg-emerald-50/60 border border-emerald-200/80 text-xs">
+                        <div class="font-bold text-emerald-900">${r.department} • <span class="font-normal text-slate-600">${r.faculty}</span></div>
+                        <div class="text-slate-700 mt-1 font-mono">${r.details}</div>
+                    </div>
+                `).join('');
+            }
+
+        } catch (err) {
+            console.error("Failed to load analytics:", err);
+            showToast("Failed to load analytics: " + err, "error");
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadAnalytics);
+</script>
+{% endblock %}

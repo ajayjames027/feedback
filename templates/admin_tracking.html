@@ -1,0 +1,352 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Faculty Submission Tracker (Who is Pending) • IQAC Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    
+    <!-- Top Tracker Header -->
+    <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div>
+            <div class="flex items-center space-x-2 text-xs font-bold text-amber-600 uppercase tracking-wider mb-1">
+                <i class="fa-solid fa-users-viewfinder"></i>
+                <span>Institutional Feedback Tracking & Compliance Monitor</span>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+                Faculty Submission Roster & Pending Tracker
+            </h1>
+            <p class="text-xs md:text-sm text-slate-500 mt-1">
+                Monitor submission status for all <strong>319 teaching staff members</strong> across 33 academic departments
+            </p>
+        </div>
+
+        <!-- Quick Action Buttons -->
+        <div class="flex flex-wrap items-center gap-3">
+            <button onclick="copyPendingEmails()" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs rounded-xl shadow-sm transition flex items-center space-x-1.5">
+                <i class="fa-solid fa-envelope"></i>
+                <span>Copy Pending Emails (<span id="btnPendingCount">--</span>)</span>
+            </button>
+            <a href="/api/export/pending" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-xl shadow-sm transition flex items-center space-x-1.5">
+                <i class="fa-solid fa-file-excel text-emerald-400"></i>
+                <span>Export Pending List</span>
+            </a>
+            <button onclick="loadTrackingData()" class="p-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs transition" title="Refresh Live Tracker">
+                <i class="fa-solid fa-arrows-rotate" id="refreshTrackIcon"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- TRACKER EXECUTIVE KPI CARDS -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <!-- Total Roster -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Faculty</span>
+                <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+            </div>
+            <div class="mt-3">
+                <div id="kpiTotalFaculty" class="text-3xl font-black text-slate-900">319</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Faculty_2026_2027 Roster</div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
+        </div>
+
+        <!-- Submitted Count -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-600">Submitted</span>
+                <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm font-bold">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+            </div>
+            <div class="mt-3">
+                <div id="kpiSubmitted" class="text-3xl font-black text-emerald-600">--</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Responses recorded</div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500"></div>
+        </div>
+
+        <!-- Pending / Yet to Submit Count -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-600">Yet to Submit (Pending)</span>
+                <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm font-bold">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+            </div>
+            <div class="mt-3">
+                <div id="kpiPending" class="text-3xl font-black text-amber-600">--</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Action required</div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
+        </div>
+
+        <!-- Compliance / Turnout Rate -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-indigo-600">Turnout Rate</span>
+                <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm font-bold">
+                    <i class="fa-solid fa-percent"></i>
+                </div>
+            </div>
+            <div class="mt-3">
+                <div id="kpiTurnout" class="text-3xl font-black text-indigo-600">--%</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Institutional completion</div>
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 h-1 bg-indigo-500"></div>
+        </div>
+    </div>
+
+    <!-- DEPARTMENT-WISE PROGRESS ACCORDION / SUMMARY CARDS -->
+    <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200/80 space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-chart-column text-brand-600"></i>
+                <h3 class="font-bold text-slate-800 text-base">Department-Wise Submission Progress</h3>
+            </div>
+            <span class="text-xs text-slate-500 font-medium">33 Departments</span>
+        </div>
+
+        <!-- Department Progress Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-72 overflow-y-auto pr-1" id="deptProgressGrid">
+            <!-- Populated via JS -->
+        </div>
+    </div>
+
+    <!-- MASTER FACULTY ROSTER TABLE & FILTER BAR -->
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 overflow-hidden space-y-4 p-6">
+        
+        <!-- Filter Controls -->
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+            
+            <!-- Filter Tabs -->
+            <div class="flex items-center bg-slate-100 p-1 rounded-xl text-xs font-bold">
+                <button onclick="setStatusFilter('ALL')" id="tab-all" class="px-3 py-1.5 rounded-lg bg-white shadow-sm text-slate-900 transition">
+                    All Faculty (<span id="tabCountAll">319</span>)
+                </button>
+                <button onclick="setStatusFilter('PENDING')" id="tab-pending" class="px-3 py-1.5 rounded-lg text-amber-700 hover:text-amber-900 transition">
+                    Pending / Yet to Submit (<span id="tabCountPending">--</span>)
+                </button>
+                <button onclick="setStatusFilter('SUBMITTED')" id="tab-submitted" class="px-3 py-1.5 rounded-lg text-emerald-700 hover:text-emerald-900 transition">
+                    Submitted (<span id="tabCountSubmitted">--</span>)
+                </button>
+            </div>
+
+            <!-- Dropdown Filters & Search -->
+            <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+                <!-- Search Input -->
+                <div class="relative w-full sm:w-56">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                    <input type="text" id="rosterSearch" oninput="filterRosterTable()" placeholder="Search faculty name / email..." class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:ring-2 focus:ring-amber-500">
+                </div>
+
+                <!-- Department Filter -->
+                <select id="rosterDeptFilter" onchange="loadTrackingData()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700">
+                    <option value="All">All Departments</option>
+                    {% for dept in departments %}
+                    <option value="{{ dept }}">{{ dept }}</option>
+                    {% endfor %}
+                </select>
+
+                <!-- Shift Filter -->
+                <select id="rosterShiftFilter" onchange="loadTrackingData()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700">
+                    <option value="All">All Shifts</option>
+                    <option value="I">Shift I (Aided/Self)</option>
+                    <option value="II">Shift II</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="overflow-x-auto rounded-2xl border border-slate-100">
+            <table class="w-full text-left text-xs md:text-sm">
+                <thead>
+                    <tr class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                        <th class="p-3 w-12 text-center">S.No</th>
+                        <th class="p-3">Department</th>
+                        <th class="p-3">Teaching Staff Name</th>
+                        <th class="p-3">Designation</th>
+                        <th class="p-3 text-center">Shift</th>
+                        <th class="p-3">Email Address</th>
+                        <th class="p-3 text-center">Submission Status</th>
+                        <th class="p-3 text-right">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="rosterTableBody" class="divide-y divide-slate-100 font-medium text-slate-700">
+                    <!-- Populated dynamically via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Copied Modal / Notification -->
+<div id="emailCopyModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+        <div class="flex items-center space-x-2 text-emerald-600 font-bold text-base">
+            <i class="fa-solid fa-circle-check text-xl"></i>
+            <span>Pending Faculty Emails Copied!</span>
+        </div>
+        <p class="text-xs text-slate-600">
+            Copied email addresses for all pending faculty members to your clipboard. You can paste directly into Gmail, Outlook, or institutional circulars.
+        </p>
+        <textarea id="copiedEmailsBox" rows="4" readonly class="w-full p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs font-mono text-slate-700"></textarea>
+        <div class="flex justify-end">
+            <button onclick="document.getElementById('emailCopyModal').classList.add('hidden')" class="px-4 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let currentStatusFilter = 'ALL';
+    let rawFacultyList = [];
+    let pendingEmailsList = [];
+
+    function setStatusFilter(status) {
+        currentStatusFilter = status;
+        
+        document.getElementById('tab-all').className = status === 'ALL' ? 'px-3 py-1.5 rounded-lg bg-white shadow-sm text-slate-900 font-bold' : 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900';
+        document.getElementById('tab-pending').className = status === 'PENDING' ? 'px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold shadow-sm' : 'px-3 py-1.5 rounded-lg text-amber-700 hover:text-amber-900';
+        document.getElementById('tab-submitted').className = status === 'SUBMITTED' ? 'px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold shadow-sm' : 'px-3 py-1.5 rounded-lg text-emerald-700 hover:text-emerald-900';
+
+        filterRosterTable();
+    }
+
+    async function loadTrackingData() {
+        const dept = document.getElementById('rosterDeptFilter').value;
+        const shift = document.getElementById('rosterShiftFilter').value;
+        const icon = document.getElementById('refreshTrackIcon');
+        icon?.classList.add('fa-spin');
+
+        try {
+            const res = await fetch(`/api/faculty/tracking?department=${encodeURIComponent(dept)}&shift=${encodeURIComponent(shift)}`);
+            const data = await res.json();
+            icon?.classList.remove('fa-spin');
+
+            if (!data.success) return;
+
+            rawFacultyList = data.faculty_list || [];
+
+            // Update Top KPIs
+            document.getElementById('kpiTotalFaculty').innerText = data.total_faculty;
+            document.getElementById('kpiSubmitted').innerText = data.submitted_count;
+            document.getElementById('kpiPending').innerText = data.pending_count;
+            document.getElementById('kpiTurnout').innerText = data.completion_rate + '%';
+            document.getElementById('btnPendingCount').innerText = data.pending_count;
+
+            document.getElementById('tabCountAll').innerText = data.faculty_list.length;
+            document.getElementById('tabCountPending').innerText = data.faculty_list.filter(f => f.status === 'PENDING').length;
+            document.getElementById('tabCountSubmitted').innerText = data.faculty_list.filter(f => f.status === 'SUBMITTED').length;
+
+            // Render Department Breakdown Grid
+            const deptGrid = document.getElementById('deptProgressGrid');
+            deptGrid.innerHTML = data.dept_breakdown.map(d => `
+                <div class="p-3 rounded-xl border border-slate-200 bg-slate-50/80 hover:bg-slate-100 transition space-y-1.5">
+                    <div class="flex items-center justify-between text-xs font-bold text-slate-800">
+                        <span class="truncate max-w-[170px]" title="${d.department}">${d.department}</span>
+                        <span class="${d.rate === 100 ? 'text-emerald-600' : d.rate >= 50 ? 'text-blue-600' : 'text-amber-600'}">${d.submitted}/${d.total} (${d.rate}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                        <div class="h-full rounded-full ${d.rate === 100 ? 'bg-emerald-500' : d.rate >= 50 ? 'bg-blue-500' : 'bg-amber-500'}" style="width: ${d.rate}%"></div>
+                    </div>
+                </div>
+            `).join('');
+
+            filterRosterTable();
+
+        } catch (err) {
+            console.error(err);
+            showToast("Failed to fetch tracking data", "error");
+        }
+    }
+
+    function filterRosterTable() {
+        const query = document.getElementById('rosterSearch').value.toLowerCase().trim();
+        
+        let filtered = rawFacultyList;
+
+        if (currentStatusFilter !== 'ALL') {
+            filtered = filtered.filter(f => f.status === currentStatusFilter);
+        }
+
+        if (query) {
+            filtered = filtered.filter(f => 
+                (f.name && f.name.toLowerCase().includes(query)) ||
+                (f.department && f.department.toLowerCase().includes(query)) ||
+                (f.email && f.email.toLowerCase().includes(query)) ||
+                (f.designation && f.designation.toLowerCase().includes(query))
+            );
+        }
+
+        // Collect all pending emails from raw list
+        pendingEmailsList = rawFacultyList.filter(f => f.status === 'PENDING' && f.email).map(f => f.email);
+
+        renderRosterRows(filtered);
+    }
+
+    function renderRosterRows(list) {
+        const tbody = document.getElementById('rosterTableBody');
+        if (list.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-400">No faculty matching selected filters.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = list.map(f => `
+            <tr class="hover:bg-slate-50/80 transition">
+                <td class="p-3 text-center font-mono text-xs text-slate-400">${f.s_no || '-'}</td>
+                <td class="p-3 font-semibold text-slate-900">${f.department}</td>
+                <td class="p-3 text-slate-800 font-medium">${f.name}</td>
+                <td class="p-3 text-xs text-slate-500">${f.designation || '-'}</td>
+                <td class="p-3 text-center"><span class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-slate-700">Shift ${f.shift || 'I'}</span></td>
+                <td class="p-3 font-mono text-xs text-slate-500">${f.email || '-'}</td>
+                <td class="p-3 text-center">
+                    ${f.status === 'SUBMITTED' 
+                        ? `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200 inline-flex items-center space-x-1"><i class="fa-solid fa-check"></i><span>Submitted</span></span>` 
+                        : `<span class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200 inline-flex items-center space-x-1"><i class="fa-solid fa-hourglass-half"></i><span>Pending</span></span>`
+                    }
+                </td>
+                <td class="p-3 text-right">
+                    ${f.response_id ? `
+                        <a href="/admin/responses" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold border border-indigo-200 transition">
+                            View
+                        </a>
+                    ` : `
+                        <button onclick="copySingleEmail('${f.email}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold border border-slate-300 transition" title="Copy Email">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    `}
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function copySingleEmail(email) {
+        if (!email) {
+            showToast("No email on record for this faculty", "error");
+            return;
+        }
+        navigator.clipboard.writeText(email);
+        showToast("Copied: " + email);
+    }
+
+    function copyPendingEmails() {
+        if (pendingEmailsList.length === 0) {
+            showToast("No pending faculty emails to copy!");
+            return;
+        }
+        const text = pendingEmailsList.join(", ");
+        navigator.clipboard.writeText(text);
+        document.getElementById('copiedEmailsBox').value = text;
+        document.getElementById('emailCopyModal').classList.remove('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadTrackingData);
+</script>
+{% endblock %}

@@ -1,0 +1,284 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Response Explorer • Faculty Feedback 2025-26{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    
+    <!-- Header -->
+    <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center space-x-2 text-xs font-bold text-brand-600 uppercase tracking-wider mb-1">
+                <i class="fa-solid fa-database"></i>
+                <span>Data Management & Record Log</span>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+                Faculty Feedback Response Explorer
+            </h1>
+            <p class="text-xs md:text-sm text-slate-500 mt-1">
+                Inspect, verify, and filter granular faculty submissions across academic departments
+            </p>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <a href="/api/export/csv" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold shadow-sm transition flex items-center space-x-1.5">
+                <i class="fa-solid fa-file-csv"></i>
+                <span>Download CSV</span>
+            </a>
+            <a href="/api/export/json" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold border border-slate-300 transition flex items-center space-x-1.5">
+                <i class="fa-solid fa-code"></i>
+                <span>Export JSON</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <!-- Search input -->
+            <div class="relative w-full sm:w-64">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                <input type="text" id="searchInput" oninput="filterTable()" placeholder="Search by faculty, dept..." class="w-full pl-9 pr-4 py-2 bg-slate-50 rounded-xl border border-slate-300 text-xs focus:bg-white focus:ring-2 focus:ring-brand-500">
+            </div>
+
+            <!-- Department dropdown -->
+            <select id="deptFilter" onchange="loadResponses()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700">
+                <option value="All">All Departments</option>
+                {% for dept in departments %}
+                <option value="{{ dept }}">{{ dept }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Level dropdown -->
+            <select id="levelFilter" onchange="loadResponses()" class="bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700">
+                <option value="All">All Course Levels</option>
+                <option value="UG">UG</option>
+                <option value="PG">PG</option>
+                <option value="Both">Both</option>
+            </select>
+        </div>
+
+        <div class="text-xs text-slate-500 font-semibold" id="recordCountText">
+            Loading submissions...
+        </div>
+    </div>
+
+    <!-- Responses Table Container -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs md:text-sm" id="responsesTable">
+                <thead>
+                    <tr class="bg-slate-100 text-slate-700 font-bold border-b border-slate-200">
+                        <th class="p-3.5">ID</th>
+                        <th class="p-3.5">Timestamp</th>
+                        <th class="p-3.5">Department</th>
+                        <th class="p-3.5">Faculty Name</th>
+                        <th class="p-3.5">Level</th>
+                        <th class="p-3.5">NEP Rating</th>
+                        <th class="p-3.5">Overlaps</th>
+                        <th class="p-3.5 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="responsesTableBody" class="divide-y divide-slate-100 font-medium text-slate-700">
+                    <!-- Populated via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Full Response Detail Modal -->
+<div id="detailModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+        <!-- Modal Header -->
+        <div class="p-6 bg-slate-900 text-white flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-brand-500/30 flex items-center justify-center text-amber-300 font-bold">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+                <div>
+                    <h3 id="modalFacultyName" class="font-bold text-lg">Faculty Name</h3>
+                    <p id="modalMeta" class="text-xs text-slate-400">Department • Level • Date</p>
+                </div>
+            </div>
+            <button onclick="closeModal()" class="text-slate-400 hover:text-white p-2 rounded-xl text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body (Scrollable) -->
+        <div id="modalContent" class="p-6 space-y-6 overflow-y-auto text-xs md:text-sm">
+            <!-- Populated dynamically -->
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+            <button onclick="closeModal()" class="px-5 py-2 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-xs rounded-xl transition">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let allResponses = [];
+
+    async function loadResponses() {
+        const dept = document.getElementById('deptFilter').value;
+        const level = document.getElementById('levelFilter').value;
+
+        try {
+            const res = await fetch(`/api/responses?department=${encodeURIComponent(dept)}&course_level=${encodeURIComponent(level)}`);
+            const data = await res.json();
+            if (data.success) {
+                allResponses = data.responses;
+                renderTable(allResponses);
+            }
+        } catch (err) {
+            console.error(err);
+            showToast("Failed to fetch responses", "error");
+        }
+    }
+
+    function renderTable(list) {
+        const tbody = document.getElementById('responsesTableBody');
+        document.getElementById('recordCountText').innerText = `Showing ${list.length} feedback submissions`;
+
+        if (list.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-400">No submissions matching criteria.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = list.map(r => `
+            <tr class="hover:bg-slate-50/80 transition">
+                <td class="p-3.5 font-mono text-xs text-slate-400">#${r.id}</td>
+                <td class="p-3.5 text-xs text-slate-500">${r.timestamp ? r.timestamp.substring(0, 16) : '-'}</td>
+                <td class="p-3.5 font-semibold text-slate-900">${r.department}</td>
+                <td class="p-3.5 text-slate-700">${r.faculty_name}</td>
+                <td class="p-3.5"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${r.course_level === 'UG' ? 'bg-blue-50 text-blue-700' : r.course_level === 'PG' ? 'bg-purple-50 text-purple-700' : 'bg-amber-50 text-amber-700'}">${r.course_level}</span></td>
+                <td class="p-3.5 font-bold text-amber-600">${r.multidisciplinary_rating || '-'} / 5</td>
+                <td class="p-3.5">
+                    <span class="px-2 py-0.5 rounded text-[11px] font-bold ${r.overlapping_courses === 'YES' ? 'bg-rose-100 text-rose-700' : 'bg-emerald-50 text-emerald-700'}">
+                        ${r.overlapping_courses}
+                    </span>
+                </td>
+                <td class="p-3.5 text-right">
+                    <button onclick="viewResponseDetail(${r.id})" class="px-3 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-lg text-xs font-semibold border border-brand-200 transition">
+                        View Full Details
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function filterTable() {
+        const query = document.getElementById('searchInput').value.toLowerCase().trim();
+        if (!query) {
+            renderTable(allResponses);
+            return;
+        }
+        const filtered = allResponses.filter(r => 
+            (r.faculty_name && r.faculty_name.toLowerCase().includes(query)) ||
+            (r.department && r.department.toLowerCase().includes(query)) ||
+            (r.courses_to_revise && r.courses_to_revise.toLowerCase().includes(query)) ||
+            (r.nep_challenges && r.nep_challenges.toLowerCase().includes(query))
+        );
+        renderTable(filtered);
+    }
+
+    async function viewResponseDetail(id) {
+        try {
+            const res = await fetch(`/api/responses/${id}`);
+            const data = await res.json();
+            if (!data.success) return;
+            const r = data.response;
+
+            document.getElementById('modalFacultyName').innerText = r.faculty_name;
+            document.getElementById('modalMeta').innerText = `${r.department} • Level: ${r.course_level} • Submitted: ${r.timestamp || ''}`;
+
+            let html = `
+                <!-- Overall Effectiveness Grid -->
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                    <h4 class="font-bold text-slate-800 mb-2">Overall Effectiveness Ratings:</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        ${Object.entries(r.overall_effectiveness || {}).map(([k, v]) => `
+                            <div class="flex justify-between p-2 rounded bg-white border border-slate-200/60">
+                                <span class="text-slate-600">${k}:</span>
+                                <strong class="text-slate-900 ml-2">${v}</strong>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- OBE Evaluation -->
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                    <h4 class="font-bold text-slate-800 mb-2">Outcome Based Education (OBE):</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        ${Object.entries(r.obe_evaluation || {}).map(([k, v]) => `
+                            <div class="flex justify-between p-2 rounded bg-white border border-slate-200/60">
+                                <span class="text-slate-600">${k}:</span>
+                                <strong class="text-indigo-700 ml-2">${v} / 5</strong>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- NEP & Emerging Tech -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 rounded-2xl bg-amber-50/60 border border-amber-200">
+                        <h4 class="font-bold text-amber-900 mb-1">NEP & Pedagogies</h4>
+                        <div class="text-xs space-y-1 text-slate-700">
+                            <div><strong>Multidisciplinary:</strong> ${r.multidisciplinary_rating}/5</div>
+                            <div><strong>Electives:</strong> ${r.electives_rating}</div>
+                            <div><strong>Flexibility:</strong> ${(r.flexible_learning_paths || []).join(', ') || 'None'}</div>
+                            <div><strong>Research Orientation:</strong> ${(r.research_orientation || []).join(', ') || 'None'}</div>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-2xl bg-purple-50/60 border border-purple-200">
+                        <h4 class="font-bold text-purple-900 mb-1">Emerging Areas Selected</h4>
+                        <div class="flex flex-wrap gap-1 mt-2">
+                            ${(r.emerging_areas || []).map(a => `<span class="px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 text-[11px] font-semibold">${a}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overlaps & Revision details -->
+                ${r.overlapping_details ? `
+                    <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs">
+                        <h4 class="font-bold text-rose-900 mb-1">Reported Course Overlap / Redundancy:</h4>
+                        <p class="text-rose-800">${r.overlapping_details}</p>
+                    </div>
+                ` : ''}
+
+                ${r.courses_to_revise ? `
+                    <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs">
+                        <h4 class="font-bold text-emerald-900 mb-1">Identified Courses for Revision:</h4>
+                        <p class="text-emerald-800 font-mono">${r.courses_to_revise}</p>
+                    </div>
+                ` : ''}
+
+                ${r.other_recommendations ? `
+                    <div class="p-4 rounded-2xl bg-slate-100 border border-slate-300 text-xs">
+                        <h4 class="font-bold text-slate-900 mb-1">Other Recommendations:</h4>
+                        <p class="text-slate-700">${r.other_recommendations}</p>
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('modalContent').innerHTML = html;
+            document.getElementById('detailModal').classList.remove('hidden');
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('detailModal').classList.add('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadResponses);
+</script>
+{% endblock %}

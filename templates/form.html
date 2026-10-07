@@ -1,0 +1,965 @@
+{% extends "base.html" %}
+
+{% block title %}Faculty Feedback Form • Curricular Design 2025-26{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Hero Banner (Matching Original Form Theme) -->
+    <div class="bg-gradient-to-br from-[#af4c10] via-[#c45a17] to-[#5746e3] rounded-3xl text-white p-8 md:p-10 shadow-2xl relative overflow-hidden mb-8">
+        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+        <div class="absolute right-12 top-6 opacity-20 hidden md:block">
+            <i class="fa-solid fa-graduation-cap text-9xl text-white"></i>
+        </div>
+        
+        <div class="relative z-10 max-w-3xl">
+            <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-amber-200 text-xs font-semibold uppercase tracking-wider mb-4 border border-white/20">
+                <i class="fa-solid fa-clipboard-check"></i>
+                <span>Official Institutional Feedback Portal • 2025-26</span>
+            </div>
+            <h1 class="text-2xl md:text-4xl font-extrabold tracking-tight text-white leading-tight">
+                TEACHER FEEDBACK ON CURRICULAR DESIGN AND DEVELOPMENT
+            </h1>
+            <p class="text-amber-100 text-sm md:text-base mt-4 leading-relaxed font-normal bg-black/15 p-4 rounded-2xl border border-white/10 backdrop-blur-sm">
+                <strong class="font-semibold text-white">Dear Professor,</strong><br>
+                Kindly provide your valuable feedback based on the syllabus revision 2025 for both UG & PG. Your valuable feedback and suggestions will help the Institution in strengthening and improving the next curriculum revision.
+            </p>
+        </div>
+
+        <!-- Progress Bar & Step Tracker -->
+        <div class="mt-8 pt-6 border-t border-white/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="w-full sm:w-2/3">
+                <div class="flex justify-between text-xs font-semibold text-amber-100 mb-2">
+                    <span id="progressText">Section 1 of 10 • Profile Details</span>
+                    <span id="progressPercent">10% Completed</span>
+                </div>
+                <div class="w-full bg-black/20 rounded-full h-2.5 overflow-hidden p-0.5 border border-white/20">
+                    <div id="progressBar" class="bg-gradient-to-r from-amber-300 to-amber-400 h-full rounded-full transition-all duration-300" style="width: 10%;"></div>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button type="button" onclick="toggleFormMode()" id="viewModeBtn" class="text-xs font-semibold bg-white/15 hover:bg-white/25 px-3 py-1.5 rounded-lg border border-white/20 transition-all text-white flex items-center space-x-1.5">
+                    <i class="fa-solid fa-list-ol"></i>
+                    <span>Toggle Single-Page View</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Submission Form -->
+    <form id="facultyFeedbackForm" onsubmit="handleFormSubmit(event)" class="space-y-8">
+        
+        <!-- SECTION 1: FACULTY & DEPARTMENT PROFILE -->
+        <section id="section-1" class="form-section bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 md:p-8 transition-all">
+            <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 font-bold flex items-center justify-center border border-brand-100 text-sm">1</div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Faculty & Department Profile</h2>
+                    <p class="text-xs text-slate-500">Provide your basic academic credentials</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Department Dropdown -->
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">
+                        Department <span class="text-rose-500">*</span>
+                    </label>
+                    <select name="department" id="departmentSelect" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition text-sm text-slate-800">
+                        <option value="" disabled selected>-- Select your Department --</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept }}">{{ dept }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Faculty Name -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">
+                        Name of the Faculty <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text" name="faculty_name" required placeholder="e.g. Dr. / Prof. Name" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition text-sm">
+                </div>
+
+                <!-- Handling Courses for -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">
+                        Handling Courses for <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <label class="form-radio-card cursor-pointer flex items-center justify-center p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 transition">
+                            <input type="radio" name="course_level" value="UG" required class="text-brand-600 focus:ring-brand-500 mr-2"> UG
+                        </label>
+                        <label class="form-radio-card cursor-pointer flex items-center justify-center p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 transition">
+                            <input type="radio" name="course_level" value="PG" class="text-brand-600 focus:ring-brand-500 mr-2"> PG
+                        </label>
+                        <label class="form-radio-card cursor-pointer flex items-center justify-center p-2.5 rounded-xl border border-slate-200 text-xs font-semibold text-slate-700 transition">
+                            <input type="radio" name="course_level" value="Both" class="text-brand-600 focus:ring-brand-500 mr-2"> Both
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: OVERALL EFFECTIVENESS -->
+        <section id="section-2" class="form-section bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 md:p-8 transition-all">
+            <div class="flex items-center space-x-3 mb-4 pb-4 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 font-bold flex items-center justify-center border border-brand-100 text-sm">2</div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Overall Effectiveness of Current Curriculum</h2>
+                    <p class="text-xs text-slate-500">Scale: 5-Highly Effective | 4-Effective | 3-Moderately Effective | 2-Less Effective | 1-Not Effective</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-200">
+                <table class="w-full text-left border-collapse text-xs md:text-sm">
+                    <thead>
+                        <tr class="bg-slate-100/80 text-slate-700 font-semibold border-b border-slate-200">
+                            <th class="p-3.5 w-1/2">Curricular Dimension</th>
+                            <th class="p-2.5 text-center font-normal">1<br><span class="text-[10px] text-slate-500">Not Effective</span></th>
+                            <th class="p-2.5 text-center font-normal">2<br><span class="text-[10px] text-slate-500">Less</span></th>
+                            <th class="p-2.5 text-center font-normal">3<br><span class="text-[10px] text-slate-500">Moderate</span></th>
+                            <th class="p-2.5 text-center font-normal">4<br><span class="text-[10px] text-slate-500">Effective</span></th>
+                            <th class="p-2.5 text-center font-normal">5<br><span class="text-[10px] text-slate-500">Highly Effective</span></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% set eff_items = [
+                            'Academically relevant',
+                            'Meets current industry needs',
+                            'Creates employability opportunities',
+                            'Prepares students for higher education and competitive exams',
+                            'Encourages research practices',
+                            'Prepares entrepreneurs',
+                            'Incorporates Emerging Developments in the Discipline',
+                            'Provides adequate Practical, Hands-on Training and Industrial Exposure',
+                            'Promotes critical thinking, problem-solving and creativity',
+                            'Content is appropriately distributed across semesters',
+                            'Provides opportunities for interdisciplinary learning',
+                            'Text and Reference Books are included within the period of last 5 years'
+                        ] %}
+                        {% for item in eff_items %}
+                        {% set eff_idx = loop.index %}
+                        <tr class="hover:bg-slate-50/80 transition">
+                            <td class="p-3 font-medium text-slate-800">{{ eff_idx }}. {{ item }}</td>
+                            {% for score in range(1, 6) %}
+                            <td class="p-2.5 text-center matrix-cell cursor-pointer">
+                                <label class="w-full h-full block cursor-pointer py-1">
+                                    <input type="radio" name="eff_{{ eff_idx }}" value="{{ score }}" required class="text-brand-600 focus:ring-brand-500 h-4 w-4">
+                                </label>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECTION 3: OUTCOME BASED EDUCATION (OBE) -->
+        <section id="section-3" class="form-section bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 md:p-8 transition-all">
+            <div class="flex items-center space-x-3 mb-4 pb-4 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 font-bold flex items-center justify-center border border-brand-100 text-sm">3</div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Outcome Based Education (OBE) Evaluation</h2>
+                    <p class="text-xs text-slate-500">Rate from 1 (Strongly Disagree / Low) to 5 (Strongly Agree / Excellent)</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-200">
+                <table class="w-full text-left border-collapse text-xs md:text-sm">
+                    <thead>
+                        <tr class="bg-slate-100/80 text-slate-700 font-semibold border-b border-slate-200">
+                            <th class="p-3.5 w-1/2">OBE Quality Indicator</th>
+                            <th class="p-2.5 text-center">1</th>
+                            <th class="p-2.5 text-center">2</th>
+                            <th class="p-2.5 text-center">3</th>
+                            <th class="p-2.5 text-center">4</th>
+                            <th class="p-2.5 text-center">5</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% set obe_items = [
+                            'Programme Outcomes are clearly defined',
+                            'PSOs reflect specialization and career expectations',
+                            'COs are measurable and appropriate to the course level',
+                            'COs are appropriately mapped to POs and PSOs',
+                            'Outcomes are clearly communicated to the students',
+                            'Teaching-learning methods are aligned with intended COs and cognitive levels',
+                            'Assessment methods effectively measure attainment of COs',
+                            'CO Attainment data are analyzed and used to improve course content, teaching and assessment'
+                        ] %}
+                        {% for item in obe_items %}
+                        {% set obe_idx = loop.index %}
+                        <tr class="hover:bg-slate-50/80 transition">
+                            <td class="p-3 font-medium text-slate-800">{{ obe_idx }}. {{ item }}</td>
+                            {% for score in range(1, 6) %}
+                            <td class="p-2.5 text-center matrix-cell cursor-pointer">
+                                <label class="w-full h-full block cursor-pointer py-1">
+                                    <input type="radio" name="obe_{{ obe_idx }}" value="{{ score }}" required class="text-brand-600 focus:ring-brand-500 h-4 w-4">
+                                </label>
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SECTION 4: CURRICULUM STRUCTURE & BALANCE -->
+        <section id="section-4" class="form-section bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 md:p-8 transition-all">
+            <div class="flex items-center space-x-3 mb-4 pb-4 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 font-bold flex items-center justify-center border border-brand-100 text-sm">4</div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Curriculum Structure: Is the curriculum balanced?</h2>
+                    <p class="text-xs text-slate-500">Scale: 4-Highly Adequate | 3-Adequate | 2-Needs Improvement | 1-Inadequate | N/A-Not Applicable</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-200 mb-6">
+                <table class="w-full text-left border-collapse text-xs md:text-sm">
+                    <thead>
+                        <tr class="bg-slate-100/80 text-slate-700 font-semibold border-b border-slate-200">
+                            <th class="p-3.5 w-1/2">Curricular Component</th>
+                            <th class="p-2 text-center font-normal">1<br><span class="text-[10px] text-slate-500">Inadequate</span></th>
+                            <th class="p-2 text-center font-normal">2<br><span class="text-[10px] text-slate-500">Improvement</span></th>
+                            <th class="p-2 text-center font-normal">3<br><span class="text-[10px] text-slate-500">Adequate</span></th>
+                            <th class="p-2 text-center font-normal">4<br><span class="text-[10px] text-slate-500">Highly Adequate</span></th>
+                            <th class="p-2 text-center font-normal">N/A</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% set struct_items = [
+                            'Theory Courses',
+                            'Practical Courses',
+                            'Project, Internship and Research',
+                            'Discipline Specific / Open Electives',
+                            'Skill / Ability Enhancement Courses',
+                            'Credit distribution across components',
+                            'Balance between foundational, advanced and specialization courses',
+                            'Opportunities for inter and multi-disciplinary course combinations'
+                        ] %}
+                        {% for item in struct_items %}
+                        <tr class="hover:bg-slate-50/80 transition">
+                            <td class="p-3 font-medium text-slate-800">{{ loop.index }}. {{ item }}</td>
+                            <td class="p-2 text-center matrix-cell cursor-pointer"><label class="block py-1"><input type="radio" name="struct_{{ loop.index }}" value="1 - Inadequate" required class="text-brand-600"></label></td>
+                            <td class="p-2 text-center matrix-cell cursor-pointer"><label class="block py-1"><input type="radio" name="struct_{{ loop.index }}" value="2 - Needs Improvement" class="text-brand-600"></label></td>
+                            <td class="p-2 text-center matrix-cell cursor-pointer"><label class="block py-1"><input type="radio" name="struct_{{ loop.index }}" value="3 - Adequate" class="text-brand-600"></label></td>
+                            <td class="p-2 text-center matrix-cell cursor-pointer"><label class="block py-1"><input type="radio" name="struct_{{ loop.index }}" value="4 - Highly Adequate" class="text-brand-600"></label></td>
+                            <td class="p-2 text-center matrix-cell cursor-pointer"><label class="block py-1"><input type="radio" name="struct_{{ loop.index }}" value="N/A - Not Applicable" class="text-brand-600"></label></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Overlapping courses question -->
+            <div class="bg-amber-50/60 rounded-xl p-5 border border-amber-200/70 space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-800 mb-2">
+                        Are there any courses or units that are repeated, overlapping, outdated, or unnecessarily detailed across semesters? <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="flex items-center space-x-6 text-sm font-medium text-slate-700">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="overlapping_courses" value="YES" required onchange="document.getElementById('overlapDetailsBox').classList.remove('hidden')" class="text-brand-600">
+                            <span>YES</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="overlapping_courses" value="NO" onchange="document.getElementById('overlapDetailsBox').classList.add('hidden')" class="text-brand-600">
+                            <span>NO</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="overlapping_courses" value="NOT SURE" onchange="document.getElementById('overlapDetailsBox').classList.add('hidden')" class="text-brand-600">
+                            <span>NOT SURE</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div id="overlapDetailsBox" class="hidden">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        If Yes, please provide details (semester, course title, unit, specific recommendation):
+                    </label>
+                    <textarea name="overlapping_details" rows="2.5" placeholder="e.g. Sem 3 Course CS302 unit 4 overlaps with Sem 4 CS401 unit 1..." class="w-full px-3.5 py-2 rounded-lg border border-amber-300 bg-white focus:ring-2 focus:ring-brand-500 text-sm"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: NEP COMPONENTS -->
+        <section id="section-5" class="form-section bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 md:p-8 transition-all">
+            <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 font-bold flex items-center justify-center border border-brand-100 text-sm">5</div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">National Education Policy (NEP) Components</h2>
+                    <p class="text-xs text-slate-500">Evaluate multidisciplinary learning, flexibility, MOOCs, and experiential pedagogy</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Multidisciplinary Learning Rating -->
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <label class="block text-sm font-semibold text-slate-800 mb-1">
+                        Multidisciplinary Learning: Is adequate opportunity available for students to study courses outside their discipline? <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="flex items-center space-x-4 mt-3">
+                        <span class="text-xs text-slate-500">1 (Inadequate)</span>
+                        {% for score in range(1, 6) %}
+                        <label class="flex items-center justify-center w-9 h-9 rounded-lg border border-slate-300 bg-white hover:border-brand-500 cursor-pointer font-bold text-xs text-slate-700 transition">
+                            <input type="radio" name="multidisciplinary_rating" value="{{ score }}" required class="sr-only peer">
+                            <span class="peer-checked:text-brand-600 peer-checked:scale-125 transition-transform">{{ score }}</span>
+                        </label>
+                        {% endfor %}
+                        <span class="text-xs text-slate-500">5 (Highly Adequate)</span>
+                    </div>
+                </div>
+
+                <!-- Flexible Learning Path Checkboxes -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-800 mb-2">
+                        Flexible Learning Path: Current curriculum supports (Select all that apply):
+                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 text-xs font-medium">
+                        {% set flex_opts = ['MEME', 'Academic Flexibility', 'Credit Transfer', 'Recognition of Credits earned through MOOCs', 'None'] %}
+                        {% for opt in flex_opts %}
+                        <label class="flex items-center space-x-2.5 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                            <input type="checkbox" name="flexible_learning_paths" value="{{ opt }}" class="rounded text-brand-600 focus:ring-brand-500">
+                            <span class="text-slate-700">{{ opt }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Choice Based Learning: Electives -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-800 mb-2">
+                            Choice Based Learning: How do you rate the electives? <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-semibold">
+                            {% for rate in ['Very Good', 'Good', 'Adequate', 'Poor'] %}
+                            <label class="form-radio-card cursor-pointer flex items-center justify-center p-2.5 rounded-xl border border-slate-200 text-slate-700 transition">
+                                <input type="radio" name="electives_rating" value="{{ rate }}" required class="text-brand-600 mr-2"> {{ rate }}
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Research Orientation Checkboxes -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-800 mb-2">
+                            Research Orientation: Students are encouraged through:
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-medium">
+                            {% set res_opts = ['Faculty-Mentored Projects', 'Research Methodology', 'Publications', 'Patent Awareness', 'Design Thinking'] %}
+                            {% for opt in res_opts %}
+                            <label class="flex items-center space-x-2 p-2 rounded-lg border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                                <input type="checkbox" name="research_orientation" value="{{ opt }}" class="rounded text-brand-600">
+                                <span class="text-slate-700">{{ opt }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Experiential Learning Grid -->
+                <div class="mt-4">
+                    <label class="block text-sm font-semibold text-slate-800 mb-2">
+                        Experiential Learning: How effectively are the following incorporated?
+                    </label>
+                    <div class="overflow-x-auto rounded-xl border border-slate-200">
+                        <table class="w-full text-left text-xs md:text-sm">
+                            <thead>
+                                <tr class="bg-slate-100/80 text-slate-700 font-semibold border-b border-slate-200">
+                                    <th class="p-3 w-1/2">Modality</th>
+                                    <th class="p-2 text-center font-normal">1 (Low)</th>
+                                    <th class="p-2 text-center font-normal">2 (Moderate)</th>
+                                    <th class="p-2 text-center font-normal">3 (High)</th>
+                                    <th class="p-2 text-center font-normal">4 (Very High)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                {% set exp_items = ['Internship', 'Field Visit', 'Case Study', 'Problem-Based Learning', 'Project-Based Learning', 'Community Engagement', 'Simulations', 'Industry-mentored Projects'] %}
+                                {% for item in exp_items %}
+                                {% set exp_idx = loop.index %}
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="p-2.5 font-medium text-slate-800">{{ item }}</td>
+                                    {% for score in ['1 - Low', '2 - Moderate', '3 - High', '4 - Very High'] %}
+                                    <td class="p-2 text-center matrix-cell"><label class="block"><input type="radio" name="exp_{{ exp_idx }}" value="{{ score }}" required class="text-brand-600"></label></td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Digital Learning Grid -->
+                <div class="mt-4">
+                    <label class="block text-sm font-semibold text-slate-800 mb-2">
+                        Digital Learning: Effective Integration of
+                    </label>
+                    <div class="overflow-x-auto rounded-xl border border-slate-200">
+                        <table class="w-full text-left text-xs md:text-sm">
+                            <thead>
+                                <tr class="bg-slate-100/80 text-slate-700 font-semibold border-b border-slate-200">
+                                    <th class="p-3 w-1/2">Digital Channel</th>
+                                    <th class="p-2 text-center font-normal">1 (Low)</th>
+                                    <th class="p-2 text-center font-normal">2 (Moderate)</th>
+                                    <th class="p-2 text-center font-normal">3 (High)</th>
+                                    <th class="p-2 text-center font-normal">4 (Very High)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                {% set digital_items = ['SWAYAM/NPTEL', 'Through Institutional LMS', 'Other MOOCs', 'Virtual Labs', 'Blended Learning'] %}
+                                {% for item in digital_items %}
+                                {% set dig_idx = loop.index %}
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="p-2.5 font-medium text-slate-800">{{ item }}</td>
+                                    {% for score in ['1 - Low', '2 - Moderate', '3 - High', '4 - Very High'] %}
+                                    <td class="p-2 text-center matrix-cell"><label class="block"><input type="radio" name="dig_{{ dig_idx }}" value="{{ score }}" required class="text-brand-600"></label></td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- NEP Challenges Textarea -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-800 mb-1.5">
+                        What are the major challenges faced in implementing NEP-related curricular components in your programme?
+                    </label>
+                    <textarea name="nep_challenges" rows="3" placeholder="Describe implementation hurdles, credit alignment, infrastructure, or scheduling challenges..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-500 text-sm"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 6: EMERGING TRENDS & FUTURE SKILLS -->
+        <section id="section-6" class="form-section bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 md:p-8 transition-all">
+            <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 font-bold flex items-center justify-center border border-brand-100 text-sm">6</div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Emerging Trends, Future Skills and Industry Readiness</h2>
+                    <p class="text-xs text-slate-500">Identify high-priority technologies and interdisciplinary focus areas</p>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-slate-800 mb-3">
+                    Which emerging areas should receive greater emphasis in the curriculum? (Select all that apply)
+                </label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs md:text-sm font-medium">
+                    {% set emerging_pool = [
+                        'Artificial Intelligence and Generative AI',
+                        'Data Science and Big Data Analytics',
+                        'Cybersecurity and Digital Privacy',
+                        'Cloud Computing, Internet of Things and Smart Systems',
+                        'Automation and Robotics',
+                        'Sustainability and Green Technologies',
+                        'Entrepreneurship, Innovation and Start-up Skills',
+                        'Digital Ethics, Governance and Responsible Technology',
+                        'Climate Change'
+                    ] %}
+                    {% for item in emerging_pool %}
+                    <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer transition">
+                        <input type="checkbox" name="emerging_areas" value="{{ item }}" class="rounded text-brand-600 focus:ring-brand-500 h-4 w-4">
+                        <span class="text-slate-800 font-normal">{{ item }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+                <div class="mt-3">
+                    <input type="text" name="emerging_other" placeholder="Other emerging area (if any, please specify)" class="w-full px-4 py-2 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white text-xs md:text-sm">
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 7: NSQF ALIGNMENT -->
+        <section id="section-7" class="form-section bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 md:p-8 transition-all">
+            <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 font-bold flex items-center justify-center border border-brand-100 text-sm">7</div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">National Skills Qualifications Framework (NSQF) Alignment</h2>
+                    <p class="text-xs text-slate-500">Skill-based competency frameworks and vocational integration</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-800 mb-2">
+                        Do learning outcomes align with industry competencies? <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-xs font-semibold">
+                        {% for opt in ['1', '2', '3', '4', '5', 'N.A.'] %}
+                        <label class="form-radio-card cursor-pointer flex items-center justify-center p-2.5 rounded-xl border border-slate-200 text-slate-700 transition">
+                            <input type="radio" name="nsqf_alignment" value="{{ opt }}" required class="text-brand-600 mr-2"> {{ opt }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-800 mb-1.5">
+                        Which courses could be redesigned as NSQF-aligned courses?
+                    </label>
+                    <input type="text" name="nsqf_courses" placeholder="e.g. Applied Certificate in Laboratory Techniques, Python Full-Stack Dev..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white text-sm">
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 8: STAKEHOLDER EXPECTATIONS -->
+        <section id="section-8" class="form-section bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 md:p-8 transition-all">
+            <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 font-bold flex items-center justify-center border border-brand-100 text-sm">8</div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Stakeholder Expectations (Based on their Feedback)</h2>
+                    <p class="text-xs text-slate-500">Evaluate feedback channels and how well stakeholder needs are met</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-800 mb-2">
+                        What sources of stakeholder feedback does your department take before revision? (Select all that apply)
+                    </label>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2.5 text-xs font-medium">
+                        {% set st_sources = ['Student', 'Alumni', 'Employer', 'Industry expert consultations', 'Board of Studies discussions', 'Other'] %}
+                        {% for src in st_sources %}
+                        <label class="flex items-center space-x-2.5 p-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                            <input type="checkbox" name="stakeholder_sources" value="{{ src }}" class="rounded text-brand-600">
+                            <span class="text-slate-700">{{ src }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-800 mb-2">
+                        Based on your knowledge and available feedback, to what extent does the current curriculum address the needs of each stakeholder? (Scale 1 to 5)
+                    </label>
+                    <div class="overflow-x-auto rounded-xl border border-slate-200">
+                        <table class="w-full text-left text-xs md:text-sm">
+                            <thead>
+                                <tr class="bg-slate-100/80 text-slate-700 font-semibold border-b border-slate-200">
+                                    <th class="p-3 w-1/2">Stakeholder Group</th>
+                                    <th class="p-2 text-center">1 (Low)</th>
+                                    <th class="p-2 text-center">2</th>
+                                    <th class="p-2 text-center">3</th>
+                                    <th class="p-2 text-center">4</th>
+                                    <th class="p-2 text-center">5 (High)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                {% set stakeholders = ['Students', 'Alumni', 'Employers', 'Parents', 'Industry Experts'] %}
+                                {% for s in stakeholders %}
+                                {% set stk_idx = loop.index %}
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="p-2.5 font-medium text-slate-800">{{ s }}</td>
+                                    {% for score in range(1, 6) %}
+                                    <td class="p-2 text-center matrix-cell"><label class="block"><input type="radio" name="stk_{{ stk_idx }}" value="{{ score }}" required class="text-brand-600"></label></td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 9: INDIAN KNOWLEDGE SYSTEMS (IKS) -->
+        <section id="section-9" class="form-section bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 md:p-8 transition-all">
+            <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 font-bold flex items-center justify-center border border-brand-100 text-sm">9</div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Indian Knowledge Systems (IKS)</h2>
+                    <p class="text-xs text-slate-500">Integration of indigenous knowledge, heritage, and traditional wisdom</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-800 mb-2">
+                        How effectively are Indian Knowledge Systems integrated? <span class="text-rose-500">*</span>
+                    </label>
+                    <div class="grid grid-cols-5 gap-2 text-xs font-semibold">
+                        {% for score in range(1, 6) %}
+                        <label class="form-radio-card cursor-pointer flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200 text-slate-700 transition">
+                            <input type="radio" name="iks_effectiveness" value="{{ score }}" required class="text-brand-600 mb-1">
+                            <span>{{ score }}</span>
+                            <span class="text-[10px] text-slate-500 font-normal">{% if score == 1 %}Low{% elif score == 5 %}Very High{% endif %}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-800 mb-2">
+                        How should IKS be integrated into Curriculum? (Select all that apply)
+                    </label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 text-xs font-medium">
+                        {% set iks_modes = ['Dedicated courses', 'Selected units in existing courses', 'Certificate Courses', 'Projects', 'Interdisciplinary activities'] %}
+                        {% for mode in iks_modes %}
+                        <label class="flex items-center space-x-2.5 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                            <input type="checkbox" name="iks_integration_modes" value="{{ mode }}" class="rounded text-brand-600">
+                            <span class="text-slate-700">{{ mode }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-2.5">
+                        <input type="text" name="iks_other" placeholder="Other integration method (optional)" class="w-full px-4 py-2 rounded-xl border border-slate-300 bg-slate-50 text-xs md:text-sm">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 10: OPEN-ENDED SUGGESTIONS & REVISION PLAN -->
+        <section id="section-10" class="form-section bg-white rounded-2xl shadow-sm border border-slate-200/80 p-6 md:p-8 transition-all">
+            <div class="flex items-center space-x-3 mb-6 pb-4 border-b border-slate-100">
+                <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 font-bold flex items-center justify-center border border-brand-100 text-sm">10</div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-800">Open-ended Suggestions & Revision Plan</h2>
+                    <p class="text-xs text-slate-500">Specific course-level revision requests & qualitative recommendations</p>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-800 mb-1.5">
+                        Identify the courses requiring revision (Course code, title, semester, nature of change, reason):
+                    </label>
+                    <textarea name="courses_to_revise" rows="3" placeholder="e.g. CS501 | Cloud Computing | Sem 5 | Replace legacy virtualization unit with Kubernetes & Microservices | Reason: Industry demand" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-500 text-sm"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-800 mb-1.5">
+                        Any other recommendations:
+                    </label>
+                    <textarea name="other_recommendations" rows="3" placeholder="General suggestions regarding syllabus restructuring, faculty training, laboratory setup, assessment methods..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-brand-500 text-sm"></textarea>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stepped Wizard Navigation & Submission Footer -->
+        <div class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-4 z-40">
+            <div class="flex items-center space-x-3 w-full sm:w-auto">
+                <button type="button" id="prevStepBtn" onclick="navigateStep(-1)" class="w-1/2 sm:w-auto px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-sm hover:bg-slate-100 transition hidden">
+                    <i class="fa-solid fa-arrow-left mr-1.5"></i> Previous
+                </button>
+                <button type="button" id="nextStepBtn" onclick="navigateStep(1)" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-brand-600 text-white font-semibold text-sm hover:bg-brand-700 transition shadow-md shadow-brand-500/20">
+                    Next Section <i class="fa-solid fa-arrow-right ml-1.5"></i>
+                </button>
+            </div>
+
+            <div class="flex items-center space-x-3 w-full sm:w-auto justify-end">
+                <button type="button" onclick="saveDraft()" class="text-xs font-semibold text-slate-500 hover:text-slate-700 px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 transition">
+                    <i class="fa-regular fa-floppy-disk mr-1"></i> Save Draft
+                </button>
+                <button type="submit" id="finalSubmitBtn" class="px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-sm hover:from-emerald-700 hover:to-teal-700 transition shadow-lg shadow-emerald-500/20 flex items-center space-x-2">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Submit Feedback</span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Submission Confirmation Modal -->
+<div id="successModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full p-8 text-center shadow-2xl transform transition-all scale-95 duration-300">
+        <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl mx-auto flex items-center justify-center text-3xl mb-5 shadow-inner">
+            <i class="fa-solid fa-check"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-slate-900 mb-2">Feedback Recorded!</h3>
+        <p class="text-slate-600 text-sm mb-6 leading-relaxed">
+            Thank you, Professor. Your feedback for the <strong>2025-26 Curricular Design & Revision</strong> has been successfully submitted and logged into the IQAC repository.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="{{ url_for('dashboard_view') }}" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold shadow-md transition">
+                <i class="fa-solid fa-chart-pie mr-1.5"></i> View Analytics Dashboard
+            </a>
+            <button onclick="window.location.reload()" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-100 transition">
+                Submit Another
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let currentStep = 1;
+    const totalSteps = 10;
+    let isSinglePageMode = false;
+
+    const stepTitles = [
+        "Profile Details",
+        "Overall Effectiveness",
+        "OBE Evaluation",
+        "Curriculum Balance",
+        "NEP Components",
+        "Emerging Trends & Skills",
+        "NSQF Alignment",
+        "Stakeholder Expectations",
+        "Indian Knowledge Systems",
+        "Revision Plan & Suggestions"
+    ];
+
+    function updateStepUI() {
+        if (isSinglePageMode) {
+            document.querySelectorAll('.form-section').forEach(sec => sec.classList.remove('hidden'));
+            document.getElementById('prevStepBtn').classList.add('hidden');
+            document.getElementById('nextStepBtn').classList.add('hidden');
+            document.getElementById('progressText').innerText = "Single Page View • All 10 Sections";
+            document.getElementById('progressBar').style.width = "100%";
+            document.getElementById('progressPercent').innerText = "Full Form";
+            return;
+        }
+
+        document.querySelectorAll('.form-section').forEach((sec, idx) => {
+            if (idx + 1 === currentStep) {
+                sec.classList.remove('hidden');
+            } else {
+                sec.classList.add('hidden');
+            }
+        });
+
+        // Prev & Next button visibility
+        document.getElementById('prevStepBtn').classList.toggle('hidden', currentStep === 1);
+        document.getElementById('nextStepBtn').classList.toggle('hidden', currentStep === totalSteps);
+
+        // Update progress bar
+        const pct = Math.round((currentStep / totalSteps) * 100);
+        document.getElementById('progressBar').style.width = `${pct}%`;
+        document.getElementById('progressPercent').innerText = `${pct}% Completed`;
+        document.getElementById('progressText').innerText = `Section ${currentStep} of ${totalSteps} • ${stepTitles[currentStep - 1]}`;
+
+        // Scroll top of current section
+        document.getElementById(`section-${currentStep}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function navigateStep(direction) {
+        if (direction === 1) {
+            // Validate required inputs in the current section
+            const currentSectionEl = document.getElementById(`section-${currentStep}`);
+            const inputs = currentSectionEl.querySelectorAll('input[required], select[required]');
+            let isValid = true;
+            for (let input of inputs) {
+                if (input.type === 'radio') {
+                    const radioGroup = currentSectionEl.querySelectorAll(`input[name="${input.name}"]`);
+                    const anyChecked = Array.from(radioGroup).some(r => r.checked);
+                    if (!anyChecked) {
+                        isValid = false;
+                        input.focus();
+                        break;
+                    }
+                } else if (!input.value) {
+                    isValid = false;
+                    input.focus();
+                    break;
+                }
+            }
+            if (!isValid) {
+                showToast("Please complete all required fields in this section before proceeding.", "error");
+                return;
+            }
+        }
+
+        currentStep = Math.max(1, Math.min(totalSteps, currentStep + direction));
+        updateStepUI();
+    }
+
+    function toggleFormMode() {
+        isSinglePageMode = !isSinglePageMode;
+        document.getElementById('viewModeBtn').innerHTML = isSinglePageMode 
+            ? '<i class="fa-solid fa-layer-group"></i> <span>Wizard Step View</span>' 
+            : '<i class="fa-solid fa-list-ol"></i> <span>Toggle Single-Page View</span>';
+        updateStepUI();
+    }
+
+    // Save Draft to LocalStorage
+    function saveDraft() {
+        const formData = new FormData(document.getElementById('facultyFeedbackForm'));
+        const obj = {};
+        for (let [k, v] of formData.entries()) {
+            if (obj[k]) {
+                if (!Array.isArray(obj[k])) obj[k] = [obj[k]];
+                obj[k].push(v);
+            } else {
+                obj[k] = v;
+            }
+        }
+        localStorage.setItem("faculty_feedback_draft_2025", JSON.stringify(obj));
+        showToast("Draft saved to browser storage!", "success");
+    }
+
+    // Restore Draft
+    function restoreDraft() {
+        const saved = localStorage.getItem("faculty_feedback_draft_2025");
+        if (!saved) return;
+        try {
+            const data = JSON.parse(saved);
+            const form = document.getElementById('facultyFeedbackForm');
+            for (let key in data) {
+                const val = data[key];
+                const elements = form.querySelectorAll(`[name="${key}"]`);
+                elements.forEach(el => {
+                    if (el.type === 'radio') {
+                        if (el.value === val) el.checked = true;
+                    } else if (el.type === 'checkbox') {
+                        if (Array.isArray(val)) {
+                            if (val.includes(el.value)) el.checked = true;
+                        } else if (el.value === val) {
+                            el.checked = true;
+                        }
+                    } else {
+                        el.value = val;
+                    }
+                });
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    // Form Submit Handler
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        const form = document.getElementById('facultyFeedbackForm');
+        
+        // Build payload matching database structure
+        const effItems = [
+            'Academically relevant',
+            'Meets current industry needs',
+            'Creates employability opportunities',
+            'Prepares students for higher education and competitive exams',
+            'Encourages research practices',
+            'Prepares entrepreneurs',
+            'Incorporates Emerging Developments in the Discipline',
+            'Provides adequate Practical, Hands-on Training and Industrial Exposure',
+            'Promotes critical thinking, problem-solving and creativity',
+            'Content is appropriately distributed across semesters',
+            'Provides opportunities for interdisciplinary learning',
+            'Text and Reference Books are included within the period of last 5 years'
+        ];
+
+        const obeItems = [
+            'Programme Outcomes are clearly defined',
+            'PSOs reflect specialization and career expectations',
+            'COs are measurable and appropriate to the course level',
+            'COs are appropriately mapped to POs and PSOs',
+            'Outcomes are clearly communicated to the students',
+            'Teaching-learning methods are aligned with intended COs and cognitive levels',
+            'Assessment methods effectively measure attainment of COs',
+            'CO Attainment data are analyzed and used to improve course content, teaching and assessment'
+        ];
+
+        const structItems = [
+            'Theory Courses',
+            'Practical Courses',
+            'Project, Internship and Research',
+            'Discipline Specific / Open Electives',
+            'Skill / Ability Enhancement Courses',
+            'Credit distribution across components',
+            'Balance between foundational, advanced and specialization courses',
+            'Opportunities for inter and multi-disciplinary course combinations'
+        ];
+
+        const expItems = ['Internship', 'Field Visit', 'Case Study', 'Problem-Based Learning', 'Project-Based Learning', 'Community Engagement', 'Simulations', 'Industry-mentored Projects'];
+        const digItems = ['SWAYAM/NPTEL', 'Through Institutional LMS', 'Other MOOCs', 'Virtual Labs', 'Blended Learning'];
+        const stakeholders = ['Students', 'Alumni', 'Employers', 'Parents', 'Industry Experts'];
+
+        // Extract matrices
+        const overallEff = {};
+        effItems.forEach((item, idx) => {
+            const checked = form.querySelector(`input[name="eff_${idx+1}"]:checked`);
+            if (checked) overallEff[item] = checked.value;
+        });
+
+        const obeEval = {};
+        obeItems.forEach((item, idx) => {
+            const checked = form.querySelector(`input[name="obe_${idx+1}"]:checked`);
+            if (checked) obeEval[item] = checked.value;
+        });
+
+        const currStruct = {};
+        structItems.forEach((item, idx) => {
+            const checked = form.querySelector(`input[name="struct_${idx+1}"]:checked`);
+            if (checked) currStruct[item] = checked.value;
+        });
+
+        const expObj = {};
+        expItems.forEach((item, idx) => {
+            const checked = form.querySelector(`input[name="exp_${idx+1}"]:checked`);
+            if (checked) expObj[item] = checked.value;
+        });
+
+        const digObj = {};
+        digItems.forEach((item, idx) => {
+            const checked = form.querySelector(`input[name="dig_${idx+1}"]:checked`);
+            if (checked) digObj[item] = checked.value;
+        });
+
+        const stkObj = {};
+        stakeholders.forEach((item, idx) => {
+            const checked = form.querySelector(`input[name="stk_${idx+1}"]:checked`);
+            if (checked) stkObj[item] = checked.value;
+        });
+
+        // Multiselect checkboxes
+        const getCheckboxes = (name) => Array.from(form.querySelectorAll(`input[name="${name}"]:checked`)).map(c => c.value);
+
+        const payload = {
+            department: form.department.value,
+            faculty_name: form.faculty_name.value,
+            course_level: form.course_level.value,
+            overall_effectiveness: overallEff,
+            obe_evaluation: obeEval,
+            curriculum_structure: currStruct,
+            overlapping_courses: form.overlapping_courses.value,
+            overlapping_details: form.overlapping_details.value,
+            multidisciplinary_rating: form.multidisciplinary_rating.value,
+            flexible_learning_paths: getCheckboxes('flexible_learning_paths'),
+            electives_rating: form.electives_rating.value,
+            experiential_learning: expObj,
+            digital_learning: digObj,
+            research_orientation: getCheckboxes('research_orientation'),
+            nep_challenges: form.nep_challenges.value,
+            emerging_areas: getCheckboxes('emerging_areas'),
+            emerging_other: form.emerging_other.value,
+            nsqf_alignment: form.nsqf_alignment.value,
+            nsqf_courses: form.nsqf_courses.value,
+            stakeholder_sources: getCheckboxes('stakeholder_sources'),
+            stakeholder_needs: stkObj,
+            iks_effectiveness: form.iks_effectiveness.value,
+            iks_integration_modes: getCheckboxes('iks_integration_modes'),
+            iks_other: form.iks_other.value,
+            courses_to_revise: form.courses_to_revise.value,
+            other_recommendations: form.other_recommendations.value
+        };
+
+        try {
+            const res = await fetch('/api/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (data.success) {
+                localStorage.removeItem("faculty_feedback_draft_2025");
+                document.getElementById('successModal').classList.remove('hidden');
+            } else {
+                showToast("Submission failed: " + data.error, "error");
+            }
+        } catch (err) {
+            showToast("Network error during submission: " + err, "error");
+        }
+    }
+
+    // Initialize UI on Load
+    document.addEventListener('DOMContentLoaded', () => {
+        updateStepUI();
+        restoreDraft();
+    });
+</script>
+{% endblock %}

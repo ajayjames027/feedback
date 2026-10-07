@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Teacher Feedback on Curricular Design & Development (2025-26){% endblock %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#fdf6f0',
+                            100: '#fbe9db',
+                            500: '#af4c10',
+                            600: '#943e0c',
+                            700: '#793108',
+                            800: '#5e2505',
+                            900: '#431902'
+                        },
+                        indigo: {
+                            50: '#f5f3ff',
+                            600: '#5746e3',
+                            700: '#4334b8',
+                            800: '#342691'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome & Lucide Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .form-radio-card:hover {
+            border-color: #af4c10;
+            background-color: #fffaf5;
+        }
+        .matrix-cell:hover {
+            background-color: #fdf2e9;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+            }
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
+    <!-- Institutional Top Bar -->
+    <header class="bg-gradient-to-r from-brand-700 via-brand-600 to-indigo-700 text-white shadow-lg sticky top-0 z-50 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Brand / Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner">
+                        <i class="fa-solid fa-graduation-cap text-amber-300 text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-bold text-lg tracking-tight leading-none">Curricular Feedback & Analytics Portal</div>
+                        <div class="text-xs text-amber-200/80 font-medium">Syllabus Revision 2025-26 • IQAC & CDC System</div>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="hidden md:flex items-center space-x-1">
+                    <a href="{{ url_for('form_view') }}" class="px-3.5 py-2 rounded-lg text-sm font-medium transition-all {% if request.path == '/form' %}bg-white/20 text-white shadow-sm font-semibold{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
+                        <i class="fa-regular fa-file-lines mr-1.5"></i> Faculty Form
+                    </a>
+                    <a href="{{ url_for('dashboard_view') }}" class="px-3.5 py-2 rounded-lg text-sm font-medium transition-all {% if request.path == '/dashboard' %}bg-white/20 text-white shadow-sm font-semibold{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
+                        <i class="fa-solid fa-chart-pie mr-1.5"></i> Live Analytics
+                    </a>
+                    <a href="{{ url_for('responses_view') }}" class="px-3.5 py-2 rounded-lg text-sm font-medium transition-all {% if request.path == '/responses' %}bg-white/20 text-white shadow-sm font-semibold{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
+                        <i class="fa-solid fa-list-check mr-1.5"></i> Response Explorer
+                    </a>
+                    <a href="{{ url_for('report_view') }}" class="px-3.5 py-2 rounded-lg text-sm font-medium transition-all {% if request.path == '/report' %}bg-white/20 text-white shadow-sm font-semibold{% else %}text-white/80 hover:bg-white/10 hover:text-white{% endif %}">
+                        <i class="fa-solid fa-file-invoice mr-1.5"></i> IQAC Report
+                    </a>
+                </nav>
+
+                <!-- Action Utilities -->
+                <div class="flex items-center space-x-2">
+                    <a href="/api/export/csv" class="hidden sm:inline-flex items-center px-3 py-1.5 bg-white/10 hover:bg-white/20 text-xs font-semibold rounded-lg border border-white/20 transition-all text-white shadow-sm" title="Export CSV">
+                        <i class="fa-solid fa-download mr-1.5"></i> CSV
+                    </a>
+                    <button onclick="seedSampleData()" class="hidden lg:inline-flex items-center px-3 py-1.5 bg-amber-400/20 hover:bg-amber-400/30 text-amber-200 text-xs font-semibold rounded-lg border border-amber-300/30 transition-all" title="Add benchmark faculty sample responses">
+                        <i class="fa-solid fa-flask mr-1.5"></i> Sample Data
+                    </button>
+                    <!-- Mobile Hamburger -->
+                    <button id="mobileMenuBtn" class="md:hidden p-2 rounded-lg text-white hover:bg-white/10">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu Dropdown -->
+            <div id="mobileMenu" class="hidden md:hidden pb-3 pt-1 border-t border-white/10 space-y-1">
+                <a href="{{ url_for('form_view') }}" class="block px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10">Faculty Form</a>
+                <a href="{{ url_for('dashboard_view') }}" class="block px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10">Live Analytics</a>
+                <a href="{{ url_for('responses_view') }}" class="block px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10">Response Explorer</a>
+                <a href="{{ url_for('report_view') }}" class="block px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white/10">IQAC Report</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 mt-12 border-t border-slate-800 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-shield-halved text-brand-500"></i>
+                <span>Teacher Feedback on Curricular Design and Development (2025-26) • Aligned with NAAC & NEP 2020 Guidelines</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="{{ url_for('form_view') }}" class="hover:text-white transition">Form</a>
+                <span>•</span>
+                <a href="{{ url_for('dashboard_view') }}" class="hover:text-white transition">Analytics</a>
+                <span>•</span>
+                <a href="{{ url_for('report_view') }}" class="hover:text-white transition">Report</a>
+                <span>•</span>
+                <button onclick="clearAllData()" class="text-rose-400 hover:text-rose-300 transition">Reset Database</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- Common JavaScript -->
+    <script>
+        // Toggle mobile menu
+        document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        });
+
+        // Toast Helper
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            const bg = type === 'success' ? 'bg-emerald-600 text-white' : type === 'error' ? 'bg-rose-600 text-white' : 'bg-slate-800 text-white';
+            const icon = type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info';
+            
+            toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl flex items-center space-x-3 pointer-events-auto transition-all transform duration-300 translate-y-2 opacity-0 text-sm font-medium`;
+            toast.innerHTML = `
+                <i class="fa-solid ${icon}"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        async function seedSampleData() {
+            if (!confirm("Add 25 benchmark faculty feedback responses for comprehensive analysis?")) return;
+            try {
+                const res = await fetch("/api/seed", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ count: 25 })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(data.message);
+                    setTimeout(() => window.location.reload(), 800);
+                }
+            } catch (err) {
+                showToast("Failed to seed sample data: " + err, "error");
+            }
+        }
+
+        async function clearAllData() {
+            if (!confirm("WARNING: Are you sure you want to delete ALL responses? This cannot be undone.")) return;
+            try {
+                const res = await fetch("/api/clear", { method: "POST" });
+                const data = await res.json();
+                if (data.success) {
+                    showToast("Database cleared successfully!");
+                    setTimeout(() => window.location.reload(), 800);
+                }
+            } catch (err) {
+                showToast("Failed to clear database: " + err, "error");
+            }
+        }
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
