@@ -606,17 +606,41 @@
             <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Response Record Explorer</h1>
-                    <p class="text-xs text-slate-500 mt-1">Granular faculty feedback log</p>
+                    <p class="text-xs text-slate-500 mt-1">Granular faculty feedback log & NAAC reporting</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="exportNaacCriterion1SummaryPDF()" class="px-4 py-2 bg-indigo-900 hover:bg-slate-900 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center gap-1.5 border border-indigo-700">
+                        <i class="fa-solid fa-award text-amber-400 text-sm"></i> <span>NAAC Criterion 1 Executive Summary (PDF)</span>
+                    </button>
                     <button onclick="exportQuestionWiseExcel()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-1.5">
                         <i class="fa-solid fa-file-excel text-sm"></i> Download Question-Wise Matrix (Excel)
                     </button>
                     <button onclick="exportAllResponsesCSV()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold shadow-sm transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-file-csv"></i> Download CSV
+                        <i class="fa-solid fa-file-csv"></i> CSV
                     </button>
-                    <button onclick="exportAllResponsesJSON()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold border border-slate-300 transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-code"></i> Export JSON
+                </div>
+            </div>
+
+            <!-- Response Explorer Filter Bar -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center space-x-2 text-xs font-bold text-slate-700">
+                    <i class="fa-solid fa-filter text-indigo-600"></i>
+                    <span>Filter Records:</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                    <select id="respSchoolFilter" onchange="onRespSchoolFilterChange()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:bg-white focus:border-indigo-600 outline-none">
+                        <option value="All">All Schools (All)</option>
+                    </select>
+                    <select id="respDeptFilter" onchange="renderResponsesTable()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:bg-white focus:border-indigo-600 outline-none">
+                        <option value="All">All Departments (All)</option>
+                    </select>
+                    <select id="respLevelFilter" onchange="renderResponsesTable()" class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:bg-white focus:border-indigo-600 outline-none">
+                        <option value="All">All Levels</option>
+                        <option value="UG">UG Only</option>
+                        <option value="PG">PG Only</option>
+                    </select>
+                    <button onclick="resetResponseFilters()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition flex items-center gap-1">
+                        <i class="fa-solid fa-arrow-rotate-left"></i> Reset
                     </button>
                 </div>
             </div>
@@ -866,16 +890,57 @@
             const depts = Array.from(new Set(MASTER_FACULTY_ROSTER.map(f => f.department))).filter(Boolean).sort();
             const rosterSelect = document.getElementById('rosterDeptSelect');
             const anaSelect = document.getElementById('analyticsDeptSelect');
+            const respDeptSelect = document.getElementById('respDeptFilter');
+            const respSchoolSelect = document.getElementById('respSchoolFilter');
 
             depts.forEach(d => {
                 const opt1 = document.createElement('option');
                 opt1.value = d; opt1.innerText = d;
-                rosterSelect.appendChild(opt1);
+                if (rosterSelect) rosterSelect.appendChild(opt1);
 
                 const opt2 = document.createElement('option');
                 opt2.value = d; opt2.innerText = d;
-                anaSelect.appendChild(opt2);
+                if (anaSelect) anaSelect.appendChild(opt2);
+
+                const opt3 = document.createElement('option');
+                opt3.value = d; opt3.innerText = d;
+                if (respDeptSelect) respDeptSelect.appendChild(opt3);
             });
+
+            if (respSchoolSelect) {
+                Object.keys(DEPARTMENT_SCHOOL_MAP).forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s; opt.innerText = s;
+                    respSchoolSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function onRespSchoolFilterChange() {
+            const selectedSchool = document.getElementById('respSchoolFilter').value;
+            const respDeptSelect = document.getElementById('respDeptFilter');
+            respDeptSelect.innerHTML = '<option value="All">All Departments (All)</option>';
+
+            let depts = Array.from(new Set(MASTER_FACULTY_ROSTER.map(f => f.department))).filter(Boolean).sort();
+            if (selectedSchool !== 'All') {
+                const allowedDepts = DEPARTMENT_SCHOOL_MAP[selectedSchool] || [];
+                depts = depts.filter(d => allowedDepts.includes(d));
+            }
+
+            depts.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d; opt.innerText = d;
+                respDeptSelect.appendChild(opt);
+            });
+
+            renderResponsesTable();
+        }
+
+        function resetResponseFilters() {
+            document.getElementById('respSchoolFilter').value = 'All';
+            document.getElementById('respDeptFilter').value = 'All';
+            document.getElementById('respLevelFilter').value = 'All';
+            onRespSchoolFilterChange();
         }
 
         // Roster Table & Progress
@@ -1288,10 +1353,26 @@
 
         // Responses Explorer Table
         function renderResponsesTable() {
-            const list = getStoredResponses();
+            let list = getStoredResponses();
             const tbody = document.getElementById('responsesTableBody');
+
+            const schoolFilter = document.getElementById('respSchoolFilter')?.value || 'All';
+            const deptFilter = document.getElementById('respDeptFilter')?.value || 'All';
+            const levelFilter = document.getElementById('respLevelFilter')?.value || 'All';
+
+            if (schoolFilter !== 'All') {
+                const allowedDepts = DEPARTMENT_SCHOOL_MAP[schoolFilter] || [];
+                list = list.filter(r => allowedDepts.includes(r.department));
+            }
+            if (deptFilter !== 'All') {
+                list = list.filter(r => r.department === deptFilter);
+            }
+            if (levelFilter !== 'All') {
+                list = list.filter(r => r.course_level === levelFilter);
+            }
+
             if (list.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">No responses recorded yet.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">No matching responses recorded yet.</td></tr>`;
                 return;
             }
 
@@ -1529,6 +1610,194 @@
                     <!-- Footer -->
                     <div style="margin-top: 35px; border-t: 1px solid #e2e8f0; pt: 12px; text-align: center; font-size: 11px; color: #64748b; font-weight: 600;">
                         Designed & Developed by Internal Quality Assurance Cell (IQAC) — St. Joseph's College (Autonomous), Tiruchirappalli
+                    </div>
+
+                    <script>
+                        window.onload = function() {
+                            setTimeout(() => {
+                                window.print();
+                                window.close();
+                            }, 400);
+                        };
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWin.document.close();
+        }
+
+        function exportNaacCriterion1SummaryPDF() {
+            const responses = getStoredResponses();
+            if (responses.length === 0) {
+                showToast("No response records available for NAAC Report generation", "error");
+                return;
+            }
+
+            const parseVal = v => {
+                if (!v) return 0;
+                const n = parseFloat(String(v)[0]);
+                return isNaN(n) ? 0 : n;
+            };
+
+            // Calculate Metrics
+            const effMeans = effItems.map(item => {
+                const vals = responses.map(r => parseVal(r.overall_effectiveness?.[item])).filter(v => v > 0);
+                return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
+            });
+            const overallAvg = effMeans.length ? (effMeans.reduce((a, b) => a + b, 0) / effMeans.length) : 0;
+            const overallPct = Math.round((overallAvg / 5) * 100);
+
+            const obeMeans = obeItems.map(item => {
+                const vals = responses.map(r => parseVal(r.obe_evaluation?.[item])).filter(v => v > 0);
+                return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
+            });
+            const obeAvg = obeMeans.length ? (obeMeans.reduce((a, b) => a + b, 0) / obeMeans.length) : 0;
+            const obePct = Math.round((obeAvg / 5) * 100);
+
+            // School Attainment
+            const schoolStats = {};
+            Object.keys(DEPARTMENT_SCHOOL_MAP).forEach(s => { schoolStats[s] = { count: 0, totalScore: 0 }; });
+            responses.forEach(r => {
+                const s = getSchoolForDepartment(r.department);
+                if (schoolStats[s]) {
+                    schoolStats[s].count++;
+                    const rScores = effItems.map(item => parseVal(r.overall_effectiveness?.[item])).filter(v => v > 0);
+                    if (rScores.length) schoolStats[s].totalScore += (rScores.reduce((a, b) => a + b, 0) / rScores.length);
+                }
+            });
+
+            // Emerging Areas
+            const emergingCounts = {};
+            responses.forEach(r => {
+                const areas = r.emerging_areas || [];
+                if (Array.isArray(areas)) {
+                    areas.forEach(a => { emergingCounts[a] = (emergingCounts[a] || 0) + 1; });
+                }
+            });
+            const topEmerging = Object.entries(emergingCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+            // Overlap Audit
+            const overlaps = responses.filter(r => r.overlapping_courses === 'YES' || (r.overlapping_details && r.overlapping_details.trim().length > 0));
+
+            const printWin = window.open('', '_blank');
+            printWin.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>NAAC Criterion 1 Executive Summary 2025-26</title>
+                    <script src="https://cdn.tailwindcss.com"><\/script>
+                    <style>
+                        body { font-family: 'Plus Jakarta Sans', sans-serif; padding: 24px; color: #0f172a; background: white; }
+                        @media print { body { padding: 0; background: white; } }
+                    </style>
+                </head>
+                <body>
+                    <!-- Header -->
+                    <div style="border-bottom: 3px double #0f172a; padding-bottom: 12px; margin-bottom: 20px; text-align: center;">
+                        <h2 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0;">ST. JOSEPH'S COLLEGE (AUTONOMOUS), TIRUCHIRAPPALLI</h2>
+                        <h3 style="font-size: 13px; font-weight: 700; color: #475569; margin: 3px 0 0 0;">INTERNAL QUALITY ASSURANCE CELL (IQAC)</h3>
+                        <p style="font-size: 12px; font-weight: 800; color: #1e1b4b; margin: 4px 0 0 0; text-transform: uppercase; background: #e0e7ff; display: inline-block; padding: 3px 12px; border-radius: 9999px;">
+                            NAAC Criterion 1 Executive Summary: Curriculum Design & Evaluation (2025–26)
+                        </p>
+                    </div>
+
+                    <!-- Key Metrics Banner -->
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px;">
+                        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; text-align: center;">
+                            <div style="font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase;">Total Respondents</div>
+                            <div style="font-size: 22px; font-weight: 900; color: #0f172a;">${responses.length}</div>
+                            <div style="font-size: 10px; color: #64748b;">Faculty Members</div>
+                        </div>
+                        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 12px; text-align: center;">
+                            <div style="font-size: 10px; font-weight: 700; color: #166534; text-transform: uppercase;">Overall Satisfaction</div>
+                            <div style="font-size: 22px; font-weight: 900; color: #15803d;">${overallPct}%</div>
+                            <div style="font-size: 10px; color: #166534;">${overallAvg.toFixed(2)} / 5.0 score</div>
+                        </div>
+                        <div style="background: #eef2ff; border: 1px solid #c7d2fe; border-radius: 10px; padding: 12px; text-align: center;">
+                            <div style="font-size: 10px; font-weight: 700; color: #3730a3; text-transform: uppercase;">OBE Attainment</div>
+                            <div style="font-size: 22px; font-weight: 900; color: #4338ca;">${obePct}%</div>
+                            <div style="font-size: 10px; color: #3730a3;">${obeAvg.toFixed(2)} / 5.0 score</div>
+                        </div>
+                        <div style="background: #fff7ed; border: 1px solid #ffedd5; border-radius: 10px; padding: 12px; text-align: center;">
+                            <div style="font-size: 10px; font-weight: 700; color: #9a3412; text-transform: uppercase;">Overlap Alerts</div>
+                            <div style="font-size: 22px; font-weight: 900; color: #c2410c;">${overlaps.length}</div>
+                            <div style="font-size: 10px; color: #9a3412;">Logged Content Issues</div>
+                        </div>
+                    </div>
+
+                    <!-- School-wise Attainment Table -->
+                    <div style="margin-bottom: 24px;">
+                        <h4 style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; margin-bottom: 8px; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px;">
+                            1. School-Wise Feedback & Attainment Breakdown
+                        </h4>
+                        <table style="width: 100%; text-align: left; font-size: 11px; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f1f5f9; color: #334155;">
+                                    <th style="padding: 8px; border: 1px solid #cbd5e1;">School Name</th>
+                                    <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: center;">Responses Logged</th>
+                                    <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: center;">Avg Attainment Score (/5)</th>
+                                    <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: center;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${Object.entries(schoolStats).map(([sName, st]) => {
+                                    const avg = st.count > 0 ? (st.totalScore / st.count).toFixed(2) : 'N/A';
+                                    return `
+                                        <tr>
+                                            <td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: 700;">${sName}</td>
+                                            <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">${st.count}</td>
+                                            <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center; font-weight: 800; color: #4338ca;">${avg}</td>
+                                            <td style="padding: 8px; border: 1px solid #e2e8f0; text-align: center;">
+                                                <span style="background: ${st.count > 0 ? '#dcfce7' : '#f1f5f9'}; color: ${st.count > 0 ? '#166534' : '#64748b'}; padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 10px;">
+                                                    ${st.count > 0 ? 'Active' : 'Pending'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Priority Emerging Skills -->
+                    <div style="margin-bottom: 24px;">
+                        <h4 style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; margin-bottom: 8px; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px;">
+                            2. Priority Emerging Areas & Future Skills Demanded
+                        </h4>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            ${topEmerging.map(([area, cnt]) => `
+                                <div style="background: #f8fafc; border: 1px solid #cbd5e1; padding: 6px 12px; border-radius: 8px; font-size: 11px;">
+                                    <strong>${area}</strong> <span style="color: #4338ca; font-weight: 800;">(${cnt} Endorsements)</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Overlaps & Recommendations -->
+                    <div style="margin-bottom: 24px;">
+                        <h4 style="font-size: 12px; font-weight: 800; color: #0f172a; text-transform: uppercase; margin-bottom: 8px; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px;">
+                            3. Key Recommendations for Curriculum Development Cell (CDC)
+                        </h4>
+                        <ul style="font-size: 11px; line-height: 1.6; color: #334155; margin: 0; padding-left: 18px;">
+                            <li>Enhance interdisciplinary course options and integrate practical modules in line with NEP recommendations.</li>
+                            <li>Review and streamline course syllabi flagged for content overlap across consecutive semesters.</li>
+                            <li>Strengthen Indian Knowledge Systems (IKS) component integration in core departmental electives.</li>
+                            <li>Conduct Board of Studies (BoS) revisions prioritizing high-demand skill areas like AI, Data Science, and Industry Certification tracks.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Institutional Sign-Off -->
+                    <div style="margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 11px; text-align: center;">
+                        <div>
+                            <br><br>
+                            <div style="border-t: 1px solid #0f172a; pt: 4px; font-weight: 800;">IQAC Coordinator</div>
+                            <div style="color: #64748b;">St. Joseph's College (Autonomous)</div>
+                        </div>
+                        <div>
+                            <br><br>
+                            <div style="border-t: 1px solid #0f172a; pt: 4px; font-weight: 800;">Principal / Chairperson</div>
+                            <div style="color: #64748b;">St. Joseph's College (Autonomous)</div>
+                        </div>
                     </div>
 
                     <script>
