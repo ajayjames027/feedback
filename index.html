@@ -858,6 +858,104 @@
         const emergingPool = ['Artificial Intelligence and Generative AI', 'Data Science and Big Data Analytics', 'Computational Biology', 'Climate Change', 'Cybersecurity and Digital Privacy', 'Cloud Computing, Internet of Things and Smart Systems', 'Automation and Robotics', 'Sustainability and Green Technologies', 'Entrepreneurship, Innovation and Start-up Skills', 'Digital Ethics, Governance and Responsible Technology'];
         const stakeholders = ['H1. Students', 'H2. Alumni', 'H3. Employers', 'H4. Parents', 'H5. Industry Experts'];
 
+        function renderMatrixTables() {
+            const effBody = document.getElementById('effTableBody');
+            if (effBody) {
+                effBody.innerHTML = effItems.map((item, idx) => `
+                    <tr class="hover:bg-indigo-50/40 transition border-b border-slate-100">
+                        <td class="p-3 text-slate-800 font-medium leading-tight">${item}</td>
+                        ${[1,2,3,4,5].map(v => `
+                            <td class="p-2 text-center align-middle">
+                                <label class="w-full h-full flex items-center justify-center cursor-pointer p-1">
+                                    <input type="radio" name="eff_${idx+1}" value="${v}" required class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                </label>
+                            </td>
+                        `).join('')}
+                    </tr>
+                `).join('');
+            }
+
+            const obeBody = document.getElementById('obeTableBody');
+            if (obeBody) {
+                obeBody.innerHTML = obeItems.map((item, idx) => `
+                    <tr class="hover:bg-indigo-50/40 transition border-b border-slate-100">
+                        <td class="p-3 text-slate-800 font-medium leading-tight">${item}</td>
+                        ${[1,2,3,4,5].map(v => `
+                            <td class="p-2 text-center align-middle">
+                                <label class="w-full h-full flex items-center justify-center cursor-pointer p-1">
+                                    <input type="radio" name="obe_${idx+1}" value="${v}" required class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                </label>
+                            </td>
+                        `).join('')}
+                    </tr>
+                `).join('');
+            }
+
+            const structBody = document.getElementById('structTableBody');
+            if (structBody) {
+                structBody.innerHTML = structItems.map((item, idx) => `
+                    <tr class="hover:bg-indigo-50/40 transition border-b border-slate-100">
+                        <td class="p-3 text-slate-800 font-medium leading-tight">${item}</td>
+                        ${['1', '2', '3', '4', 'N/A'].map(v => `
+                            <td class="p-2 text-center align-middle">
+                                <label class="w-full h-full flex items-center justify-center cursor-pointer p-1">
+                                    <input type="radio" name="struct_${idx+1}" value="${v}" required class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                </label>
+                            </td>
+                        `).join('')}
+                    </tr>
+                `).join('');
+            }
+
+            const expBody = document.getElementById('expTableBody');
+            if (expBody) {
+                expBody.innerHTML = expItems.map((item, idx) => `
+                    <tr class="hover:bg-indigo-50/40 transition border-b border-slate-100">
+                        <td class="p-3 text-slate-800 font-medium leading-tight">${item}</td>
+                        ${['High', 'Moderate', 'Low', 'Not Applicable'].map(v => `
+                            <td class="p-2 text-center align-middle">
+                                <label class="w-full h-full flex items-center justify-center cursor-pointer p-1">
+                                    <input type="radio" name="exp_${idx+1}" value="${v}" required class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                </label>
+                            </td>
+                        `).join('')}
+                    </tr>
+                `).join('');
+            }
+
+            const digBody = document.getElementById('digTableBody');
+            if (digBody) {
+                digBody.innerHTML = digItems.map((item, idx) => `
+                    <tr class="hover:bg-indigo-50/40 transition border-b border-slate-100">
+                        <td class="p-3 text-slate-800 font-medium leading-tight">${item}</td>
+                        ${['Extensively', 'Moderately', 'Rarely', 'Not Used'].map(v => `
+                            <td class="p-2 text-center align-middle">
+                                <label class="w-full h-full flex items-center justify-center cursor-pointer p-1">
+                                    <input type="radio" name="dig_${idx+1}" value="${v}" required class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                </label>
+                            </td>
+                        `).join('')}
+                    </tr>
+                `).join('');
+            }
+
+            const stkBody = document.getElementById('stkTableBody');
+            if (stkBody) {
+                stkBody.innerHTML = stakeholders.map((item, idx) => `
+                    <tr class="hover:bg-indigo-50/40 transition border-b border-slate-100">
+                        <td class="p-3 text-slate-800 font-medium leading-tight">${item}</td>
+                        ${['Strongly Agree', 'Agree', 'Neutral', 'Disagree'].map(v => `
+                            <td class="p-2 text-center align-middle">
+                                <label class="w-full h-full flex items-center justify-center cursor-pointer p-1">
+                                    <input type="radio" name="stk_${idx+1}" value="${v}" required class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                </label>
+                            </td>
+                        `).join('')}
+                    </tr>
+                `).join('');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             initDepartmentOptions();
             renderMatrixTables();
