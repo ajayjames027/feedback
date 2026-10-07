@@ -609,12 +609,15 @@
                     <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Response Record Explorer</h1>
                     <p class="text-xs text-slate-500 mt-1">Granular faculty feedback log</p>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <button onclick="exportAllResponsesCSV()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold shadow-sm transition">
-                        <i class="fa-solid fa-file-csv mr-1"></i> Download CSV
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="exportQuestionWiseExcel()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-excel text-sm"></i> Download Question-Wise Matrix (Excel)
                     </button>
-                    <button onclick="exportAllResponsesJSON()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold border border-slate-300 transition">
-                        <i class="fa-solid fa-code mr-1"></i> Export JSON
+                    <button onclick="exportAllResponsesCSV()" class="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold shadow-sm transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-csv"></i> Download CSV
+                    </button>
+                    <button onclick="exportAllResponsesJSON()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold border border-slate-300 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-code"></i> Export JSON
                     </button>
                 </div>
             </div>
@@ -718,7 +721,10 @@
                 </button>
             </div>
             <div id="modalContent" class="p-6 space-y-4 overflow-y-auto text-xs md:text-sm"></div>
-            <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end">
+            <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
+                <button onclick="downloadSingleResponsePDF()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf"></i> <span>Download Response PDF</span>
+                </button>
                 <button onclick="document.getElementById('detailModal').classList.add('hidden')" class="px-5 py-2 bg-slate-800 text-white font-semibold text-xs rounded-xl">Close</button>
             </div>
         </div>
@@ -1331,60 +1337,269 @@
             showToast('Response deleted successfully.');
         }
 
+        let activeModalResponse = null;
+
         function viewSingleResponse(idx) {
             const r = getStoredResponses()[idx];
             if (!r) return;
+            activeModalResponse = r;
 
             document.getElementById('modalFacultyName').innerText = r.faculty_name;
-            document.getElementById('modalMeta').innerText = `${r.department} • Level: ${r.course_level} • Email: ${r.faculty_email || 'N/A'}`;
+            document.getElementById('modalMeta').innerText = `${getSchoolForDepartment(r.department)} • ${r.department} • Level: ${r.course_level} • Email: ${r.faculty_email || 'N/A'}`;
 
-            const formatDict = (obj) => {
-                if (!obj || Object.keys(obj).length === 0) return '<em class="text-slate-400">None</em>';
+            const formatSectionMap = (obj) => {
+                if (!obj || Object.keys(obj).length === 0) return '<em class="text-slate-400">No data recorded</em>';
                 return `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">` +
                     Object.entries(obj).map(([k, v]) => `
-                        <div class="flex justify-between p-2 rounded bg-white border border-slate-200/60 text-xs">
-                            <span class="text-slate-600 truncate mr-2" title="${k}">${k}:</span>
-                            <strong class="text-slate-900">${v}</strong>
+                        <div class="flex justify-between items-center p-2.5 rounded-xl bg-white border border-slate-200/80 text-xs">
+                            <span class="text-slate-600 font-medium mr-2 truncate" title="${k}">${k}</span>
+                            <strong class="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-bold">${v}</strong>
                         </div>
                     `).join('') + `</div>`;
             };
 
+            const formatList = (arr) => {
+                if (!arr || arr.length === 0) return '<em class="text-slate-400">None selected</em>';
+                if (typeof arr === 'string') return `<span class="font-semibold text-slate-800">${arr}</span>`;
+                return `<div class="flex flex-wrap gap-1.5 mt-1">` +
+                    arr.map(item => `<span class="px-2.5 py-1 rounded-lg bg-slate-200 text-slate-800 font-medium text-xs">${item}</span>`).join('') +
+                    `</div>`;
+            };
+
             const revs = (r.course_revisions || []).map(c => `
                 <tr class="border-b border-slate-100">
-                    <td class="p-2 font-semibold">${c.title}</td>
-                    <td class="p-2 text-center">${c.sem}</td>
-                    <td class="p-2">${c.change}</td>
+                    <td class="p-2 font-semibold text-indigo-900">${c.title}</td>
+                    <td class="p-2 text-center font-bold">${c.sem}</td>
+                    <td class="p-2 font-medium">${c.change}</td>
                     <td class="p-2 text-slate-500">${c.reason}</td>
                 </tr>
             `).join('');
 
             document.getElementById('modalContent').innerHTML = `
-                <div class="space-y-4">
-                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                        <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-2">Overall Effectiveness Ratings</h4>
-                        ${formatDict(r.overall_effectiveness)}
+                <div class="space-y-5" id="printableModalArea">
+                    <!-- Metadata Profile Header -->
+                    <div class="p-4 rounded-2xl bg-indigo-900 text-white space-y-2">
+                        <div class="flex justify-between items-center text-xs text-indigo-200">
+                            <span>Submission Date: <strong>${r.timestamp || 'N/A'}</strong></span>
+                            <span>Programme Level: <strong class="uppercase text-amber-300">${r.course_level || 'N/A'}</strong></span>
+                        </div>
+                        <div class="text-xs">
+                            <strong>Courses / Papers Handled:</strong> ${r.courses_handled || 'N/A'}
+                        </div>
                     </div>
-                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                        <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-2">OBE Evaluation</h4>
-                        ${formatDict(r.obe_evaluation)}
+
+                    <!-- Section B: Overall Effectiveness -->
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                        <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-star text-amber-500"></i> Section B: Overall Curricular Effectiveness Ratings (1-5)
+                        </h4>
+                        ${formatSectionMap(r.overall_effectiveness)}
                     </div>
-                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-                        <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider mb-2">Curriculum Structure Balance</h4>
-                        ${formatDict(r.curriculum_structure)}
+
+                    <!-- Section C: Outcome Based Education -->
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                        <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-bullseye text-indigo-500"></i> Section C: Outcome Based Education (OBE) Ratings
+                        </h4>
+                        ${formatSectionMap(r.obe_evaluation)}
                     </div>
-                    ${r.overlapping_details ? `<div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs"><strong>Overlap Details:</strong> ${r.overlapping_details}</div>` : ''}
+
+                    <!-- Section D: Curriculum Structure -->
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                        <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-layer-group text-emerald-500"></i> Section D: Component Balance Adequacy
+                        </h4>
+                        ${formatSectionMap(r.curriculum_structure)}
+                    </div>
+
+                    <!-- Section E & F: Emerging Areas, Skills & Experiential Learning -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-lightbulb text-purple-500"></i> Section E: Emerging Areas Selected
+                            </h4>
+                            ${formatList(r.emerging_areas)}
+                            ${r.emerging_other ? `<div class="text-xs text-slate-600 mt-1"><strong>Other:</strong> ${r.emerging_other}</div>` : ''}
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
+                            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-flask text-cyan-500"></i> Section F: Future Skills & Research
+                            </h4>
+                            <div class="text-xs space-y-1">
+                                <div><strong>Experiential Learning:</strong> ${r.experiential_rating || 'N/A'}/5</div>
+                                <div><strong>Research Orientation:</strong> ${formatList(r.research_orientation)}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section G, H, I: NSQF, Stakeholders & IKS -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1">
+                            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Section G: NSQF Alignment</h4>
+                            <div class="text-xs font-bold text-indigo-700">${r.nsqf_alignment || 'N/A'}</div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1">
+                            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Section H: Stakeholders</h4>
+                            <div class="text-xs">${formatList(r.stakeholder_sources)}</div>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1">
+                            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Section I: IKS Effectiveness</h4>
+                            <div class="text-xs font-bold text-indigo-700">${r.iks_effectiveness || 'N/A'} / 5</div>
+                            <div class="text-[11px] text-slate-500">${formatList(r.iks_modes)}</div>
+                        </div>
+                    </div>
+
+                    <!-- Overlaps & Revisions -->
+                    ${r.overlapping_details || r.overlapping_courses === 'Yes' ? `
+                        <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
+                            <div class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Redundant Content / Course Overlaps Logged</div>
+                            <div>${r.overlapping_details || 'Faculty reported overlapping course content.'}</div>
+                        </div>
+                    ` : ''}
+
                     ${revs ? `
                         <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-                            <h4 class="font-bold text-slate-800 text-xs uppercase tracking-wider">Course Revision Proposals</h4>
-                            <table class="w-full text-left text-xs bg-white rounded-xl overflow-hidden border border-slate-200">
-                                <thead><tr class="bg-slate-100 text-slate-600 font-bold"><th class="p-2">Course</th><th class="p-2 text-center">Sem</th><th class="p-2">Change</th><th class="p-2">Reason</th></tr></thead>
-                                <tbody>${revs}</tbody>
-                            </table>
+                            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Section J: Course Revision Proposals</h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs bg-white rounded-xl overflow-hidden border border-slate-200">
+                                    <thead><tr class="bg-slate-100 text-slate-700 font-bold"><th class="p-2">Course</th><th class="p-2 text-center">Sem</th><th class="p-2">Change</th><th class="p-2">Reason</th></tr></thead>
+                                    <tbody>${revs}</tbody>
+                                </table>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${r.general_feedback ? `
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-1">
+                            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">General Feedback & Institutional Suggestions</h4>
+                            <p class="text-xs text-slate-700 leading-relaxed">${r.general_feedback}</p>
                         </div>
                     ` : ''}
                 </div>
             `;
             document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function downloadSingleResponsePDF() {
+            if (!activeModalResponse) return;
+            const printWin = window.open('', '', 'width=900,height=900');
+            printWin.document.write(`
+                <html>
+                <head>
+                    <title>Faculty Response - ${activeModalResponse.faculty_name}</title>
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <style>
+                        body { font-family: sans-serif; padding: 20px; }
+                        @media print { body { padding: 0; } }
+                    </style>
+                </head>
+                <body>
+                    <div style="border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; text-align: center;">
+                        <h2 style="font-size: 16px; font-weight: bold; margin: 0;">ST. JOSEPH'S COLLEGE (AUTONOMOUS), TIRUCHIRAPPALLI</h2>
+                        <h3 style="font-size: 14px; color: #444; margin: 4px 0;">INTERNAL QUALITY ASSURANCE CELL (IQAC)</h3>
+                        <h4 style="font-size: 12px; margin: 0; text-transform: uppercase;">Faculty Feedback Response Record: 2025-26</h4>
+                    </div>
+                    <div style="margin-bottom: 15px; background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 12px;">
+                        <strong>Faculty Name:</strong> ${activeModalResponse.faculty_name}<br>
+                        <strong>Department:</strong> ${activeModalResponse.department} (${getSchoolForDepartment(activeModalResponse.department)})<br>
+                        <strong>Email:</strong> ${activeModalResponse.faculty_email || 'N/A'} | <strong>Programme Level:</strong> ${activeModalResponse.course_level}<br>
+                        <strong>Timestamp:</strong> ${activeModalResponse.timestamp}
+                    </div>
+                    ${document.getElementById('printableModalArea').innerHTML}
+                    <div style="margin-top: 30px; text-align: center; font-size: 10px; color: #888;">
+                        Designed & Developed by Internal Quality Assurance Cell - St. Joseph's College (Autonomous)
+                    </div>
+                    <script>
+                        setTimeout(() => { window.print(); window.close(); }, 500);
+                    </script>
+                </body>
+                </html>
+            `);
+            printWin.document.close();
+        }
+
+        function exportQuestionWiseExcel() {
+            const responses = getStoredResponses();
+            if (responses.length === 0) {
+                showToast("No response data available to export");
+                return;
+            }
+
+            // Build full question key list dynamically
+            let headers = ["S.No", "Timestamp", "School", "Department", "Faculty Name", "Email", "Programme Level", "Courses Handled"];
+
+            // Add Section B headers
+            effItems.forEach(q => headers.push(`[Section B] ${q}`));
+            // Add Section C headers
+            obeItems.forEach(q => headers.push(`[Section C] ${q}`));
+            // Add Section D headers
+            structItems.forEach(q => headers.push(`[Section D] ${q}`));
+            // Add Section E headers
+            headers.push("[Section E] Selected Emerging Areas");
+            headers.push("[Section E] Other Emerging Areas");
+            // Add Section F, G, H, I, J
+            headers.push("[Section F] Experiential Learning Rating (/5)");
+            headers.push("[Section F] Research Orientation");
+            headers.push("[Section G] NSQF Alignment");
+            headers.push("[Section H] Stakeholder Sources");
+            headers.push("[Section I] IKS Effectiveness Rating (/5)");
+            headers.push("[Section I] IKS Integration Modes");
+            headers.push("Overlapping Content Logged");
+            headers.push("Overlap Details");
+            headers.push("[Section J] Proposed Course Revisions");
+            headers.push("[Section J] General Suggestions");
+
+            let csvContent = "\uFEFF" + headers.map(h => `"${h.replace(/"/g, '""')}"`).join(",") + "\n";
+
+            responses.forEach((r, idx) => {
+                let row = [
+                    idx + 1,
+                    r.timestamp || '',
+                    getSchoolForDepartment(r.department),
+                    r.department || '',
+                    r.faculty_name || '',
+                    r.faculty_email || '',
+                    r.course_level || '',
+                    r.courses_handled || ''
+                ];
+
+                // Section B ratings
+                effItems.forEach(q => row.push(r.overall_effectiveness?.[q] || 'N/A'));
+                // Section C ratings
+                obeItems.forEach(q => row.push(r.obe_evaluation?.[q] || 'N/A'));
+                // Section D ratings
+                structItems.forEach(q => row.push(r.curriculum_structure?.[q] || 'N/A'));
+                // Section E
+                row.push(Array.isArray(r.emerging_areas) ? r.emerging_areas.join("; ") : (r.emerging_areas || 'N/A'));
+                row.push(r.emerging_other || 'N/A');
+                // Section F
+                row.push(r.experiential_rating || 'N/A');
+                row.push(Array.isArray(r.research_orientation) ? r.research_orientation.join("; ") : (r.research_orientation || 'N/A'));
+                // Section G
+                row.push(r.nsqf_alignment || 'N/A');
+                // Section H
+                row.push(Array.isArray(r.stakeholder_sources) ? r.stakeholder_sources.join("; ") : (r.stakeholder_sources || 'N/A'));
+                // Section I
+                row.push(r.iks_effectiveness || 'N/A');
+                row.push(Array.isArray(r.iks_modes) ? r.iks_modes.join("; ") : (r.iks_modes || 'N/A'));
+                // Overlaps
+                row.push(r.overlapping_courses || 'No');
+                row.push(r.overlapping_details || '');
+                // Section J
+                const revSummary = (r.course_revisions || []).map(c => `${c.title} (Sem ${c.sem}): ${c.change} [Reason: ${c.reason}]`).join(" | ");
+                row.push(revSummary || r.courses_to_revise || 'None');
+                row.push(r.general_feedback || '');
+
+                csvContent += row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",") + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `SJC_Faculty_Feedback_Question_Wise_Matrix_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            showToast("Question-Wise Excel Matrix downloaded successfully!");
         }
 
         function exportAllResponsesCSV() {
