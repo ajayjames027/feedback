@@ -1040,7 +1040,12 @@
                         document.getElementById('successView').classList.remove('hidden');
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                     })
-                    .catch(e => { console.error('Error saving to Firestore:', e); });
+                    .catch(e => { 
+                        console.error('Error saving to Firestore:', e); 
+                        alert("Firebase Save Error: " + e.message);
+                    });
+            } else {
+                alert("Firebase not initialized! The module script hasn't loaded yet.");
             }
 
             // Show Google Form style success screen
@@ -1049,7 +1054,8 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function showModalError(msg) {
+                function showModalError(msg) {
+            alert("Validation Error: " + msg);
             document.getElementById('errorMessage').innerText = msg;
             document.getElementById('errorModal').classList.remove('hidden');
         }
