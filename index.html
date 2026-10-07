@@ -134,26 +134,36 @@
     <!-- Main Container -->
     <div class="max-w-4xl mx-auto space-y-6" id="mainContainer">
         
-        <!-- Header Banner with College Logo -->
-        <header class="portal-card p-6 md:p-8 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white relative overflow-hidden rounded-2xl border-none">
-            <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                <div class="flex items-start md:items-center gap-4">
-                    <img src="sjc-logo-small (1).png" alt="St. Joseph's College Logo" class="w-16 h-16 md:w-20 md:h-20 object-contain p-1.5 bg-white/10 rounded-2xl border border-white/20 shadow-lg flex-shrink-0">
-                    <div>
-                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold tracking-wide uppercase mb-2 backdrop-blur-md border border-indigo-500/30">
-                            <i class="fa-solid fa-building-columns"></i> St. Joseph's College (Autonomous) • IQAC
-                        </div>
-                        <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
-                            Curriculum Feedback Portal <span class="text-indigo-400">2025-26</span>
-                        </h1>
-                        <p class="text-slate-300 text-xs md:text-sm mt-1 max-w-2xl leading-relaxed">
-                            Comprehensive Evaluation & Feedback on Syllabus Revision for UG & PG Programmes.
-                        </p>
-                    </div>
+        <!-- Header Banner with Authentic Academic Institutional Header -->
+        <header class="bg-white p-6 md:p-8 rounded-2xl border border-amber-900/20 shadow-md relative overflow-hidden">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+                <!-- Left: Official Logo -->
+                <div class="flex-shrink-0">
+                    <img src="sjc-logo-small (1).png" alt="St. Joseph's College Logo" class="w-20 h-24 md:w-24 md:h-28 object-contain mx-auto md:mx-0 drop-shadow-sm">
                 </div>
-                <div class="hidden lg:flex flex-shrink-0 items-center justify-center w-16 h-16 bg-indigo-600/30 text-indigo-300 rounded-2xl border border-indigo-400/20 shadow-inner">
-                    <i class="fa-solid fa-graduation-cap text-3xl"></i>
+
+                <!-- Center: Academic Typography & Accreditation Details -->
+                <div class="flex-grow text-center space-y-1">
+                    <div class="text-xs md:text-sm font-black tracking-widest text-amber-800 uppercase">
+                        INTERNAL QUALITY ASSURANCE CELL
+                    </div>
+                    <h1 class="text-xl md:text-3xl font-extrabold text-blue-900 tracking-tight font-serif">
+                        St. Joseph’s College (Autonomous)
+                    </h1>
+                    <div class="text-[11px] md:text-xs text-slate-700 font-medium space-y-0.5">
+                        <p>Accredited at A<sup>++</sup> (Cycle IV) by NAAC | Special Heritage Status Awarded by UGC</p>
+                        <p class="font-semibold text-blue-950">Tiruchirappalli – 620002, Tamil Nadu, India</p>
+                    </div>
+                    <div class="pt-2">
+                        <div class="inline-block border-t-2 border-b-2 border-blue-900 py-1 px-4">
+                            <h2 class="text-xs md:text-sm font-black text-blue-900 tracking-wider uppercase">
+                                TEACHER FEEDBACK ON CURRICULAR DESIGN AND DEVELOPMENT
+                            </h2>
+                            <div class="text-xs md:text-sm font-extrabold text-blue-950 mt-0.5">
+                                2025 – 2026
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -937,6 +947,9 @@
         </div>
     </div>
 
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-[300] space-y-2 pointer-events-none"></div>
+
     <!-- Duplicate Submission Alert Modal -->
     <div id="duplicateAlertModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl border border-rose-100">
@@ -1280,7 +1293,7 @@
 
         function goToStep(stepNum) {
             if (stepNum > currentMaxStepUnlocked) {
-                alert(`Step ${stepNum} is locked. Please complete the current section and click 'Next Step' to proceed sequentially.`);
+                showToast(`Section ${stepNum} is locked. Complete the current section to proceed.`, 'error');
                 return;
             }
             showStep(stepNum);
@@ -1307,7 +1320,7 @@
                 if (input.type === 'radio' || input.type === 'checkbox') continue;
                 if (!input.value.trim()) {
                     input.focus();
-                    alert('Please fill out all required fields in this section.');
+                    showToast('Please fill out all required fields in this section.', 'error');
                     return false;
                 }
             }
@@ -1315,11 +1328,23 @@
             const radioGroups = new Set(Array.from(section.querySelectorAll('input[type="radio"][required]')).map(el => el.name));
             for (const name of radioGroups) {
                 if (!section.querySelector(`input[name="${name}"]:checked`)) {
-                    alert('Please answer all required questions in this section.');
+                    showToast('Please answer all required questions in this section.', 'error');
                     return false;
                 }
             }
             return true;
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            const bg = type === 'error' ? 'bg-rose-800 text-white border border-rose-700' : 'bg-slate-900 text-white border border-slate-700';
+            const icon = type === 'error' ? 'fa-triangle-exclamation text-amber-400' : 'fa-circle-check text-emerald-400';
+            toast.className = `${bg} px-4 py-3 rounded-xl shadow-xl flex items-center space-x-2.5 text-xs font-semibold pointer-events-auto transition-all transform duration-300 backdrop-blur-md`;
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
         }
 
         function submitFacultyFeedback(e) {
