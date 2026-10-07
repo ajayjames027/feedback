@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TEACHER FEEDBACK ON CURRICULAR DESIGN AND DEVELOPMENT: 2025-26</title>
+    <title>St. Joseph's College • Curriculum Feedback Portal 2025-26</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,747 +11,718 @@
             theme: {
                 extend: {
                     colors: {
-                        gform: {
-                            purple: '#5746e3',
-                            terracotta: '#6366f1',
-                            bg: '#f0ebf8',
-                            card: '#ffffff',
-                            border: '#dadce0',
-                            accent: '#6366f1'
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#1e1b4b',
                         }
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
                     }
                 }
             }
         }
     </script>
     
-<!-- Firebase App (the core Firebase SDK) -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyC7FuA4XE3DYQevwoaSd7_G0G0Z7UPi2ms",
-        authDomain: "feedback-4cb66.firebaseapp.com",
-        projectId: "feedback-4cb66",
-        storageBucket: "feedback-4cb66.firebasestorage.app",
-        messagingSenderId: "1071690168576",
-        appId: "1:1071690168576:web:fd0d2163495e3b928a5be5"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyC7FuA4XE3DYQevwoaSd7_G0G0Z7UPi2ms",
+            authDomain: "feedback-4cb66.firebaseapp.com",
+            projectId: "feedback-4cb66",
+            storageBucket: "feedback-4cb66.firebasestorage.app",
+            messagingSenderId: "1071690168576",
+            appId: "1:1071690168576:web:fd0d2163495e3b928a5be5"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    window.db = db;
-    window.addDoc = addDoc;
-    window.collection = collection;
-</script>
-<!-- FontAwesome & Google Fonts -->
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        window.db = db;
+        window.addDoc = addDoc;
+        window.collection = collection;
+    </script>
+
+    <!-- FontAwesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
         body {
-            font-family: 'Roboto', 'Google Sans', sans-serif;
-            background-color: #f7ede7;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            min-height: 100vh;
         }
-        /* Modern form card styles */
-        .gform-card {
-            background: #ffffff;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
-            transition: all 0.2s ease;
-            position: relative;
+
+        .portal-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.04), 0 8px 10px -6px rgba(15, 23, 42, 0.02);
+            border-radius: 16px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .gform-card:focus-within {
-            border-color: #6366f1;
-            box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.1), 0 2px 4px -1px rgba(99, 102, 241, 0.06);
+
+        .portal-card:hover {
+            box-shadow: 0 20px 30px -10px rgba(79, 70, 229, 0.07);
         }
-        .gform-card::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background-color: transparent;
-            border-top-left-radius: 12px;
-            border-bottom-left-radius: 12px;
-            transition: background-color 0.2s ease;
+
+        .step-pill {
+            transition: all 0.3s ease;
         }
-        .gform-card:focus-within::before {
-            background-color: #6366f1;
-        }
-        .stepper-active .stepper-icon {
+
+        .step-pill.active {
             background-color: #4f46e5;
-            color: white;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
         }
-        .stepper-active .stepper-text {
+
+        .step-pill.active .step-num {
+            background-color: #ffffff;
             color: #4f46e5;
         }
-        .stepper-completed .stepper-icon {
+
+        .step-pill.completed {
+            background-color: #ecfdf5;
+            color: #059669;
+            border-color: #a7f3d0;
+        }
+
+        .step-pill.completed .step-num {
             background-color: #10b981;
-            color: white;
-            border-color: #10b981;
+            color: #ffffff;
         }
-        .hidden { display: none !important; }
-        .matrix-row:hover {
-            background-color: #fff9f5;
+
+        /* Modern Radio and Checkbox Styling */
+        input[type="radio"], input[type="checkbox"] {
+            accent-color: #4f46e5;
         }
+
+        .matrix-table th {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.725rem;
+        }
+
+        .matrix-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .matrix-table tr:hover {
+            background-color: #eef2ff;
+        }
+
         .required-star {
-            color: #d93025;
-        }
-        input[type="radio"]:checked, input[type="checkbox"]:checked {
-            accent-color: #af4c10;
+            color: #ef4444;
         }
     </style>
+
     <!-- Master Roster Data -->
     <script src="faculty_roster_data.js"></script>
-    <!-- Firebase Roster Hydration Logic Stub -->
 </head>
-<body class="min-h-screen py-8 px-3 sm:px-6">
+<body class="text-slate-800 py-8 px-4 sm:px-6 lg:px-8">
 
-    <div class="max-w-3xl mx-auto space-y-4" id="mainContainer">
+    <!-- Main Container -->
+    <div class="max-w-4xl mx-auto space-y-6" id="mainContainer">
         
-        
-        <!-- Modern Header -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
-            <div class="h-2 relative bg-indigo-600"></div>
-            <div class="p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <!-- Header Banner -->
+        <header class="portal-card p-6 md:p-8 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white relative overflow-hidden rounded-2xl border-none">
+            <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div>
-                    <div class="text-xs font-bold text-indigo-600 tracking-wider uppercase mb-1">St. Joseph's College • IQAC</div>
-                    <h1 class="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">
-                        Curriculum Feedback 2025-26
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold tracking-wide uppercase mb-3 backdrop-blur-md border border-indigo-500/30">
+                        <i class="fa-solid fa-building-columns"></i> St. Joseph's College (Autonomous) • IQAC
+                    </div>
+                    <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
+                        Curriculum Feedback Portal <span class="text-indigo-400">2025-26</span>
                     </h1>
-                    <p class="text-slate-500 text-sm mt-2 max-w-2xl">
-                        Kindly provide your valuable feedback based on the syllabus revision 2025 for both UG & PG.
+                    <p class="text-slate-300 text-sm mt-2 max-w-2xl leading-relaxed">
+                        Comprehensive Evaluation & Feedback on Syllabus Revision for UG & PG Programmes.
                     </p>
                 </div>
-                <div class="flex-shrink-0 flex items-center justify-center w-16 h-16 bg-indigo-50 text-indigo-600 rounded-full border border-indigo-100 shadow-inner">
-                    <i class="fa-solid fa-graduation-cap text-2xl"></i>
+                <div class="hidden md:flex flex-shrink-0 items-center justify-center w-16 h-16 bg-indigo-600/30 text-indigo-300 rounded-2xl border border-indigo-400/20 shadow-inner">
+                    <i class="fa-solid fa-graduation-cap text-3xl"></i>
                 </div>
             </div>
-        </div>
+        </header>
 
-        <!-- Modern Stepper UI -->
-        <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200 mb-6 flex items-center justify-between overflow-x-auto gap-4" id="stepperNav">
-            <div class="flex items-center space-x-2 stepper-item" id="stepper-1">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-slate-100 text-slate-400 border border-slate-200 stepper-icon transition-all duration-300">1</div>
-                <span class="text-xs font-semibold text-slate-500 whitespace-nowrap stepper-text transition-all duration-300">Basic Profile</span>
-            </div>
-            <div class="flex items-center space-x-2 stepper-item" id="stepper-2">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-slate-100 text-slate-400 border border-slate-200 stepper-icon transition-all duration-300">2</div>
-                <span class="text-xs font-semibold text-slate-500 whitespace-nowrap stepper-text transition-all duration-300">Effectiveness & OBE</span>
-            </div>
-            <div class="flex items-center space-x-2 stepper-item" id="stepper-3">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-slate-100 text-slate-400 border border-slate-200 stepper-icon transition-all duration-300">3</div>
-                <span class="text-xs font-semibold text-slate-500 whitespace-nowrap stepper-text transition-all duration-300">Learning Paths</span>
-            </div>
-            <div class="flex items-center space-x-2 stepper-item" id="stepper-4">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-slate-100 text-slate-400 border border-slate-200 stepper-icon transition-all duration-300">4</div>
-                <span class="text-xs font-semibold text-slate-500 whitespace-nowrap stepper-text transition-all duration-300">Exp & Digital Learning</span>
-            </div>
-            <div class="flex items-center space-x-2 stepper-item" id="stepper-5">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-slate-100 text-slate-400 border border-slate-200 stepper-icon transition-all duration-300">5</div>
-                <span class="text-xs font-semibold text-slate-500 whitespace-nowrap stepper-text transition-all duration-300">Modern Integration</span>
-            </div>
-            <div class="flex items-center space-x-2 stepper-item" id="stepper-6">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm bg-slate-100 text-slate-400 border border-slate-200 stepper-icon transition-all duration-300">6</div>
-                <span class="text-xs font-semibold text-slate-500 whitespace-nowrap stepper-text transition-all duration-300">Knowledge Systems</span>
-            </div>
-        </div>
+        <!-- Stepper Navigation Bar -->
+        <nav class="portal-card p-3 overflow-x-auto flex items-center gap-2 no-scrollbar" id="stepperNav">
+            <button type="button" onclick="goToStep(1)" class="step-pill active flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-transparent text-xs font-semibold whitespace-nowrap cursor-pointer" id="stepper-1">
+                <span class="step-num w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold">1</span>
+                <span>Basic Profile</span>
+            </button>
+            <button type="button" onclick="goToStep(2)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer" id="stepper-2">
+                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">2</span>
+                <span>Effectiveness & OBE</span>
+            </button>
+            <button type="button" onclick="goToStep(3)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer" id="stepper-3">
+                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">3</span>
+                <span>Learning Paths</span>
+            </button>
+            <button type="button" onclick="goToStep(4)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer" id="stepper-4">
+                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">4</span>
+                <span>Exp & Digital Learning</span>
+            </button>
+            <button type="button" onclick="goToStep(5)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer" id="stepper-5">
+                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">5</span>
+                <span>Modern Integration</span>
+            </button>
+            <button type="button" onclick="goToStep(6)" class="step-pill flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold whitespace-nowrap cursor-pointer" id="stepper-6">
+                <span class="step-num w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-bold">6</span>
+                <span>Knowledge Systems</span>
+            </button>
+        </nav>
 
-        <!-- Feedback Form View -->
-        <form id="facultyForm" onsubmit="submitFacultyFeedback(event)" class="space-y-4" novalidate>
+        <!-- Dynamic Form -->
+        <form id="facultyForm" onsubmit="submitFacultyFeedback(event)" class="space-y-6" novalidate>
 
-        <!-- Floating Faculty Details Header -->
-        <div id="stickyFacultyDetails" class="hidden sticky top-0 z-50 bg-indigo-50 border-b border-indigo-100 shadow-sm mb-6 p-4 rounded-lg flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-sm" id="stickyInitials">FA</div>
-                <div>
-                    <div class="text-sm font-bold text-slate-800" id="stickyName">Faculty Name</div>
-                    <div class="text-xs text-slate-500" id="stickyDept">Department</div>
-                </div>
-            </div>
-            <div class="text-xs text-indigo-700 bg-indigo-100 px-3 py-1 rounded-full font-medium" id="stickyDesig">
-                Designation
-            </div>
-        </div>
-            <div class="form-section " id="form-section-1" data-step="1">
-                <div class="text-lg font-bold text-slate-800 mb-4 px-2">Basic Profile</div>
-<!-- Question 1: Department -->
-            <div class="gform-card p-6 space-y-3" id="card-dept">
-                <label class="block text-base font-normal text-[#202124]">
-                    Department <span class="required-star">*</span>
-                </label>
-                <select name="department" id="deptSelect" required onchange="onDepartmentChange()" class="w-full px-3.5 py-2.5 rounded border border-[#dadce0] bg-white text-sm text-[#202124] focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition">
-                    <option value="" disabled selected>Choose Department</option>
-                </select>
-            </div>
-
-            <!-- Question 2: Name of the Faculty (Dynamic Roster Dropdown) -->
-            <div class="gform-card p-6 space-y-3" id="card-name">
-                <label class="block text-base font-normal text-[#202124]">
-                    Name of the Teaching Staff <span class="required-star">*</span>
-                </label>
-                <div class="space-y-2">
-                    <select name="faculty_name_select" id="facultyNameSelect" required onchange="onFacultySelectChange()" class="w-full px-3.5 py-2.5 rounded border border-[#dadce0] bg-white text-sm text-[#202124] focus:outline-none focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition">
-                        <option value="" disabled selected>-- Select department first --</option>
-                    </select>
-                    <div id="facultyMetaBadge" class="hidden text-xs bg-slate-50 text-slate-700 p-2.5 rounded border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-                        <span id="facultyDesignation" class="font-medium text-slate-800"></span>
-                        <span id="facultyEmailText" class="font-mono text-slate-500"></span>
-                    </div>
-                    <input type="hidden" name="faculty_name" id="facultyNameInput">
-                    <input type="hidden" name="faculty_email" id="facultyEmailInput">
-                </div>
-            </div>
-
-            <!-- Question 3: Handling Courses for -->
-            <div class="gform-card p-6 space-y-3" id="card-level">
-                <label class="block text-base font-normal text-[#202124]">
-                    Handling Courses for <span class="required-star">*</span>
-                </label>
-                <div class="space-y-2.5 text-sm text-[#202124]">
-                    <label class="flex items-center space-x-3 cursor-pointer py-1">
-                        <input type="radio" name="course_level" value="UG" required class="w-4 h-4 text-indigo-600">
-                        <span>UG</span>
-                    </label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1">
-                        <input type="radio" name="course_level" value="PG" class="w-4 h-4 text-indigo-600">
-                        <span>PG</span>
-                    </label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1">
-                        <input type="radio" name="course_level" value="Both" class="w-4 h-4 text-indigo-600">
-                        <span>Both</span>
-                    </label>
-                </div>
-            </div>
-
-                            <div class="flex items-center justify-between pt-6 pb-4 px-2 border-t border-slate-100 mt-4">
-                    <div></div>
-                    <button type="button" onclick="nextStep(1)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded shadow-sm transition">Next Step</button>
-                </div>
-            </div>
-            <div class="form-section hidden" id="form-section-2" data-step="2">
-                <div class="text-lg font-bold text-slate-800 mb-4 px-2">Effectiveness & OBE</div>
-<!-- Question 4 & 5: Overall Effectiveness (Header + Grid) -->
-            <div class="gform-card p-6 space-y-4" id="card-eff">
-                <div>
-                    <h2 class="text-base font-normal text-[#202124]">
-                        Overall Effectiveness of Current Curriculum <span class="required-star">*</span>
-                    </h2>
-                    <p class="text-xs text-[#5f6368] mt-1">
-                        Scale: 5-Highly Effective / 4-Effective / 3-Moderately Effective / 2-Less Effective / 1-Not Effective
-                    </p>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs sm:text-sm border-collapse" id="effTable">
-                        <thead>
-                            <tr class="bg-slate-50 text-[#5f6368] font-normal border-b border-slate-200">
-                                <th class="p-3 w-1/2">Curricular Dimension</th>
-                                <th class="p-2 text-center w-12 font-normal">1<br><span class="text-[9px]">Not</span></th>
-                                <th class="p-2 text-center w-12 font-normal">2<br><span class="text-[9px]">Less</span></th>
-                                <th class="p-2 text-center w-12 font-normal">3<br><span class="text-[9px]">Mod</span></th>
-                                <th class="p-2 text-center w-12 font-normal">4<br><span class="text-[9px]">Eff</span></th>
-                                <th class="p-2 text-center w-12 font-normal">5<br><span class="text-[9px]">High</span></th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100" id="effTableBody">
-                            <!-- Populated dynamically via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Question 6 & 7: Outcome Based Education (OBE) Evaluation -->
-            <div class="gform-card p-6 space-y-4" id="card-obe">
-                <div>
-                    <h2 class="text-base font-normal text-[#202124]">
-                        Outcome Based Education (OBE) Evaluation <span class="required-star">*</span>
-                    </h2>
-                    <p class="text-xs text-[#5f6368] mt-1">
-                        Rate from 1 (Low) to 5 (Strongly Agree / Excellent)
-                    </p>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs sm:text-sm border-collapse" id="obeTable">
-                        <thead>
-                            <tr class="bg-slate-50 text-[#5f6368] font-normal border-b border-slate-200">
-                                <th class="p-3 w-1/2">OBE Indicator</th>
-                                <th class="p-2 text-center w-12 font-normal">1</th>
-                                <th class="p-2 text-center w-12 font-normal">2</th>
-                                <th class="p-2 text-center w-12 font-normal">3</th>
-                                <th class="p-2 text-center w-12 font-normal">4</th>
-                                <th class="p-2 text-center w-12 font-normal">5</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100" id="obeTableBody">
-                            <!-- Populated dynamically via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Question 8 & 9: Curriculum Structure Balance -->
-            <div class="gform-card p-6 space-y-4" id="card-struct">
-                <div>
-                    <h2 class="text-base font-normal text-[#202124]">
-                        Curriculum Structure: Is the curriculum balanced? <span class="required-star">*</span>
-                    </h2>
-                    <p class="text-xs text-[#5f6368] mt-1">
-                        Scale: 4-Highly Adequate / 3-Adequate / 2-Needs Improvement / 1-Inadequate / N/A-Not Applicable
-                    </p>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs sm:text-sm border-collapse" id="structTable">
-                        <thead>
-                            <tr class="bg-slate-50 text-[#5f6368] font-normal border-b border-slate-200">
-                                <th class="p-3 w-1/2">Component</th>
-                                <th class="p-2 text-center font-normal">1<br><span class="text-[9px]">Inadequate</span></th>
-                                <th class="p-2 text-center font-normal">2<br><span class="text-[9px]">Improve</span></th>
-                                <th class="p-2 text-center font-normal">3<br><span class="text-[9px]">Adequate</span></th>
-                                <th class="p-2 text-center font-normal">4<br><span class="text-[9px]">High</span></th>
-                                <th class="p-2 text-center font-normal">N/A</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100" id="structTableBody">
-                            <!-- Populated dynamically via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-                            <div class="flex items-center justify-between pt-6 pb-4 px-2 border-t border-slate-100 mt-4">
-                    <button type="button" onclick="prevStep(2)" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded shadow-sm transition">Back</button>
-                    <button type="button" onclick="nextStep(2)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded shadow-sm transition">Next Step</button>
-                </div>
-            </div>
-            <div class="form-section hidden" id="form-section-3" data-step="3">
-                <div class="text-lg font-bold text-slate-800 mb-4 px-2">Learning Paths</div>
-<!-- Question 10 & 11: Overlapping Courses -->
-            <div class="gform-card p-6 space-y-4" id="card-overlap">
-                <label class="block text-base font-normal text-[#202124]">
-                    Are there any courses or units that are repeated, overlapping, outdated, or unnecessarily detailed across semesters? <span class="required-star">*</span>
-                </label>
-                <div class="space-y-2.5 text-sm text-[#202124]">
-                    <label class="flex items-center space-x-3 cursor-pointer py-1">
-                        <input type="radio" name="overlapping_courses" value="YES" required onchange="document.getElementById('overlapTextBox').classList.remove('hidden')" class="w-4 h-4 text-indigo-600">
-                        <span>YES</span>
-                    </label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1">
-                        <input type="radio" name="overlapping_courses" value="NO" onchange="document.getElementById('overlapTextBox').classList.add('hidden')" class="w-4 h-4 text-indigo-600">
-                        <span>NO</span>
-                    </label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1">
-                        <input type="radio" name="overlapping_courses" value="NOT SURE" onchange="document.getElementById('overlapTextBox').classList.add('hidden')" class="w-4 h-4 text-indigo-600">
-                        <span>NOT SURE</span>
-                    </label>
-                </div>
-                
-                <div id="overlapTextBox" class="hidden pt-3 border-t border-slate-100">
-                    <label class="block text-xs font-medium text-slate-700 mb-1">
-                        If Yes, please provide details (semester, course title, unit, specific recommendation):
-                    </label>
-                    <textarea name="overlapping_details" rows="3" placeholder="Your answer" class="w-full px-3 py-2 border-b-2 border-slate-300 focus:border-indigo-600 outline-none text-sm bg-transparent"></textarea>
-                </div>
-            </div>
-
-            <!-- Question 13: Multidisciplinary Learning -->
-            <div class="gform-card p-6 space-y-3" id="card-multi">
-                <label class="block text-base font-normal text-[#202124]">
-                    Multidisciplinary Learning: Is adequate opportunity available for students to study courses outside their discipline? <span class="required-star">*</span>
-                </label>
-                <div class="flex items-center justify-between max-w-md pt-2 text-xs text-[#5f6368]">
-                    <span>1 (Poor)</span>
-                    <div class="flex space-x-6">
-                        <label class="flex flex-col items-center space-y-1 cursor-pointer"><span class="text-xs text-slate-700">1</span><input type="radio" name="multidisciplinary_rating" value="1" required class="w-4 h-4"></label>
-                        <label class="flex flex-col items-center space-y-1 cursor-pointer"><span class="text-xs text-slate-700">2</span><input type="radio" name="multidisciplinary_rating" value="2" class="w-4 h-4"></label>
-                        <label class="flex flex-col items-center space-y-1 cursor-pointer"><span class="text-xs text-slate-700">3</span><input type="radio" name="multidisciplinary_rating" value="3" class="w-4 h-4"></label>
-                        <label class="flex flex-col items-center space-y-1 cursor-pointer"><span class="text-xs text-slate-700">4</span><input type="radio" name="multidisciplinary_rating" value="4" class="w-4 h-4"></label>
-                        <label class="flex flex-col items-center space-y-1 cursor-pointer"><span class="text-xs text-slate-700">5</span><input type="radio" name="multidisciplinary_rating" value="5" class="w-4 h-4"></label>
-                    </div>
-                    <span>5 (Excellent)</span>
-                </div>
-            </div>
-
-            <!-- Question 14: Flexible Learning Path -->
-            <div class="gform-card p-6 space-y-3" id="card-flex">
-                <label class="block text-base font-normal text-[#202124]">
-                    Flexible Learning Path: Current curriculum supports (Select all that apply): <span class="required-star">*</span>
-                </label>
-                <div class="space-y-2.5 text-sm text-[#202124]">
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="flexible_learning_paths" value="MEME" class="w-4 h-4 rounded text-indigo-600"><span>MEME</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="flexible_learning_paths" value="Academic Flexibility" class="w-4 h-4 rounded text-indigo-600"><span>Academic Flexibility</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="flexible_learning_paths" value="Credit Transfer" class="w-4 h-4 rounded text-indigo-600"><span>Credit Transfer</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="flexible_learning_paths" value="Recognition of Credits earned through MOOCs" class="w-4 h-4 rounded text-indigo-600"><span>Recognition of Credits earned through MOOCs</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="flexible_learning_paths" value="None" class="w-4 h-4 rounded text-indigo-600"><span>None</span></label>
-                </div>
-            </div>
-
-            <!-- Question 15: Choice Based Learning -->
-            <div class="gform-card p-6 space-y-3" id="card-electives">
-                <label class="block text-base font-normal text-[#202124]">
-                    Choice Based Learning: How do you rate the electives? <span class="required-star">*</span>
-                </label>
-                <div class="space-y-2.5 text-sm text-[#202124]">
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="radio" name="electives_rating" value="Very Good" required class="w-4 h-4 text-indigo-600"><span>Very Good</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="radio" name="electives_rating" value="Good" class="w-4 h-4 text-indigo-600"><span>Good</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="radio" name="electives_rating" value="Adequate" class="w-4 h-4 text-indigo-600"><span>Adequate</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="radio" name="electives_rating" value="Poor" class="w-4 h-4 text-indigo-600"><span>Poor</span></label>
-                </div>
-            </div>
-
-                            <div class="flex items-center justify-between pt-6 pb-4 px-2 border-t border-slate-100 mt-4">
-                    <button type="button" onclick="prevStep(3)" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded shadow-sm transition">Back</button>
-                    <button type="button" onclick="nextStep(3)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded shadow-sm transition">Next Step</button>
-                </div>
-            </div>
-            <div class="form-section hidden" id="form-section-4" data-step="4">
-                <div class="text-lg font-bold text-slate-800 mb-4 px-2">Exp & Digital Learning</div>
-<!-- Question 16: Experiential Learning Grid -->
-            <div class="gform-card p-6 space-y-4" id="card-exp">
-                <div>
-                    <h2 class="text-base font-normal text-[#202124]">
-                        Experiential Learning: How effectively are the following incorporated? <span class="required-star">*</span>
-                    </h2>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs sm:text-sm border-collapse" id="expTable">
-                        <thead>
-                            <tr class="bg-slate-50 text-[#5f6368] font-normal border-b border-slate-200">
-                                <th class="p-3 w-1/2">Modality</th>
-                                <th class="p-2 text-center font-normal">1 - Low</th>
-                                <th class="p-2 text-center font-normal">2 - Moderate</th>
-                                <th class="p-2 text-center font-normal">3 - High</th>
-                                <th class="p-2 text-center font-normal">4 - Very High</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100" id="expTableBody">
-                            <!-- Populated dynamically via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Question 17: Digital Learning Grid -->
-            <div class="gform-card p-6 space-y-4" id="card-dig">
-                <div>
-                    <h2 class="text-base font-normal text-[#202124]">
-                        Digital Learning: Effective Integration of <span class="required-star">*</span>
-                    </h2>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs sm:text-sm border-collapse" id="digTable">
-                        <thead>
-                            <tr class="bg-slate-50 text-[#5f6368] font-normal border-b border-slate-200">
-                                <th class="p-3 w-1/2">Digital Channel</th>
-                                <th class="p-2 text-center font-normal">1 - Low</th>
-                                <th class="p-2 text-center font-normal">2 - Moderate</th>
-                                <th class="p-2 text-center font-normal">3 - High</th>
-                                <th class="p-2 text-center font-normal">4 - Very High</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100" id="digTableBody">
-                            <!-- Populated dynamically via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Question 18: Research Orientation -->
-            <div class="gform-card p-6 space-y-3" id="card-research">
-                <label class="block text-base font-normal text-[#202124]">
-                    Research Orientation: Students are encouraged through (Select all that apply): <span class="required-star">*</span>
-                </label>
-                <div class="space-y-2.5 text-sm text-[#202124]">
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="research_orientation" value="Faculty-Mentored Projects" class="w-4 h-4 rounded text-indigo-600"><span>Faculty-Mentored Projects</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="research_orientation" value="Research Methodology" class="w-4 h-4 rounded text-indigo-600"><span>Research Methodology</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="research_orientation" value="Publications" class="w-4 h-4 rounded text-indigo-600"><span>Publications</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="research_orientation" value="Patent Awareness" class="w-4 h-4 rounded text-indigo-600"><span>Patent Awareness</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="research_orientation" value="Design Thinking" class="w-4 h-4 rounded text-indigo-600"><span>Design Thinking</span></label>
-                </div>
-            </div>
-
-                            <div class="flex items-center justify-between pt-6 pb-4 px-2 border-t border-slate-100 mt-4">
-                    <button type="button" onclick="prevStep(4)" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded shadow-sm transition">Back</button>
-                    <button type="button" onclick="nextStep(4)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded shadow-sm transition">Next Step</button>
-                </div>
-            </div>
-            <div class="form-section hidden" id="form-section-5" data-step="5">
-                <div class="text-lg font-bold text-slate-800 mb-4 px-2">Modern Integration</div>
-<!-- Question 19: NEP Challenges -->
-            <div class="gform-card p-6 space-y-3">
-                <label class="block text-base font-normal text-[#202124]">
-                    What are the major challenges faced in implementing NEP-related curricular components in your programme?
-                </label>
-                <textarea name="nep_challenges" rows="3" placeholder="Your answer" class="w-full px-3 py-2 border-b-2 border-slate-300 focus:border-indigo-600 outline-none text-sm bg-transparent"></textarea>
-            </div>
-
-            <!-- Question 21: Emerging Areas -->
-            <div class="gform-card p-6 space-y-3" id="card-emerging">
-                <label class="block text-base font-normal text-[#202124]">
-                    Which emerging areas should receive greater emphasis in the curriculum? (Select all that apply) <span class="required-star">*</span>
-                </label>
-                <div class="space-y-2.5 text-sm text-[#202124]" id="emergingCheckboxesContainer">
-                    <!-- Populated dynamically via JS -->
-                </div>
-                <div class="pt-2">
-                    <input type="text" name="emerging_other" placeholder="Other:" class="w-full px-3 py-1.5 border-b border-slate-300 focus:border-indigo-600 outline-none text-sm bg-transparent">
-                </div>
-            </div>
-
-            <!-- Question 23: NSQF Alignment -->
-            <div class="gform-card p-6 space-y-3" id="card-nsqf">
-                <label class="block text-base font-normal text-[#202124]">
-                    Do learning outcomes align with industry competencies? <span class="required-star">*</span>
-                </label>
-                <div class="grid grid-cols-3 sm:grid-cols-6 gap-3 text-sm text-[#202124]">
-                    <label class="flex items-center space-x-2 cursor-pointer p-2 rounded border border-slate-200"><input type="radio" name="nsqf_alignment" value="1" required class="w-4 h-4"><span>1</span></label>
-                    <label class="flex items-center space-x-2 cursor-pointer p-2 rounded border border-slate-200"><input type="radio" name="nsqf_alignment" value="2" class="w-4 h-4"><span>2</span></label>
-                    <label class="flex items-center space-x-2 cursor-pointer p-2 rounded border border-slate-200"><input type="radio" name="nsqf_alignment" value="3" class="w-4 h-4"><span>3</span></label>
-                    <label class="flex items-center space-x-2 cursor-pointer p-2 rounded border border-slate-200"><input type="radio" name="nsqf_alignment" value="4" class="w-4 h-4"><span>4</span></label>
-                    <label class="flex items-center space-x-2 cursor-pointer p-2 rounded border border-slate-200"><input type="radio" name="nsqf_alignment" value="5" class="w-4 h-4"><span>5</span></label>
-                    <label class="flex items-center space-x-2 cursor-pointer p-2 rounded border border-slate-200"><input type="radio" name="nsqf_alignment" value="N.A." class="w-4 h-4"><span>N.A.</span></label>
-                </div>
-            </div>
-
-            <!-- Question 24: NSQF Redesign Courses -->
-            <div class="gform-card p-6 space-y-3">
-                <label class="block text-base font-normal text-[#202124]">
-                    Which courses could be redesigned as NSQF-aligned courses?
-                </label>
-                <input type="text" name="nsqf_courses" placeholder="Your answer" class="w-full px-3 py-2 border-b-2 border-slate-300 focus:border-indigo-600 outline-none text-sm bg-transparent">
-            </div>
-
-            <!-- Question 26: Stakeholder Sources -->
-            <div class="gform-card p-6 space-y-3" id="card-stakeholder-src">
-                <label class="block text-base font-normal text-[#202124]">
-                    What sources of stakeholder feedback does your department take before revision? (Select all that apply) <span class="required-star">*</span>
-                </label>
-                <div class="space-y-2.5 text-sm text-[#202124]">
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Student" class="w-4 h-4 rounded text-indigo-600"><span>Student</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Alumni" class="w-4 h-4 rounded text-indigo-600"><span>Alumni</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Employer" class="w-4 h-4 rounded text-indigo-600"><span>Employer</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Industry expert consultations" class="w-4 h-4 rounded text-indigo-600"><span>Industry expert consultations</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Board of Studies discussions" class="w-4 h-4 rounded text-indigo-600"><span>Board of Studies discussions</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="stakeholder_sources" value="Other" class="w-4 h-4 rounded text-indigo-600"><span>Other</span></label>
-                </div>
-            </div>
-
-                            <div class="flex items-center justify-between pt-6 pb-4 px-2 border-t border-slate-100 mt-4">
-                    <button type="button" onclick="prevStep(5)" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded shadow-sm transition">Back</button>
-                    <button type="button" onclick="nextStep(5)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded shadow-sm transition">Next Step</button>
-                </div>
-            </div>
-            <div class="form-section hidden" id="form-section-6" data-step="6">
-                <div class="text-lg font-bold text-slate-800 mb-4 px-2">Knowledge Systems</div>
-<!-- Question 27: Stakeholder Needs Matrix -->
-            <div class="gform-card p-6 space-y-4" id="card-stakeholder-grid">
-                <div>
-                    <h2 class="text-base font-normal text-[#202124]">
-                        Based on your knowledge and available feedback, To what extent does the current curriculum address the needs of each stakeholder? <span class="required-star">*</span>
-                    </h2>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs sm:text-sm border-collapse" id="stkTable">
-                        <thead>
-                            <tr class="bg-slate-50 text-[#5f6368] font-normal border-b border-slate-200">
-                                <th class="p-3 w-1/2">Stakeholder</th>
-                                <th class="p-2 text-center w-12 font-normal">1 (Low)</th>
-                                <th class="p-2 text-center w-12 font-normal">2</th>
-                                <th class="p-2 text-center w-12 font-normal">3</th>
-                                <th class="p-2 text-center w-12 font-normal">4</th>
-                                <th class="p-2 text-center w-12 font-normal">5 (High)</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100" id="stkTableBody">
-                            <!-- Populated dynamically via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Question 29: Indian Knowledge Systems (IKS) Rating -->
-            <div class="gform-card p-6 space-y-3" id="card-iks">
-                <label class="block text-base font-normal text-[#202124]">
-                    How effectively are Indian Knowledge Systems integrated? <span class="required-star">*</span>
-                </label>
-                <div class="flex items-center justify-between max-w-md pt-2 text-xs text-[#5f6368]">
-                    <span>1 (Low)</span>
-                    <div class="flex space-x-6">
-                        <label class="flex flex-col items-center space-y-1 cursor-pointer"><span class="text-xs text-slate-700">1</span><input type="radio" name="iks_effectiveness" value="1" required class="w-4 h-4"></label>
-                        <label class="flex flex-col items-center space-y-1 cursor-pointer"><span class="text-xs text-slate-700">2</span><input type="radio" name="iks_effectiveness" value="2" class="w-4 h-4"></label>
-                        <label class="flex flex-col items-center space-y-1 cursor-pointer"><span class="text-xs text-slate-700">3</span><input type="radio" name="iks_effectiveness" value="3" class="w-4 h-4"></label>
-                        <label class="flex flex-col items-center space-y-1 cursor-pointer"><span class="text-xs text-slate-700">4</span><input type="radio" name="iks_effectiveness" value="4" class="w-4 h-4"></label>
-                        <label class="flex flex-col items-center space-y-1 cursor-pointer"><span class="text-xs text-slate-700">5</span><input type="radio" name="iks_effectiveness" value="5" class="w-4 h-4"></label>
-                    </div>
-                    <span>5 (High)</span>
-                </div>
-            </div>
-
-            <!-- Question 30: IKS Integration Modes -->
-            <div class="gform-card p-6 space-y-3" id="card-iks-modes">
-                <label class="block text-base font-normal text-[#202124]">
-                    How should IKS be integrated into Curriculum? (Select all that apply) <span class="required-star">*</span>
-                </label>
-                <div class="space-y-2.5 text-sm text-[#202124]">
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="iks_integration_modes" value="Dedicated courses" class="w-4 h-4 rounded text-indigo-600"><span>Dedicated courses</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="iks_integration_modes" value="Selected units in existing courses" class="w-4 h-4 rounded text-indigo-600"><span>Selected units in existing courses</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="iks_integration_modes" value="Certificate Courses" class="w-4 h-4 rounded text-indigo-600"><span>Certificate Courses</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="iks_integration_modes" value="Projects" class="w-4 h-4 rounded text-indigo-600"><span>Projects</span></label>
-                    <label class="flex items-center space-x-3 cursor-pointer py-1"><input type="checkbox" name="iks_integration_modes" value="Interdisciplinary activities" class="w-4 h-4 rounded text-indigo-600"><span>Interdisciplinary activities</span></label>
-                    <div class="pt-2">
-                        <input type="text" name="iks_other" placeholder="Other:" class="w-full px-3 py-1.5 border-b border-slate-300 focus:border-indigo-600 outline-none text-sm bg-transparent">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Question 32: Open-ended Suggestions (Course revision) -->
-            <div class="gform-card p-6 space-y-3">
-                <label class="block text-base font-normal text-[#202124]">
-                    Identify the courses requiring revision (Course code, title, semester, nature of change, reason):
-                </label>
-                <textarea name="courses_to_revise" rows="3" placeholder="Your answer" class="w-full px-3 py-2 border-b-2 border-slate-300 focus:border-indigo-600 outline-none text-sm bg-transparent"></textarea>
-            </div>
-
-                            <div class="flex items-center justify-between pt-6 pb-4 px-2 border-t border-slate-100 mt-4">
-                    <button type="button" onclick="prevStep(6)" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium text-sm rounded shadow-sm transition">Back</button>
-                    <button type="submit" id="submitBtn" class="px-7 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm rounded shadow-sm transition">Submit</button>
-                </div>
-            </div>
-</form>
-
-        <!-- Google Form Style Footer -->
-        <div class="text-center text-xs text-[#5f6368] space-y-1 pb-10">
-            <div>This content is neither created nor endorsed by Google.</div>
-            <div class="font-medium">St. Joseph's College (Autonomous) • Internal Quality Assurance Cell (IQAC)</div>
-        </div>
-
-    </div>
-
-    <!-- Success Confirmation View (Hidden by default, shown upon submit) -->
-    <div id="successView" class="max-w-xl mx-auto space-y-4 hidden py-12">
-        <div class="gform-card overflow-hidden shadow-sm border-t-8 border-t-[#af4c10]">
-            <div class="h-24 bg-gradient-to-r from-[#af4c10] via-[#c45a17] to-[#5746e3] flex items-center px-6 text-white space-x-3">
-                <i class="fa-solid fa-graduation-cap text-2xl text-amber-300"></i>
-                <div class="font-medium text-sm">St. Joseph's College (Autonomous) • IQAC & CDC</div>
-            </div>
-            <div class="p-8 space-y-4">
-                <h1 class="text-2xl font-normal text-[#202124]">
-                    TEACHER FEEDBACK ON CURRICULAR DESIGN AND DEVELOPMENT: 2025-26
-                </h1>
-                <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-200 text-emerald-800 text-sm flex items-center space-x-3">
-                    <i class="fa-solid fa-circle-check text-xl text-emerald-600"></i>
+            <!-- Sticky Active Profile Badge -->
+            <div id="stickyFacultyDetails" class="hidden sticky top-4 z-40 portal-card p-4 bg-indigo-900 text-white flex items-center justify-between shadow-lg border-indigo-700">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-sm text-white shadow" id="stickyInitials">FA</div>
                     <div>
-                        <strong>Your response has been recorded.</strong><br>
-                        Thank you for providing your feedback for the 2025-26 Curricular Revision.
+                        <div class="text-sm font-bold" id="stickyName">Faculty Name</div>
+                        <div class="text-xs text-indigo-200" id="stickyDept">Department</div>
                     </div>
                 </div>
-                <div class="pt-4 text-xs text-[#5f6368]">
-                    <p>Your response has been safely stored in the institutional repository.</p>
+                <div class="text-xs bg-indigo-800/80 border border-indigo-600 px-3 py-1 rounded-lg font-medium text-indigo-200" id="stickyDesig">
+                    Designation
                 </div>
-                <div class="pt-2">
-                    <button onclick="window.location.reload()" class="text-xs text-indigo-600 hover:underline font-medium">
-                        Submit another response
+            </div>
+
+            <!-- SECTION 1: Basic Profile -->
+            <div class="form-section space-y-6" id="form-section-1" data-step="1">
+                <div class="portal-card p-6 md:p-8 space-y-6">
+                    <div class="border-b border-slate-100 pb-4">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-user-tie text-indigo-600"></i> Basic Profile & Information
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">Please select your department and teaching profile details.</p>
+                    </div>
+
+                    <!-- Question 1: Department -->
+                    <div class="space-y-2" id="card-dept">
+                        <label class="block text-sm font-semibold text-slate-700">
+                            Department <span class="required-star">*</span>
+                        </label>
+                        <select name="department" id="deptSelect" required onchange="onDepartmentChange()" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-800 focus:outline-none focus:border-indigo-600 focus:bg-white focus:ring-2 focus:ring-indigo-100 transition">
+                            <option value="" disabled selected>Select Department</option>
+                        </select>
+                    </div>
+
+                    <!-- Question 2: Faculty Name -->
+                    <div class="space-y-2" id="card-name">
+                        <label class="block text-sm font-semibold text-slate-700">
+                            Name of the Teaching Staff <span class="required-star">*</span>
+                        </label>
+                        <select name="faculty_name_select" id="facultyNameSelect" required onchange="onFacultySelectChange()" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/50 text-sm text-slate-800 focus:outline-none focus:border-indigo-600 focus:bg-white focus:ring-2 focus:ring-indigo-100 transition">
+                            <option value="" disabled selected>-- Select department first --</option>
+                        </select>
+                        <div id="facultyMetaBadge" class="hidden p-3 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-between text-xs text-indigo-900">
+                            <span id="facultyDesignation" class="font-semibold"></span>
+                            <span id="facultyEmailText" class="font-mono text-indigo-600"></span>
+                        </div>
+                        <input type="hidden" name="faculty_name" id="facultyNameInput">
+                        <input type="hidden" name="faculty_email" id="facultyEmailInput">
+                    </div>
+
+                    <!-- Question 3: Handling Courses -->
+                    <div class="space-y-3" id="card-level">
+                        <label class="block text-sm font-semibold text-slate-700">
+                            Handling Courses for <span class="required-star">*</span>
+                        </label>
+                        <div class="grid grid-cols-3 gap-4 text-sm">
+                            <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50 transition">
+                                <input type="radio" name="course_level" value="UG" required class="w-4 h-4 text-indigo-600 mr-2">
+                                <span class="font-medium">UG</span>
+                            </label>
+                            <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50 transition">
+                                <input type="radio" name="course_level" value="PG" class="w-4 h-4 text-indigo-600 mr-2">
+                                <span class="font-medium">PG</span>
+                            </label>
+                            <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50 transition">
+                                <input type="radio" name="course_level" value="Both" class="w-4 h-4 text-indigo-600 mr-2">
+                                <span class="font-medium">Both</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center justify-between pt-4">
+                    <div></div>
+                    <button type="button" onclick="nextStep(1)" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
+                        <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </div>
             </div>
+
+            <!-- SECTION 2: Effectiveness & OBE -->
+            <div class="form-section hidden space-y-6" id="form-section-2" data-step="2">
+                <div class="portal-card p-6 md:p-8 space-y-6">
+                    <div class="border-b border-slate-100 pb-4">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-indigo-600"></i> Overall Effectiveness & OBE Evaluation
+                        </h2>
+                    </div>
+
+                    <!-- Overall Effectiveness -->
+                    <div class="space-y-3" id="card-eff">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Overall Effectiveness of Current Curriculum <span class="required-star">*</span>
+                        </label>
+                        <p class="text-xs text-slate-500">Scale: 5-Highly Effective | 4-Effective | 3-Moderately | 2-Less | 1-Not Effective</p>
+                        <div class="overflow-x-auto rounded-xl border border-slate-200">
+                            <table class="w-full text-left text-xs matrix-table">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-600 border-b border-slate-200">
+                                        <th class="p-3.5 w-1/2">Curricular Dimension</th>
+                                        <th class="p-2 text-center">1</th>
+                                        <th class="p-2 text-center">2</th>
+                                        <th class="p-2 text-center">3</th>
+                                        <th class="p-2 text-center">4</th>
+                                        <th class="p-2 text-center">5</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="effTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- OBE Evaluation -->
+                    <div class="space-y-3 pt-4" id="card-obe">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Outcome Based Education (OBE) Evaluation <span class="required-star">*</span>
+                        </label>
+                        <div class="overflow-x-auto rounded-xl border border-slate-200">
+                            <table class="w-full text-left text-xs matrix-table">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-600 border-b border-slate-200">
+                                        <th class="p-3.5 w-1/2">OBE Indicator</th>
+                                        <th class="p-2 text-center">1</th>
+                                        <th class="p-2 text-center">2</th>
+                                        <th class="p-2 text-center">3</th>
+                                        <th class="p-2 text-center">4</th>
+                                        <th class="p-2 text-center">5</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="obeTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Curriculum Structure Balance -->
+                    <div class="space-y-3 pt-4" id="card-struct">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Curriculum Structure Balance <span class="required-star">*</span>
+                        </label>
+                        <div class="overflow-x-auto rounded-xl border border-slate-200">
+                            <table class="w-full text-left text-xs matrix-table">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-600 border-b border-slate-200">
+                                        <th class="p-3.5 w-1/2">Component</th>
+                                        <th class="p-2 text-center">1 (Inadequate)</th>
+                                        <th class="p-2 text-center">2 (Improve)</th>
+                                        <th class="p-2 text-center">3 (Adequate)</th>
+                                        <th class="p-2 text-center">4 (High)</th>
+                                        <th class="p-2 text-center">N/A</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="structTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center justify-between pt-4">
+                    <button type="button" onclick="prevStep(2)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
+                    </button>
+                    <button type="button" onclick="nextStep(2)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
+                        <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION 3: Learning Paths -->
+            <div class="form-section hidden space-y-6" id="form-section-3" data-step="3">
+                <div class="portal-card p-6 md:p-8 space-y-6">
+                    <div class="border-b border-slate-100 pb-4">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-route text-indigo-600"></i> Course Content & Learning Paths
+                        </h2>
+                    </div>
+
+                    <!-- Overlapping Courses -->
+                    <div class="space-y-3" id="card-overlap">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Are there any courses/units repeated, overlapping, or outdated? <span class="required-star">*</span>
+                        </label>
+                        <div class="grid grid-cols-3 gap-4 text-sm">
+                            <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50 transition">
+                                <input type="radio" name="overlapping_courses" value="YES" required onchange="document.getElementById('overlapTextBox').classList.remove('hidden')" class="mr-2"> YES
+                            </label>
+                            <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50 transition">
+                                <input type="radio" name="overlapping_courses" value="NO" onchange="document.getElementById('overlapTextBox').classList.add('hidden')" class="mr-2"> NO
+                            </label>
+                            <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50 transition">
+                                <input type="radio" name="overlapping_courses" value="NOT SURE" onchange="document.getElementById('overlapTextBox').classList.add('hidden')" class="mr-2"> NOT SURE
+                            </label>
+                        </div>
+                        <div id="overlapTextBox" class="hidden pt-3">
+                            <textarea name="overlapping_details" rows="3" placeholder="Provide details (Semester, Course Code, Topic...)" class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-600"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Multidisciplinary Rating -->
+                    <div class="space-y-3" id="card-multi">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Multidisciplinary Learning Opportunity (1: Low - 5: Excellent) <span class="required-star">*</span>
+                        </label>
+                        <div class="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-200 max-w-md">
+                            <span class="text-xs font-semibold text-slate-500">Poor</span>
+                            <div class="flex gap-4">
+                                <label class="flex flex-col items-center cursor-pointer text-xs font-semibold"><span class="mb-1">1</span><input type="radio" name="multidisciplinary_rating" value="1" required></label>
+                                <label class="flex flex-col items-center cursor-pointer text-xs font-semibold"><span class="mb-1">2</span><input type="radio" name="multidisciplinary_rating" value="2"></label>
+                                <label class="flex flex-col items-center cursor-pointer text-xs font-semibold"><span class="mb-1">3</span><input type="radio" name="multidisciplinary_rating" value="3"></label>
+                                <label class="flex flex-col items-center cursor-pointer text-xs font-semibold"><span class="mb-1">4</span><input type="radio" name="multidisciplinary_rating" value="4"></label>
+                                <label class="flex flex-col items-center cursor-pointer text-xs font-semibold"><span class="mb-1">5</span><input type="radio" name="multidisciplinary_rating" value="5"></label>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-500">Excellent</span>
+                        </div>
+                    </div>
+
+                    <!-- Flexible Learning Path -->
+                    <div class="space-y-3" id="card-flex">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Flexible Learning Path Supports (Select all that apply) <span class="required-star">*</span>
+                        </label>
+                        <div class="space-y-2 text-sm">
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer hover:bg-indigo-50/40">
+                                <input type="checkbox" name="flexible_learning_paths" value="MEME" class="w-4 h-4 rounded text-indigo-600"> <span>Multiple Entry Multiple Exit (MEME)</span>
+                            </label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer hover:bg-indigo-50/40">
+                                <input type="checkbox" name="flexible_learning_paths" value="Academic Flexibility" class="w-4 h-4 rounded text-indigo-600"> <span>Academic Flexibility</span>
+                            </label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer hover:bg-indigo-50/40">
+                                <input type="checkbox" name="flexible_learning_paths" value="Credit Transfer" class="w-4 h-4 rounded text-indigo-600"> <span>Credit Transfer</span>
+                            </label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer hover:bg-indigo-50/40">
+                                <input type="checkbox" name="flexible_learning_paths" value="Recognition of Credits earned through MOOCs" class="w-4 h-4 rounded text-indigo-600"> <span>MOOC Credit Recognition</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Elective Rating -->
+                    <div class="space-y-3" id="card-electives">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Choice Based Learning Electives Rating <span class="required-star">*</span>
+                        </label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                            <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50"><input type="radio" name="electives_rating" value="Very Good" required class="mr-2"> Very Good</label>
+                            <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50"><input type="radio" name="electives_rating" value="Good" class="mr-2"> Good</label>
+                            <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50"><input type="radio" name="electives_rating" value="Adequate" class="mr-2"> Adequate</label>
+                            <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50"><input type="radio" name="electives_rating" value="Poor" class="mr-2"> Poor</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center justify-between pt-4">
+                    <button type="button" onclick="prevStep(3)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
+                    </button>
+                    <button type="button" onclick="nextStep(3)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
+                        <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION 4: Experiential & Digital Learning -->
+            <div class="form-section hidden space-y-6" id="form-section-4" data-step="4">
+                <div class="portal-card p-6 md:p-8 space-y-6">
+                    <div class="border-b border-slate-100 pb-4">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-laptop-code text-indigo-600"></i> Experiential & Digital Learning Integration
+                        </h2>
+                    </div>
+
+                    <!-- Experiential Grid -->
+                    <div class="space-y-3" id="card-exp">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Experiential Learning Effectiveness <span class="required-star">*</span>
+                        </label>
+                        <div class="overflow-x-auto rounded-xl border border-slate-200">
+                            <table class="w-full text-left text-xs matrix-table">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-600 border-b border-slate-200">
+                                        <th class="p-3.5 w-1/2">Modality</th>
+                                        <th class="p-2 text-center">1 - Low</th>
+                                        <th class="p-2 text-center">2 - Moderate</th>
+                                        <th class="p-2 text-center">3 - High</th>
+                                        <th class="p-2 text-center">4 - Very High</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="expTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Digital Grid -->
+                    <div class="space-y-3 pt-4" id="card-dig">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Digital Learning Integration <span class="required-star">*</span>
+                        </label>
+                        <div class="overflow-x-auto rounded-xl border border-slate-200">
+                            <table class="w-full text-left text-xs matrix-table">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-600 border-b border-slate-200">
+                                        <th class="p-3.5 w-1/2">Digital Channel</th>
+                                        <th class="p-2 text-center">1 - Low</th>
+                                        <th class="p-2 text-center">2 - Moderate</th>
+                                        <th class="p-2 text-center">3 - High</th>
+                                        <th class="p-2 text-center">4 - Very High</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="digTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Research Orientation -->
+                    <div class="space-y-3 pt-4" id="card-research">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Research Orientation (Select all that apply) <span class="required-star">*</span>
+                        </label>
+                        <div class="space-y-2 text-sm">
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer hover:bg-indigo-50/40">
+                                <input type="checkbox" name="research_orientation" value="Faculty-Mentored Projects" class="w-4 h-4 rounded text-indigo-600"> <span>Faculty-Mentored Projects</span>
+                            </label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer hover:bg-indigo-50/40">
+                                <input type="checkbox" name="research_orientation" value="Research Methodology" class="w-4 h-4 rounded text-indigo-600"> <span>Research Methodology</span>
+                            </label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer hover:bg-indigo-50/40">
+                                <input type="checkbox" name="research_orientation" value="Publications" class="w-4 h-4 rounded text-indigo-600"> <span>Student Publications</span>
+                            </label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer hover:bg-indigo-50/40">
+                                <input type="checkbox" name="research_orientation" value="Patent Awareness" class="w-4 h-4 rounded text-indigo-600"> <span>Patent Awareness & IPR</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center justify-between pt-4">
+                    <button type="button" onclick="prevStep(4)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
+                    </button>
+                    <button type="button" onclick="nextStep(4)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
+                        <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION 5: Modern Integration & NSQF -->
+            <div class="form-section hidden space-y-6" id="form-section-5" data-step="5">
+                <div class="portal-card p-6 md:p-8 space-y-6">
+                    <div class="border-b border-slate-100 pb-4">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-lightbulb text-indigo-600"></i> Modern Integration, NEP & NSQF Alignment
+                        </h2>
+                    </div>
+
+                    <!-- NEP Challenges -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Major challenges faced in implementing NEP-related curricular components:
+                        </label>
+                        <textarea name="nep_challenges" rows="3" placeholder="Enter details..." class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-600"></textarea>
+                    </div>
+
+                    <!-- Emerging Areas -->
+                    <div class="space-y-3" id="card-emerging">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Emerging areas to receive greater emphasis (Select all that apply) <span class="required-star">*</span>
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm" id="emergingCheckboxesContainer"></div>
+                        <input type="text" name="emerging_other" placeholder="Other emerging areas..." class="w-full mt-2 p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-600">
+                    </div>
+
+                    <!-- NSQF Alignment -->
+                    <div class="space-y-3" id="card-nsqf">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Do learning outcomes align with industry competencies? <span class="required-star">*</span>
+                        </label>
+                        <div class="grid grid-cols-6 gap-2 text-sm">
+                            <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50"><input type="radio" name="nsqf_alignment" value="1" required class="mr-1"> 1</label>
+                            <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50"><input type="radio" name="nsqf_alignment" value="2" class="mr-1"> 2</label>
+                            <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50"><input type="radio" name="nsqf_alignment" value="3" class="mr-1"> 3</label>
+                            <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50"><input type="radio" name="nsqf_alignment" value="4" class="mr-1"> 4</label>
+                            <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50"><input type="radio" name="nsqf_alignment" value="5" class="mr-1"> 5</label>
+                            <label class="flex items-center justify-center p-3 rounded-xl border border-slate-200 cursor-pointer hover:bg-indigo-50/50"><input type="radio" name="nsqf_alignment" value="N.A." class="mr-1"> N/A</label>
+                        </div>
+                    </div>
+
+                    <!-- Stakeholder Sources -->
+                    <div class="space-y-3" id="card-stakeholder-src">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Sources of stakeholder feedback collected before revision <span class="required-star">*</span>
+                        </label>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer"><input type="checkbox" name="stakeholder_sources" value="Student"> <span>Student</span></label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer"><input type="checkbox" name="stakeholder_sources" value="Alumni"> <span>Alumni</span></label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer"><input type="checkbox" name="stakeholder_sources" value="Employer"> <span>Employer</span></label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer"><input type="checkbox" name="stakeholder_sources" value="Industry experts"> <span>Industry Experts</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center justify-between pt-4">
+                    <button type="button" onclick="prevStep(5)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
+                    </button>
+                    <button type="button" onclick="nextStep(5)" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2">
+                        <span>Next Step</span> <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION 6: Knowledge Systems & Final Submission -->
+            <div class="form-section hidden space-y-6" id="form-section-6" data-step="6">
+                <div class="portal-card p-6 md:p-8 space-y-6">
+                    <div class="border-b border-slate-100 pb-4">
+                        <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                            <i class="fa-solid fa-om text-indigo-600"></i> Indian Knowledge Systems & Final Review
+                        </h2>
+                    </div>
+
+                    <!-- Stakeholder Needs Matrix -->
+                    <div class="space-y-3" id="card-stakeholder-grid">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Extents curriculum addresses needs of stakeholders <span class="required-star">*</span>
+                        </label>
+                        <div class="overflow-x-auto rounded-xl border border-slate-200">
+                            <table class="w-full text-left text-xs matrix-table">
+                                <thead>
+                                    <tr class="bg-slate-100 text-slate-600 border-b border-slate-200">
+                                        <th class="p-3.5 w-1/2">Stakeholder</th>
+                                        <th class="p-2 text-center">1 (Low)</th>
+                                        <th class="p-2 text-center">2</th>
+                                        <th class="p-2 text-center">3</th>
+                                        <th class="p-2 text-center">4</th>
+                                        <th class="p-2 text-center">5 (High)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100" id="stkTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Indian Knowledge Systems (IKS) -->
+                    <div class="space-y-3 pt-4" id="card-iks">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            How effectively are Indian Knowledge Systems integrated? <span class="required-star">*</span>
+                        </label>
+                        <div class="flex items-center justify-between bg-slate-50 p-4 rounded-xl border border-slate-200 max-w-md">
+                            <span class="text-xs font-semibold text-slate-500">Low</span>
+                            <div class="flex gap-4">
+                                <label class="flex flex-col items-center cursor-pointer text-xs font-semibold"><span class="mb-1">1</span><input type="radio" name="iks_effectiveness" value="1" required></label>
+                                <label class="flex flex-col items-center cursor-pointer text-xs font-semibold"><span class="mb-1">2</span><input type="radio" name="iks_effectiveness" value="2"></label>
+                                <label class="flex flex-col items-center cursor-pointer text-xs font-semibold"><span class="mb-1">3</span><input type="radio" name="iks_effectiveness" value="3"></label>
+                                <label class="flex flex-col items-center cursor-pointer text-xs font-semibold"><span class="mb-1">4</span><input type="radio" name="iks_effectiveness" value="4"></label>
+                                <label class="flex flex-col items-center cursor-pointer text-xs font-semibold"><span class="mb-1">5</span><input type="radio" name="iks_effectiveness" value="5"></label>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-500">High</span>
+                        </div>
+                    </div>
+
+                    <!-- IKS Modes -->
+                    <div class="space-y-3" id="card-iks-modes">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            How should IKS be integrated into Curriculum? <span class="required-star">*</span>
+                        </label>
+                        <div class="space-y-2 text-sm">
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer"><input type="checkbox" name="iks_integration_modes" value="Dedicated courses"> <span>Dedicated courses</span></label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer"><input type="checkbox" name="iks_integration_modes" value="Selected units in existing courses"> <span>Units in existing courses</span></label>
+                            <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer"><input type="checkbox" name="iks_integration_modes" value="Certificate Courses"> <span>Certificate Courses</span></label>
+                        </div>
+                        <input type="text" name="iks_other" placeholder="Other modes..." class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-600">
+                    </div>
+
+                    <!-- Courses to Revise -->
+                    <div class="space-y-2 pt-2">
+                        <label class="block text-sm font-semibold text-slate-800">
+                            Courses requiring revision (Code, Title, Semester, Reason):
+                        </label>
+                        <textarea name="courses_to_revise" rows="3" placeholder="Enter suggestions..." class="w-full p-3 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-indigo-600"></textarea>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="flex items-center justify-between pt-4">
+                    <button type="button" onclick="prevStep(6)" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold text-sm rounded-xl hover:bg-slate-50 transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-left"></i> <span>Back</span>
+                    </button>
+                    <button type="submit" id="submitBtn" class="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> <span>Submit Feedback</span>
+                    </button>
+                </div>
+            </div>
+
+        </form>
+
+        <!-- Footer -->
+        <footer class="text-center py-6 text-xs text-slate-500 font-medium">
+            St. Joseph's College (Autonomous) • Internal Quality Assurance Cell (IQAC)
+        </footer>
+
+    </div>
+
+    <!-- Success Screen View -->
+    <div id="successView" class="max-w-xl mx-auto space-y-6 hidden py-12">
+        <div class="portal-card p-8 text-center space-y-4">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-2xl">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900">Feedback Submitted Successfully!</h2>
+            <p class="text-sm text-slate-600">Thank you for contributing to the 2025-26 Curricular Design and Development evaluation.</p>
+            <div class="pt-4">
+                <button onclick="window.location.reload()" class="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold text-xs shadow">Submit Another Response</button>
+            </div>
         </div>
     </div>
 
-    <!-- Error Modal -->
-    <div id="errorModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
-            <div class="text-rose-600 text-2xl font-bold flex items-center space-x-2">
-                <i class="fa-solid fa-circle-exclamation"></i>
-                <span class="text-base font-bold text-slate-900">Incomplete Form</span>
-            </div>
-            <p id="errorMessage" class="text-xs text-slate-600 leading-relaxed">
-                Please answer all required questions before submitting.
-            </p>
-            <div class="flex justify-end">
-                <button onclick="document.getElementById('errorModal').classList.add('hidden')" class="px-4 py-1.5 bg-indigo-600 text-white rounded text-xs font-semibold">
-                    OK
-                </button>
-            </div>
-        </div>
-    </div>
-
+    <!-- JavaScript Logic -->
     <script>
-        // Data Structures
-        const effItems = [
-            'Academically relevant',
-            'Meets current industry needs',
-            'Creates employability opportunities',
-            'Prepares students for higher education and competitive exams',
-            'Encourages research practices',
-            'Prepares entrepreneurs',
-            'Incorporates Emerging Developments in the Discipline',
-            'Provides adequate Practical, Hands-on Training and Industrial Exposure',
-            'Promotes critical thinking, problem-solving and creativity',
-            'Content is appropriately distributed across semesters',
-            'Provides opportunities for interdisciplinary learning',
-            'Text and Reference Books are included within the period of last 5 years'
-        ];
-
-        const obeItems = [
-            'Programme Outcomes are clearly defined',
-            'PSOs reflect specialization and career expectations',
-            'COs are measurable and appropriate to the course level',
-            'COs are appropriately mapped to POs and PSOs',
-            'Outcomes are clearly communicated to the students',
-            'Teaching-learning methods are aligned with intended COs and cognitive levels',
-            'Assessment methods effectively measure attainment of COs',
-            'CO Attainment data are analyzed and used to improve course content, teaching and assessment'
-        ];
-
-        const structItems = [
-            'Theory Courses',
-            'Practical Courses',
-            'Project, Internship and Research',
-            'Discipline Specific / Open Electives',
-            'Skill / Ability Enhancement Courses',
-            'Credit distribution across components',
-            'Balance between foundational, advanced and specialization courses',
-            'Opportunities for inter and multi-disciplinary course combinations'
-        ];
-
+        const effItems = ['Academically relevant', 'Meets current industry needs', 'Creates employability opportunities', 'Prepares students for higher education', 'Encourages research practices', 'Prepares entrepreneurs', 'Incorporates Emerging Developments', 'Provides Practical Hands-on Training', 'Promotes critical thinking', 'Content appropriately distributed across semesters', 'Provides interdisciplinary learning', 'Text & Reference Books updated (last 5 yrs)'];
+        const obeItems = ['Programme Outcomes clearly defined', 'PSOs reflect specialization', 'COs measurable and level-appropriate', 'COs mapped to POs and PSOs', 'Outcomes communicated to students', 'Teaching methods aligned with COs', 'Assessment measures CO attainment', 'CO Attainment analyzed for improvement'];
+        const structItems = ['Theory Courses', 'Practical Courses', 'Project, Internship and Research', 'Discipline Specific / Open Electives', 'Skill / Ability Enhancement Courses', 'Credit distribution across components', 'Balance between foundational and advanced', 'Inter-disciplinary course combinations'];
         const expItems = ['Internship', 'Field Visit', 'Case Study', 'Problem-Based Learning', 'Project-Based Learning', 'Community Engagement', 'Simulations', 'Industry-mentored Projects'];
-        const digItems = ['SWAYAM/NPTEL', 'Through Institutional LMS', 'Other MOOCs', 'Virtual Labs', 'Blended Learning'];
-        const emergingPool = [
-            'Artificial Intelligence and Generative AI',
-            'Data Science and Big Data Analytics',
-            'Cybersecurity and Digital Privacy',
-            'Cloud Computing, Internet of Things and Smart Systems',
-            'Automation and Robotics',
-            'Sustainability and Green Technologies',
-            'Entrepreneurship, Innovation and Start-up Skills',
-            'Digital Ethics, Governance and Responsible Technology',
-            'Climate Change'
-        ];
+        const digItems = ['SWAYAM/NPTEL', 'Institutional LMS', 'Other MOOCs', 'Virtual Labs', 'Blended Learning'];
+        const emergingPool = ['AI & Generative AI', 'Data Science & Analytics', 'Cybersecurity', 'Cloud Computing & IoT', 'Automation & Robotics', 'Sustainability', 'Entrepreneurship', 'Digital Ethics'];
         const stakeholders = ['Students', 'Alumni', 'Employers', 'Parents', 'Industry Experts'];
 
-        // Init UI on Load
         document.addEventListener('DOMContentLoaded', () => {
             initDepartmentOptions();
             renderMatrixTables();
-            updateStepperStatus(1);
+            showStep(1);
         });
 
         function initDepartmentOptions() {
             const deptSelect = document.getElementById('deptSelect');
             const depts = Array.from(new Set(MASTER_FACULTY_ROSTER.map(f => f.department))).filter(Boolean).sort();
-            
             depts.forEach(d => {
                 const opt = document.createElement('option');
                 opt.value = d;
@@ -763,19 +734,14 @@
         function onDepartmentChange() {
             const dept = document.getElementById('deptSelect').value;
             const selectEl = document.getElementById('facultyNameSelect');
-            const badge = document.getElementById('facultyMetaBadge');
-            
-            badge.classList.add('hidden');
-            selectEl.innerHTML = '<option value="" disabled selected>-- Select your name from faculty list --</option>';
-
+            document.getElementById('facultyMetaBadge').classList.add('hidden');
+            selectEl.innerHTML = '<option value="" disabled selected>-- Select your name --</option>';
             const facultyList = MASTER_FACULTY_ROSTER.filter(f => f.department === dept).sort((a, b) => a.name.localeCompare(b.name));
-
             facultyList.forEach(f => {
                 const opt = document.createElement('option');
                 opt.value = f.name;
                 opt.dataset.email = f.email || '';
                 opt.dataset.desig = f.designation || '';
-                opt.dataset.shift = f.shift || '';
                 opt.innerText = `${f.name} (${f.designation || 'Faculty'})`;
                 selectEl.appendChild(opt);
             });
@@ -785,300 +751,98 @@
             const selectEl = document.getElementById('facultyNameSelect');
             const selectedOpt = selectEl.options[selectEl.selectedIndex];
             if (!selectedOpt) return;
-
-            const name = selectedOpt.value;
-            const email = selectedOpt.dataset.email || '';
-            const desig = selectedOpt.dataset.desig || '';
-
-            document.getElementById('facultyNameInput').value = name;
-            document.getElementById('facultyEmailInput').value = email;
-
-            const badge = document.getElementById('facultyMetaBadge');
-            document.getElementById('facultyDesignation').innerText = desig;
-            document.getElementById('facultyEmailText').innerText = email;
-            badge.classList.remove('hidden');
+            document.getElementById('facultyNameInput').value = selectedOpt.value;
+            document.getElementById('facultyEmailInput').value = selectedOpt.dataset.email || '';
+            document.getElementById('facultyDesignation').innerText = selectedOpt.dataset.desig || '';
+            document.getElementById('facultyEmailText').innerText = selectedOpt.dataset.email || '';
+            document.getElementById('facultyMetaBadge').classList.remove('hidden');
         }
 
         function renderMatrixTables() {
-            // 1. Overall Effectiveness
             document.getElementById('effTableBody').innerHTML = effItems.map((item, idx) => `
-                <tr class="matrix-row">
-                    <td class="p-2.5 font-normal text-[#202124]">${idx + 1}. ${item}</td>
-                    ${[1, 2, 3, 4, 5].map(score => `
-                        <td class="p-2 text-center">
-                            <input type="radio" name="eff_${idx + 1}" value="${score}" required class="w-4 h-4 cursor-pointer">
-                        </td>
-                    `).join('')}
+                <tr>
+                    <td class="p-3 font-medium text-slate-800">${idx + 1}. ${item}</td>
+                    ${[1, 2, 3, 4, 5].map(score => `<td class="p-2 text-center"><input type="radio" name="eff_${idx + 1}" value="${score}" required></td>`).join('')}
                 </tr>
             `).join('');
 
-            // 2. OBE
             document.getElementById('obeTableBody').innerHTML = obeItems.map((item, idx) => `
-                <tr class="matrix-row">
-                    <td class="p-2.5 font-normal text-[#202124]">${idx + 1}. ${item}</td>
-                    ${[1, 2, 3, 4, 5].map(score => `
-                        <td class="p-2 text-center">
-                            <input type="radio" name="obe_${idx + 1}" value="${score}" required class="w-4 h-4 cursor-pointer">
-                        </td>
-                    `).join('')}
+                <tr>
+                    <td class="p-3 font-medium text-slate-800">${idx + 1}. ${item}</td>
+                    ${[1, 2, 3, 4, 5].map(score => `<td class="p-2 text-center"><input type="radio" name="obe_${idx + 1}" value="${score}" required></td>`).join('')}
                 </tr>
             `).join('');
 
-            // 3. Structure
             document.getElementById('structTableBody').innerHTML = structItems.map((item, idx) => `
-                <tr class="matrix-row">
-                    <td class="p-2.5 font-normal text-[#202124]">${idx + 1}. ${item}</td>
-                    <td class="p-2 text-center"><input type="radio" name="struct_${idx + 1}" value="1 - Inadequate" required class="w-4 h-4 cursor-pointer"></td>
-                    <td class="p-2 text-center"><input type="radio" name="struct_${idx + 1}" value="2 - Needs Improvement" class="w-4 h-4 cursor-pointer"></td>
-                    <td class="p-2 text-center"><input type="radio" name="struct_${idx + 1}" value="3 - Adequate" class="w-4 h-4 cursor-pointer"></td>
-                    <td class="p-2 text-center"><input type="radio" name="struct_${idx + 1}" value="4 - Highly Adequate" class="w-4 h-4 cursor-pointer"></td>
-                    <td class="p-2 text-center"><input type="radio" name="struct_${idx + 1}" value="N/A - Not Applicable" class="w-4 h-4 cursor-pointer"></td>
+                <tr>
+                    <td class="p-3 font-medium text-slate-800">${idx + 1}. ${item}</td>
+                    <td class="p-2 text-center"><input type="radio" name="struct_${idx + 1}" value="1" required></td>
+                    <td class="p-2 text-center"><input type="radio" name="struct_${idx + 1}" value="2"></td>
+                    <td class="p-2 text-center"><input type="radio" name="struct_${idx + 1}" value="3"></td>
+                    <td class="p-2 text-center"><input type="radio" name="struct_${idx + 1}" value="4"></td>
+                    <td class="p-2 text-center"><input type="radio" name="struct_${idx + 1}" value="N/A"></td>
                 </tr>
             `).join('');
 
-            // 4. Exp
             document.getElementById('expTableBody').innerHTML = expItems.map((item, idx) => `
-                <tr class="matrix-row">
-                    <td class="p-2.5 font-normal text-[#202124]">${item}</td>
-                    ${['1 - Low', '2 - Moderate', '3 - High', '4 - Very High'].map(score => `
-                        <td class="p-2 text-center">
-                            <input type="radio" name="exp_${idx + 1}" value="${score}" required class="w-4 h-4 cursor-pointer">
-                        </td>
-                    `).join('')}
+                <tr>
+                    <td class="p-3 font-medium text-slate-800">${item}</td>
+                    ${[1, 2, 3, 4].map(score => `<td class="p-2 text-center"><input type="radio" name="exp_${idx + 1}" value="${score}" required></td>`).join('')}
                 </tr>
             `).join('');
 
-            // 5. Digital
             document.getElementById('digTableBody').innerHTML = digItems.map((item, idx) => `
-                <tr class="matrix-row">
-                    <td class="p-2.5 font-normal text-[#202124]">${item}</td>
-                    ${['1 - Low', '2 - Moderate', '3 - High', '4 - Very High'].map(score => `
-                        <td class="p-2 text-center">
-                            <input type="radio" name="dig_${idx + 1}" value="${score}" required class="w-4 h-4 cursor-pointer">
-                        </td>
-                    `).join('')}
+                <tr>
+                    <td class="p-3 font-medium text-slate-800">${item}</td>
+                    ${[1, 2, 3, 4].map(score => `<td class="p-2 text-center"><input type="radio" name="dig_${idx + 1}" value="${score}" required></td>`).join('')}
                 </tr>
             `).join('');
 
-            // 6. Emerging Checkboxes
             document.getElementById('emergingCheckboxesContainer').innerHTML = emergingPool.map(item => `
-                <label class="flex items-center space-x-3 cursor-pointer py-1">
-                    <input type="checkbox" name="emerging_areas" value="${item}" class="w-4 h-4 rounded text-indigo-600">
-                    <span>${item}</span>
+                <label class="flex items-center space-x-3 p-3 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer hover:bg-indigo-50/40">
+                    <input type="checkbox" name="emerging_areas" value="${item}" class="w-4 h-4 rounded text-indigo-600"> <span>${item}</span>
                 </label>
             `).join('');
 
-            // 7. Stakeholders
             document.getElementById('stkTableBody').innerHTML = stakeholders.map((s, idx) => `
-                <tr class="matrix-row">
-                    <td class="p-2.5 font-normal text-[#202124]">${s}</td>
-                    ${[1, 2, 3, 4, 5].map(score => `
-                        <td class="p-2 text-center">
-                            <input type="radio" name="stk_${idx + 1}" value="${score}" required class="w-4 h-4 cursor-pointer">
-                        </td>
-                    `).join('')}
+                <tr>
+                    <td class="p-3 font-medium text-slate-800">${s}</td>
+                    ${[1, 2, 3, 4, 5].map(score => `<td class="p-2 text-center"><input type="radio" name="stk_${idx + 1}" value="${score}" required></td>`).join('')}
                 </tr>
             `).join('');
         }
 
-        function clearForm() {
-            if (confirm("Are you sure you want to clear all entered responses?")) {
-                document.getElementById('facultyForm').reset();
-                document.getElementById('facultyMetaBadge').classList.add('hidden');
-            }
-        }
-
-        function submitFacultyFeedback(e) {
-            e.preventDefault();
-            const form = document.getElementById('facultyForm');
-
-            const getCheckboxes = (name) => Array.from(form.querySelectorAll(`input[name="${name}"]:checked`)).map(c => c.value);
-
-            const flexPaths = getCheckboxes('flexible_learning_paths');
-            if (flexPaths.length === 0) {
-                showModalError("Please select at least one option under 'Flexible Learning Path'.");
-                document.getElementById('card-flex').scrollIntoView({ behavior: 'smooth' });
-                return;
-            }
-
-            const researchOpts = getCheckboxes('research_orientation');
-            if (researchOpts.length === 0) {
-                showModalError("Please select at least one option under 'Research Orientation'.");
-                document.getElementById('card-research').scrollIntoView({ behavior: 'smooth' });
-                return;
-            }
-
-            const emergingOpts = getCheckboxes('emerging_areas');
-            if (emergingOpts.length === 0 && !form.emerging_other.value.trim()) {
-                showModalError("Please select at least one Emerging Area or specify in 'Other'.");
-                document.getElementById('card-emerging').scrollIntoView({ behavior: 'smooth' });
-                return;
-            }
-
-            const stakeholderSrcs = getCheckboxes('stakeholder_sources');
-            if (stakeholderSrcs.length === 0) {
-                showModalError("Please select at least one Stakeholder Feedback Source.");
-                document.getElementById('card-stakeholder-src').scrollIntoView({ behavior: 'smooth' });
-                return;
-            }
-
-            const iksModes = getCheckboxes('iks_integration_modes');
-            if (iksModes.length === 0 && !form.iks_other.value.trim()) {
-                showModalError("Please select how IKS should be integrated into the curriculum.");
-                document.getElementById('card-iks-modes').scrollIntoView({ behavior: 'smooth' });
-                return;
-            }
-
-            // Extract Matrices
-            const overallEff = {};
-            effItems.forEach((item, idx) => {
-                const checked = form.querySelector(`input[name="eff_${idx+1}"]:checked`);
-                if (checked) overallEff[item] = checked.value;
-            });
-
-            const obeEval = {};
-            obeItems.forEach((item, idx) => {
-                const checked = form.querySelector(`input[name="obe_${idx+1}"]:checked`);
-                if (checked) obeEval[item] = checked.value;
-            });
-
-            const currStruct = {};
-            structItems.forEach((item, idx) => {
-                const checked = form.querySelector(`input[name="struct_${idx+1}"]:checked`);
-                if (checked) currStruct[item] = checked.value;
-            });
-
-            const expObj = {};
-            expItems.forEach((item, idx) => {
-                const checked = form.querySelector(`input[name="exp_${idx+1}"]:checked`);
-                if (checked) expObj[item] = checked.value;
-            });
-
-            const digObj = {};
-            digItems.forEach((item, idx) => {
-                const checked = form.querySelector(`input[name="dig_${idx+1}"]:checked`);
-                if (checked) digObj[item] = checked.value;
-            });
-
-            const stkObj = {};
-            stakeholders.forEach((item, idx) => {
-                const checked = form.querySelector(`input[name="stk_${idx+1}"]:checked`);
-                if (checked) stkObj[item] = checked.value;
-            });
-
-            const payload = {
-                id: Date.now(),
-                timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-                department: form.department.value,
-                faculty_name: form.faculty_name.value || document.getElementById('facultyNameSelect').value,
-                faculty_email: form.faculty_email.value,
-                course_level: form.course_level.value,
-                overall_effectiveness: overallEff,
-                obe_evaluation: obeEval,
-                curriculum_structure: currStruct,
-                overlapping_courses: form.overlapping_courses.value,
-                overlapping_details: form.overlapping_details.value,
-                multidisciplinary_rating: parseInt(form.multidisciplinary_rating.value) || 3,
-                flexible_learning_paths: flexPaths,
-                electives_rating: form.electives_rating.value,
-                experiential_learning: expObj,
-                digital_learning: digObj,
-                research_orientation: researchOpts,
-                nep_challenges: form.nep_challenges.value,
-                emerging_areas: emergingOpts,
-                emerging_other: form.emerging_other.value,
-                nsqf_alignment: form.nsqf_alignment.value,
-                nsqf_courses: form.nsqf_courses.value,
-                stakeholder_sources: stakeholderSrcs,
-                stakeholder_needs: stkObj,
-                iks_effectiveness: parseInt(form.iks_effectiveness.value) || 3,
-                iks_integration_modes: iksModes,
-                iks_other: form.iks_other.value,
-                courses_to_revise: form.courses_to_revise.value,
-                other_recommendations: form.other_recommendations.value
-            };
-
-            // Save in localStorage repository
-            const existingRaw = localStorage.getItem("sjc_faculty_feedback_records_2025");
-            let records = [];
-            if (existingRaw) {
-                try { records = JSON.parse(existingRaw); } catch(e) {}
-            }
-            records.push(payload);
-            localStorage.setItem("sjc_faculty_feedback_records_2025", JSON.stringify(records));
-
-            // Submit directly to Firebase Firestore
-            if (window.db) {
-                window.addDoc(window.collection(window.db, "responses"), payload)
-                    .then(() => { 
-                        console.log('Successfully saved to Firestore'); 
-                        document.getElementById('mainContainer').classList.add('hidden');
-                        document.getElementById('successView').classList.remove('hidden');
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    })
-                    .catch(e => { 
-                        console.error('Error saving to Firestore:', e); 
-                        alert("Firebase Save Error: " + e.message);
-                    });
-            } else {
-                alert("Firebase not initialized! The module script hasn't loaded yet.");
-            }
-
-            // Show Google Form style success screen
-            document.getElementById('mainContainer').classList.add('hidden');
-            document.getElementById('successView').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-                function showModalError(msg) {
-            alert("Validation Error: " + msg);
-            document.getElementById('errorMessage').innerText = msg;
-            document.getElementById('errorModal').classList.remove('hidden');
-        }
-    
-        // Section Navigation Logic
-        const totalSteps = 6;
-        
-        function updateStepperStatus(currentStep) {
-            for (let i = 1; i <= totalSteps; i++) {
-                const el = document.getElementById('stepper-' + i);
-                if(el){
-                    el.classList.remove('stepper-active', 'stepper-completed');
-                    
-                    if (i === currentStep) {
-                        el.classList.add('stepper-active');
-                    } else if (i < currentStep) {
-                        el.classList.add('stepper-completed');
-                    }
-                }
-            }
-        }
-        
         function showStep(stepNum) {
             document.querySelectorAll('.form-section').forEach(sec => sec.classList.add('hidden'));
             const nxt = document.getElementById('form-section-' + stepNum);
-            if(nxt) nxt.classList.remove('hidden');
-            updateStepperStatus(stepNum);
+            if (nxt) nxt.classList.remove('hidden');
+
+            for (let i = 1; i <= 6; i++) {
+                const el = document.getElementById('stepper-' + i);
+                if (el) {
+                    el.classList.remove('active', 'completed');
+                    if (i === stepNum) el.classList.add('active');
+                    else if (i < stepNum) el.classList.add('completed');
+                }
+            }
 
             if (stepNum > 1) {
                 const name = document.getElementById('facultyNameInput').value;
                 const dept = document.getElementById('deptSelect').value;
-                const opt = document.getElementById('facultyNameSelect').options[document.getElementById('facultyNameSelect').selectedIndex];
-                const desig = opt ? opt.dataset.desig : '';
-                
-                if(name && dept) {
+                if (name && dept) {
                     document.getElementById('stickyFacultyDetails').classList.remove('hidden');
                     document.getElementById('stickyName').innerText = name;
                     document.getElementById('stickyDept').innerText = dept;
-                    document.getElementById('stickyDesig').innerText = desig;
-                    let initials = name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
-                    document.getElementById('stickyInitials').innerText = initials;
                 }
             } else {
                 document.getElementById('stickyFacultyDetails').classList.add('hidden');
             }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goToStep(stepNum) {
+            showStep(stepNum);
         }
 
         function nextStep(currentStep) {
@@ -1092,28 +856,55 @@
 
         function validateStep(stepNum) {
             const section = document.getElementById('form-section-' + stepNum);
-            if(!section) return true;
+            if (!section) return true;
             
-            const reqInputs = section.querySelectorAll('input[required], select[required], textarea[required]');
+            const reqInputs = section.querySelectorAll('input[required], select[required]');
             for (const input of reqInputs) {
                 if (input.type === 'radio' || input.type === 'checkbox') continue;
                 if (!input.value.trim()) {
                     input.focus();
-                    showModalError('Please ensure all required fields are filled.');
+                    alert('Please fill out all required fields.');
                     return false;
                 }
             }
-            
+
             const radioGroups = new Set(Array.from(section.querySelectorAll('input[type="radio"][required]')).map(el => el.name));
             for (const name of radioGroups) {
                 if (!section.querySelector(`input[name="${name}"]:checked`)) {
-                    showModalError(`Please answer all required questions.`);
-                    section.querySelector(`input[name="${name}"]`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    alert('Please answer all required questions in this section.');
                     return false;
                 }
             }
             return true;
         }
-</script>
+
+        function submitFacultyFeedback(e) {
+            e.preventDefault();
+            const form = document.getElementById('facultyForm');
+
+            const payload = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                department: form.department.value,
+                faculty_name: form.faculty_name.value || document.getElementById('facultyNameSelect').value,
+                faculty_email: form.faculty_email.value,
+                course_level: form.course_level.value,
+            };
+
+            if (window.db) {
+                window.addDoc(window.collection(window.db, "responses"), payload)
+                    .then(() => {
+                        document.getElementById('mainContainer').classList.add('hidden');
+                        document.getElementById('successView').classList.remove('hidden');
+                    })
+                    .catch(err => {
+                        alert("Error saving: " + err.message);
+                    });
+            } else {
+                document.getElementById('mainContainer').classList.add('hidden');
+                document.getElementById('successView').classList.remove('hidden');
+            }
+        }
+    </script>
 </body>
 </html>
