@@ -424,6 +424,50 @@
                     <div class="divide-y divide-slate-100" id="qListEmerging"></div>
                 </div>
 
+                <!-- Section F: Emerging Trends & Future Skills -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-laptop-code text-cyan-500"></i> Section F: Emerging Trends, Future Skills & Industry Readiness
+                        </h3>
+                        <span class="px-2.5 py-1 rounded-full bg-cyan-50 text-cyan-700 text-xs font-bold" id="qCountSecF">3 components</span>
+                    </div>
+                    <div class="divide-y divide-slate-100" id="qListSecF"></div>
+                </div>
+
+                <!-- Section G: NSQF Alignment -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-award text-teal-500"></i> Section G: NSQF Alignment & Competency Framework
+                        </h3>
+                        <span class="px-2.5 py-1 rounded-full bg-teal-50 text-teal-700 text-xs font-bold" id="qCountSecG">1 criteria</span>
+                    </div>
+                    <div class="divide-y divide-slate-100" id="qListSecG"></div>
+                </div>
+
+                <!-- Section H: Stakeholder Expectations -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-users text-violet-500"></i> Section H: Stakeholder Expectations & Feedback
+                        </h3>
+                        <span class="px-2.5 py-1 rounded-full bg-violet-50 text-violet-700 text-xs font-bold" id="qCountSecH">2 parameters</span>
+                    </div>
+                    <div class="divide-y divide-slate-100" id="qListSecH"></div>
+                </div>
+
+                <!-- Section I: Indian Knowledge Systems (IKS) -->
+                <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-om text-orange-500"></i> Section I: Indian Knowledge Systems (IKS)
+                        </h3>
+                        <span class="px-2.5 py-1 rounded-full bg-orange-50 text-orange-700 text-xs font-bold" id="qCountSecI">2 modules</span>
+                    </div>
+                    <div class="divide-y divide-slate-100" id="qListSecI"></div>
+                </div>
+
                 <!-- Section J: Course Revision & Open Feedback -->
                 <div class="bg-white rounded-3xl p-6 shadow-sm border border-slate-200 space-y-4">
                     <div class="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -1397,6 +1441,26 @@
             'Name of Course(s) / Papers Handled'
         ];
 
+        const secFItems = [
+            'Experiential Learning Effectiveness (Internship, Fieldwork, Lab)',
+            'Digital Learning & LMS Integration',
+            'Research Orientation & Student Publications'
+        ];
+
+        const secGItems = [
+            'NSQF Alignment & Industry Competency Standard Match'
+        ];
+
+        const secHItems = [
+            'Stakeholder Feedback Source Integration (Students, Alumni, Employers)',
+            'Curricular Responsiveness to Stakeholder Needs'
+        ];
+
+        const secIItems = [
+            'Indian Knowledge Systems (IKS) Integration Effectiveness',
+            'IKS Integration Modes (Dedicated Courses, Units, Certificates)'
+        ];
+
         const secJItems = [
             'Specific Course Content Revisions & Recommended Changes',
             'General Feedback, Institutional Support & Suggestions'
@@ -1409,6 +1473,10 @@
                 case 'obe': return obeItems;
                 case 'struct': return structItems;
                 case 'emerging': return emergingPool;
+                case 'secF': return secFItems;
+                case 'secG': return secGItems;
+                case 'secH': return secHItems;
+                case 'secI': return secIItems;
                 case 'secJ': return secJItems;
                 default: return effItems;
             }
@@ -1511,6 +1579,98 @@
                                 <i class="fa-solid fa-pen"></i>
                             </button>
                             <button onclick="deleteQuestion('emerging', ${idx})" class="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg text-xs font-semibold transition" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Render Section F (secF)
+            const elCountF = document.getElementById('qCountSecF');
+            const elListF = document.getElementById('qListSecF');
+            if (elCountF && elListF) {
+                elCountF.innerText = `${secFItems.length} components`;
+                elListF.innerHTML = secFItems.map((item, idx) => `
+                    <div class="py-3 flex items-center justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-6 h-6 rounded-full bg-cyan-50 text-cyan-600 flex items-center justify-center font-bold text-xs">${idx + 1}</span>
+                            <span class="text-xs font-semibold text-slate-800">${item}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="editQuestion('secF', ${idx})" class="p-1.5 text-slate-400 hover:text-amber-500 rounded-lg text-xs font-semibold transition" title="Edit">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="deleteQuestion('secF', ${idx})" class="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg text-xs font-semibold transition" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Render Section G (secG)
+            const elCountG = document.getElementById('qCountSecG');
+            const elListG = document.getElementById('qListSecG');
+            if (elCountG && elListG) {
+                elCountG.innerText = `${secGItems.length} criteria`;
+                elListG.innerHTML = secGItems.map((item, idx) => `
+                    <div class="py-3 flex items-center justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-6 h-6 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center font-bold text-xs">${idx + 1}</span>
+                            <span class="text-xs font-semibold text-slate-800">${item}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="editQuestion('secG', ${idx})" class="p-1.5 text-slate-400 hover:text-amber-500 rounded-lg text-xs font-semibold transition" title="Edit">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="deleteQuestion('secG', ${idx})" class="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg text-xs font-semibold transition" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Render Section H (secH)
+            const elCountH = document.getElementById('qCountSecH');
+            const elListH = document.getElementById('qListSecH');
+            if (elCountH && elListH) {
+                elCountH.innerText = `${secHItems.length} parameters`;
+                elListH.innerHTML = secHItems.map((item, idx) => `
+                    <div class="py-3 flex items-center justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-6 h-6 rounded-full bg-violet-50 text-violet-600 flex items-center justify-center font-bold text-xs">${idx + 1}</span>
+                            <span class="text-xs font-semibold text-slate-800">${item}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="editQuestion('secH', ${idx})" class="p-1.5 text-slate-400 hover:text-amber-500 rounded-lg text-xs font-semibold transition" title="Edit">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="deleteQuestion('secH', ${idx})" class="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg text-xs font-semibold transition" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Render Section I (secI)
+            const elCountI = document.getElementById('qCountSecI');
+            const elListI = document.getElementById('qListSecI');
+            if (elCountI && elListI) {
+                elCountI.innerText = `${secIItems.length} modules`;
+                elListI.innerHTML = secIItems.map((item, idx) => `
+                    <div class="py-3 flex items-center justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-6 h-6 rounded-full bg-orange-50 text-orange-600 flex items-center justify-center font-bold text-xs">${idx + 1}</span>
+                            <span class="text-xs font-semibold text-slate-800">${item}</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="editQuestion('secI', ${idx})" class="p-1.5 text-slate-400 hover:text-amber-500 rounded-lg text-xs font-semibold transition" title="Edit">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="deleteQuestion('secI', ${idx})" class="p-1.5 text-slate-400 hover:text-rose-500 rounded-lg text-xs font-semibold transition" title="Delete">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </div>
@@ -1709,6 +1869,10 @@
                         <option value="obe">Section C: Outcome Based Education (OBE)</option>
                         <option value="struct">Section D: Curriculum Component Adequacy</option>
                         <option value="emerging">Section E: Emerging Discipline Topics Pool</option>
+                        <option value="secF">Section F: Emerging Trends & Future Skills</option>
+                        <option value="secG">Section G: NSQF Alignment</option>
+                        <option value="secH">Section H: Stakeholder Expectations</option>
+                        <option value="secI">Section I: Indian Knowledge Systems (IKS)</option>
                         <option value="secJ">Section J: Course Revisions & Recommendations</option>
                     </select>
                 </div>
