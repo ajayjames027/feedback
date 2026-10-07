@@ -130,44 +130,45 @@
 
     
     <!-- Admin Top Header -->
-    <header class="bg-slate-900 text-white shadow-xl sticky top-0 z-50 border-b border-slate-800 no-print">
+    <header class="bg-white text-slate-900 shadow-md sticky top-0 z-50 border-b border-slate-200 no-print">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
+            <div class="flex items-center justify-between h-20">
                 <!-- Brand -->
-                <div class="flex items-center space-x-3">
-                    <img src="sjc-logo-small (1).png" alt="St. Joseph's College Logo" class="w-10 h-10 object-contain p-0.5 bg-white/10 rounded-xl border border-white/20 shadow-md">
+                <div class="flex items-center space-x-4">
+                    <img src="sjc-logo-small (1).png" alt="St. Joseph's College Logo" class="w-12 h-14 object-contain">
                     <div>
-                        <div class="font-bold text-base tracking-tight flex items-center space-x-2">
-                            <span>IQAC & CDC Administrator Portal</span>
-                            <span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-extrabold uppercase border border-amber-500/30">Admin Only</span>
+                        <div class="font-bold text-sm tracking-tight text-blue-950 font-serif flex items-center space-x-2">
+                            <span>INTERNAL QUALITY ASSURANCE CELL (IQAC)</span>
+                            <span class="px-2 py-0.5 rounded bg-blue-100 text-blue-900 text-[10px] font-extrabold uppercase border border-blue-200">Admin Portal</span>
                         </div>
-                        <div class="text-xs text-slate-400">Teacher Feedback & Curricular Revision 2025-26</div>
+                        <div class="text-xs font-semibold text-amber-800">St. Joseph’s College (Autonomous), Tiruchirappalli</div>
+                        <div class="text-[11px] text-slate-500 font-medium">Teacher Feedback on Curricular Revision 2025–26</div>
                     </div>
                 </div>
 
                 <!-- Admin Navigation Tabs -->
-                <nav class="hidden md:flex items-center space-x-1">
-                    <button onclick="switchTab('tracking')" id="nav-tracking" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all bg-slate-800 text-amber-300 border border-slate-700 shadow-inner">
-                        <i class="fa-solid fa-list-check mr-1.5 text-amber-400"></i> Faculty Tracker
+                <nav class="hidden lg:flex items-center space-x-1">
+                    <button onclick="switchTab('tracking')" id="nav-tracking" class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all bg-blue-900 text-white shadow">
+                        <i class="fa-solid fa-users-gear mr-1.5 text-amber-400"></i> Faculty Tracker
                     </button>
-                    <button onclick="switchTab('questions')" id="nav-questions" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
-                        <i class="fa-solid fa-pen-to-square mr-1.5 text-indigo-400"></i> Question Manager
+                    <button onclick="switchTab('questions')" id="nav-questions" class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 hover:text-blue-900">
+                        <i class="fa-solid fa-sliders mr-1.5 text-indigo-600"></i> Question Manager
                     </button>
-                    <button onclick="switchTab('analytics')" id="nav-analytics" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
-                        <i class="fa-solid fa-chart-pie mr-1.5 text-indigo-400"></i> Analytics Dashboard
+                    <button onclick="switchTab('analytics')" id="nav-analytics" class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 hover:text-blue-900">
+                        <i class="fa-solid fa-chart-column mr-1.5 text-indigo-600"></i> Analytics
                     </button>
-                    <button onclick="switchTab('responses')" id="nav-responses" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
-                        <i class="fa-solid fa-database mr-1.5 text-emerald-400"></i> Response Records
+                    <button onclick="switchTab('responses')" id="nav-responses" class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 hover:text-blue-900">
+                        <i class="fa-solid fa-folder-open mr-1.5 text-emerald-600"></i> Response Records
                     </button>
-                    <button onclick="switchTab('report')" id="nav-report" class="px-3.5 py-2 rounded-xl text-xs font-semibold transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
-                        <i class="fa-solid fa-file-contract mr-1.5 text-rose-400"></i> IQAC Report
+                    <button onclick="switchTab('report')" id="nav-report" class="px-3.5 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 hover:text-blue-900">
+                        <i class="fa-solid fa-file-signature mr-1.5 text-rose-600"></i> IQAC Audit Report
                     </button>
                 </nav>
 
                 <!-- Action Utilities -->
                 <div class="flex items-center space-x-2">
-                    <a href="index.html" target="_blank" class="hidden sm:inline-flex items-center px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-xl border border-slate-700 text-slate-200 transition" title="Open Faculty Feedback Form">
-                        <i class="fa-solid fa-arrow-up-right-from-square mr-1.5 text-slate-400"></i> Faculty Form
+                    <a href="index.html" target="_blank" class="hidden sm:inline-flex items-center px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-xs font-bold rounded-xl text-white shadow transition" title="Open Faculty Feedback Form">
+                        <i class="fa-solid fa-up-right-from-square mr-1.5 text-amber-400"></i> Faculty Survey Form
                     </a>
                 </div>
             </div>
@@ -676,13 +677,13 @@
         function switchTab(tabId) {
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('nav button').forEach(el => {
-                el.className = "px-3.5 py-2 rounded-xl text-xs font-semibold transition-all text-slate-300 hover:bg-slate-800 hover:text-white";
+                el.className = "px-3.5 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 hover:bg-slate-100 hover:text-blue-900";
             });
 
             document.getElementById(`tab-content-${tabId}`)?.classList.remove('hidden');
             const activeNav = document.getElementById(`nav-${tabId}`);
             if (activeNav) {
-                activeNav.className = "px-3.5 py-2 rounded-xl text-xs font-semibold transition-all bg-slate-800 text-amber-300 border border-slate-700 shadow-inner";
+                activeNav.className = "px-3.5 py-2 rounded-xl text-xs font-bold transition-all bg-blue-900 text-white shadow";
             }
 
             if (tabId === 'tracking') renderRosterTable();
