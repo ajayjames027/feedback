@@ -1031,12 +1031,17 @@
             records.push(payload);
             localStorage.setItem("sjc_faculty_feedback_records_2025", JSON.stringify(records));
 
-            // Also attempt backend submit if server is running
-            fetch('http://127.0.0.1:5000/api/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            }).catch(() => {});
+            // Submit directly to Firebase Firestore
+            if (window.db) {
+                window.addDoc(window.collection(window.db, "responses"), payload)
+                    .then(() => { 
+                        console.log('Successfully saved to Firestore'); 
+                        document.getElementById('mainContainer').classList.add('hidden');
+                        document.getElementById('successView').classList.remove('hidden');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    })
+                    .catch(e => { console.error('Error saving to Firestore:', e); });
+            }
 
             // Show Google Form style success screen
             document.getElementById('mainContainer').classList.add('hidden');
