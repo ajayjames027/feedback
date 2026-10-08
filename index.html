@@ -31,7 +31,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC7FuA4XE3DYQevwoaSd7_G0G0Z7UPi2ms",
@@ -50,6 +50,7 @@
         window.getDocs = getDocs;
         window.doc = doc;
         window.getDoc = getDoc;
+        window.onSnapshot = onSnapshot;
 
         window.loadSystemSettings = async function() {
             let settings = {
@@ -62,19 +63,26 @@
                 if (local) settings = { ...settings, ...JSON.parse(local) };
             } catch(e) {}
 
-            try {
-                const snap = await getDoc(doc(db, "system_settings", "form_control"));
-                if (snap.exists()) {
-                    settings = { ...settings, ...snap.data() };
-                    localStorage.setItem("sjc_system_settings", JSON.stringify(settings));
-                }
-            } catch(e) {
-                console.warn("Could not load settings from Firestore:", e);
-            }
-
             if (typeof applyFormAccessControl === 'function') {
                 applyFormAccessControl(settings);
             }
+
+            try {
+                onSnapshot(doc(db, "system_settings", "form_control"), (snap) => {
+                    if (snap.exists()) {
+                        settings = { ...settings, ...snap.data() };
+                        localStorage.setItem("sjc_system_settings", JSON.stringify(settings));
+                        if (typeof applyFormAccessControl === 'function') {
+                            applyFormAccessControl(settings);
+                        }
+                    }
+                }, (err) => {
+                    console.warn("Real-time settings listener error:", err);
+                });
+            } catch(e) {
+                console.warn("Could not attach settings realtime listener:", e);
+            }
+
             return settings;
         };
 
@@ -189,7 +197,7 @@
     </style>
 
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v5"></script>
+    <script src="faculty_roster_data.js?v=20261008_v6"></script>
 </head>
 <body class="text-slate-800 py-8 px-4 sm:px-6 lg:px-8">
 
@@ -1353,6 +1361,51 @@
         </div>
     </div>
 
+    <!-- Official Portal Closed / Deadline Exceeded Pop-up Modal -->
+    <div id="closedFormModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[350] flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 text-center space-y-5 shadow-2xl border-2 border-rose-200 animate-in fade-in zoom-in-95 duration-200">
+            <div class="w-16 h-16 bg-rose-50 border-2 border-rose-200 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-3xl shadow-sm">
+                <i class="fa-solid fa-calendar-xmark"></i>
+            </div>
+            <div class="space-y-2">
+                <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-200">
+                    Submission Portal Closed
+                </span>
+                <h3 class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
+                    Thank You — Deadline Exceeded
+                </h3>
+                <p class="text-xs text-slate-600 leading-relaxed">
+                    The scheduled deadline for submitting the Teacher Curricular Feedback has concluded, or the submission portal has been closed by the administration. No further responses can be submitted.
+                </p>
+            </div>
+
+            <div class="bg-amber-50/80 border border-amber-200 rounded-2xl p-4 text-left space-y-2 text-xs">
+                <div class="font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5 text-[11px]">
+                    <i class="fa-solid fa-circle-info text-amber-600"></i> Contact Internal Quality Assurance Cell (IQAC)
+                </div>
+                <p class="text-slate-700 leading-relaxed">
+                    For special extensions, permissions, or enquiries regarding your curricular feedback submission, please contact the IQAC office:
+                </p>
+                <div class="pt-1 space-y-1 font-medium text-slate-800">
+                    <div><i class="fa-solid fa-building-columns text-slate-500 mr-2"></i><strong>Office:</strong> Internal Quality Assurance Cell (IQAC), St. Joseph’s College (Autonomous)</div>
+                    <div><i class="fa-solid fa-envelope text-slate-500 mr-2"></i><strong>Email:</strong> <a href="mailto:iqac@mail.sjctni.edu" class="text-blue-700 font-semibold underline">iqac@mail.sjctni.edu</a></div>
+                    <div><i class="fa-solid fa-location-dot text-slate-500 mr-2"></i>Tiruchirappalli – 620002, Tamil Nadu, India</div>
+                </div>
+            </div>
+
+            <div class="pt-2 flex items-center justify-center gap-3">
+                <button type="button" onclick="window.location.reload()" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow flex items-center gap-1.5">
+                    <i class="fa-solid fa-arrow-rotate-right"></i>
+                    <span>Refresh Portal</span>
+                </button>
+                <button type="button" onclick="closeCurrentTab()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-xmark"></i>
+                    <span>Close Tab</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript Logic -->
     <script>
         const effItems = [
@@ -1825,10 +1878,12 @@
             const stepper = document.getElementById('stepperNav');
             const lockView = document.getElementById('deadlineExceededView');
             const timerBanner = document.getElementById('deadlineNoticeBanner');
+            const closedModal = document.getElementById('closedFormModal');
 
             if (form) form.classList.add('hidden');
             if (stepper) stepper.classList.add('hidden');
             if (lockView) lockView.classList.remove('hidden');
+            if (closedModal) closedModal.classList.remove('hidden');
 
             const countdownBox = document.getElementById('bannerCountdownBox');
             const countdownText = document.getElementById('bannerCountdownText');
@@ -1842,7 +1897,9 @@
             const form = document.getElementById('facultyForm');
             const stepper = document.getElementById('stepperNav');
             const lockView = document.getElementById('deadlineExceededView');
+            const closedModal = document.getElementById('closedFormModal');
 
+            if (closedModal) closedModal.classList.add('hidden');
             if (lockView) lockView.classList.add('hidden');
             if (form) form.classList.remove('hidden');
             if (stepper) stepper.classList.remove('hidden');
@@ -1924,6 +1981,14 @@
 
             // Restore draft (or initialize step 1 if no draft)
             restoreFormDraft();
+
+            // Re-verify form access immediately after restoring draft
+            const deadlineDate = new Date(currentSystemSettings.deadline);
+            const now = new Date();
+            const isExpired = !isNaN(deadlineDate.getTime()) && now.getTime() > deadlineDate.getTime();
+            if (currentSystemSettings.isOpen === false || isExpired) {
+                lockFormDeadlineExceeded();
+            }
 
             const form = document.getElementById('facultyForm');
             if (form) {
@@ -2083,6 +2148,14 @@
 
         // --- Stepper Navigation & Locking ---
         function showStep(stepNum) {
+            const deadlineDate = new Date(currentSystemSettings.deadline);
+            const now = new Date();
+            const isExpired = !isNaN(deadlineDate.getTime()) && now.getTime() > deadlineDate.getTime();
+            if (currentSystemSettings.isOpen === false || isExpired) {
+                lockFormDeadlineExceeded();
+                return;
+            }
+
             currentStepNumber = stepNum;
             document.querySelectorAll('.form-section').forEach(sec => sec.classList.add('hidden'));
             const nxt = document.getElementById('form-section-' + stepNum);
@@ -2127,6 +2200,13 @@
         }
 
         function goToStep(stepNum) {
+            const deadlineDate = new Date(currentSystemSettings.deadline);
+            const now = new Date();
+            const isExpired = !isNaN(deadlineDate.getTime()) && now.getTime() > deadlineDate.getTime();
+            if (currentSystemSettings.isOpen === false || isExpired) {
+                lockFormDeadlineExceeded();
+                return;
+            }
             if (stepNum > currentMaxStepUnlocked) {
                 showToast(`Section ${stepNum} is locked. Complete the current section to proceed.`, 'error');
                 return;

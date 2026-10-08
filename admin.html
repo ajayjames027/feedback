@@ -42,7 +42,7 @@
 <!-- Firebase App (the core Firebase SDK) -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, addDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, addDoc, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyC7FuA4XE3DYQevwoaSd7_G0G0Z7UPi2ms",
@@ -63,6 +63,7 @@
     window.doc = doc;
     window.setDoc = setDoc;
     window.getDoc = getDoc;
+    window.onSnapshot = onSnapshot;
 
     window.loadSystemSettings = async function() {
         let settings = {
@@ -75,19 +76,26 @@
             if (local) settings = { ...settings, ...JSON.parse(local) };
         } catch(e) {}
 
-        try {
-            const snap = await getDoc(doc(db, "system_settings", "form_control"));
-            if (snap.exists()) {
-                settings = { ...settings, ...snap.data() };
-                localStorage.setItem("sjc_system_settings", JSON.stringify(settings));
-            }
-        } catch(e) {
-            console.warn("Could not load settings from Firestore:", e);
-        }
-
         if (typeof applyAdminFormSettingsUI === 'function') {
             applyAdminFormSettingsUI(settings);
         }
+
+        try {
+            onSnapshot(doc(db, "system_settings", "form_control"), (snap) => {
+                if (snap.exists()) {
+                    settings = { ...settings, ...snap.data() };
+                    localStorage.setItem("sjc_system_settings", JSON.stringify(settings));
+                    if (typeof applyAdminFormSettingsUI === 'function') {
+                        applyAdminFormSettingsUI(settings);
+                    }
+                }
+            }, (err) => {
+                console.warn("Firestore settings realtime listener error:", err);
+            });
+        } catch(e) {
+            console.warn("Could not attach settings listener:", e);
+        }
+
         return settings;
     };
 
@@ -161,7 +169,7 @@
 <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v5"></script>
+    <script src="faculty_roster_data.js?v=20261008_v6"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
