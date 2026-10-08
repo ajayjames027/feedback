@@ -141,7 +141,39 @@
         }
     };
 
-    // Load responses from Firestore globally so the rest of the script can use them
+    function syncCloudResponses(cloudRecords) {
+        if (!Array.isArray(cloudRecords)) return;
+        let localRecords = [];
+        try {
+            localRecords = JSON.parse(localStorage.getItem("sjc_feedback_responses") || "[]");
+        } catch(e) {}
+
+        const map = new Map();
+        localRecords.forEach(r => {
+            const key = r.id || `${(r.faculty_name||'').trim().toLowerCase()}__${(r.department||'').trim().toLowerCase()}`;
+            map.set(key, r);
+        });
+        cloudRecords.forEach(r => {
+            const key = r.id || `${(r.faculty_name||'').trim().toLowerCase()}__${(r.department||'').trim().toLowerCase()}`;
+            map.set(key, r);
+        });
+
+        const merged = Array.from(map.values());
+        merged.sort((a, b) => (b.submitted_at_epoch || b.id || 0) - (a.submitted_at_epoch || a.id || 0));
+
+        localStorage.setItem("sjc_feedback_responses", JSON.stringify(merged));
+        localStorage.setItem("sjc_faculty_feedback_records_2025", JSON.stringify(merged));
+        window.__cachedAdminResponses = merged;
+
+        console.log(`[Admin Cloud Sync] Synced ${cloudRecords.length} cloud records. Total active: ${merged.length}`);
+
+        if (typeof renderRosterTable === 'function') renderRosterTable();
+        if (typeof renderAnalyticsDashboard === 'function') renderAnalyticsDashboard();
+        if (typeof renderResponsesTable === 'function') renderResponsesTable();
+        if (typeof renderReportTable === 'function') renderReportTable();
+    }
+
+    // Load responses from Firestore globally and listen in real time
     window.loadFirebaseResponses = async function() {
         try {
             const querySnapshot = await getDocs(collection(db, "responses"));
@@ -149,15 +181,21 @@
             querySnapshot.forEach((doc) => {
                 firebaseRecords.push(doc.data());
             });
-            
-            localStorage.setItem("sjc_faculty_feedback_records_2025", JSON.stringify(firebaseRecords));
-            console.log("Firebase synced!", firebaseRecords.length, "records pulled.");
-            
-            if(typeof renderRosterTable === 'function') renderRosterTable();
-            if(typeof renderAnalyticsDashboard === 'function') renderAnalyticsDashboard();
-            if(typeof renderResponsesTable === 'function') renderResponsesTable();
+            syncCloudResponses(firebaseRecords);
         } catch(e) {
-            console.warn("Could not sync responses from cloud:", e);
+            console.warn("Could not sync responses from cloud initially:", e);
+        }
+
+        try {
+            onSnapshot(collection(db, "responses"), (snapshot) => {
+                let liveRecords = [];
+                snapshot.forEach(doc => liveRecords.push(doc.data()));
+                syncCloudResponses(liveRecords);
+            }, (err) => {
+                console.warn("Real-time responses listener error:", err);
+            });
+        } catch(e) {
+            console.warn("Could not attach real-time responses listener:", e);
         }
     };
     
@@ -169,7 +207,7 @@
 <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v7"></script>
+    <script src="faculty_roster_data.js?v=20261008_v8"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -261,6 +299,10 @@
 
                 <!-- Action Utilities -->
                 <div class="flex items-center space-x-2">
+                    <button onclick="triggerManualSync()" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5" title="Refresh submissions from Cloud">
+                        <i class="fa-solid fa-arrows-rotate text-emerald-600" id="syncSpinnerIcon"></i>
+                        <span>Sync Cloud</span>
+                    </button>
                     <a href="index.html" target="_blank" class="hidden xl:inline-flex items-center px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-xs font-bold rounded-xl text-white shadow transition gap-1.5" title="Open Faculty Feedback Form">
                         <i class="fa-solid fa-up-right-from-square text-amber-400"></i>
                         <span>Faculty Survey Form</span>
@@ -1034,8 +1076,8 @@
 
         const structItems = [
             'Theory Courses', 'Practical Courses', 'Project, Internship and Research',
-            'Discipline Specific / Open Electives', 'Skill / Ability Enhancement Courses',
-            'Credit distribution across components', 'Balance between foundational, advanced and specialization courses',
+            'Discipline Specific / Open Electives', 'Skill Enhancement Courses (SECs) / Ability Enhancement Courses (AECs)',
+            'Credit distributed across theory, practical, projects & internship components', 'Balance between foundational, advanced and specialization courses',
             'Opportunities for inter and multi-disciplinary course combinations'
         ];
 
@@ -1068,15 +1110,43 @@
         }
 
         function getStoredResponses() {
-            const rawNew = localStorage.getItem("sjc_feedback_responses");
-            if (rawNew) {
-                try { return JSON.parse(rawNew); } catch(e) {}
+            if (Array.isArray(window.__cachedAdminResponses) && window.__cachedAdminResponses.length > 0) {
+                return window.__cachedAdminResponses;
             }
-            const rawOld = localStorage.getItem("sjc_faculty_feedback_records_2025");
-            if (rawOld) {
-                try { return JSON.parse(rawOld); } catch(e) {}
+            let list = [];
+            try {
+                const rawNew = JSON.parse(localStorage.getItem("sjc_feedback_responses") || "[]");
+                const rawOld = JSON.parse(localStorage.getItem("sjc_faculty_feedback_records_2025") || "[]");
+                const map = new Map();
+                rawOld.forEach(r => {
+                    const key = r.id || `${(r.faculty_name||'').trim().toLowerCase()}__${(r.department||'').trim().toLowerCase()}`;
+                    map.set(key, r);
+                });
+                rawNew.forEach(r => {
+                    const key = r.id || `${(r.faculty_name||'').trim().toLowerCase()}__${(r.department||'').trim().toLowerCase()}`;
+                    map.set(key, r);
+                });
+                list = Array.from(map.values());
+                list.sort((a, b) => (b.submitted_at_epoch || b.id || 0) - (a.submitted_at_epoch || a.id || 0));
+                window.__cachedAdminResponses = list;
+            } catch(e) {}
+            return list;
+        }
+
+        async function triggerManualSync() {
+            const icon = document.getElementById('syncSpinnerIcon');
+            if (icon) icon.classList.add('fa-spin');
+            try {
+                if (window.loadFirebaseResponses) {
+                    await window.loadFirebaseResponses();
+                }
+                showToast('Cloud responses synchronized successfully!', 'success');
+            } catch(e) {
+                console.error('Manual sync error:', e);
+                showToast('Sync error: Check internet connection', 'error');
+            } finally {
+                if (icon) icon.classList.remove('fa-spin');
             }
-            return [];
         }
 
         // Init
@@ -1586,8 +1656,17 @@
             });
 
             // 3. Structure Bar
-            const structMeans = structItems.map(item => {
-                const vals = responses.map(r => parseVal(r.curriculum_structure?.[item])).filter(v => v > 0);
+            const structMeans = structItems.map((item, idx) => {
+                const vals = responses.map(r => {
+                    const cs = r.curriculum_structure || {};
+                    let v = cs[item];
+                    if (v === undefined) v = cs[`D${idx+1}. ${item}`];
+                    if (v === undefined) {
+                        const m = Object.keys(cs).find(k => k.startsWith(`D${idx+1}.`) || k.toLowerCase().includes(item.toLowerCase().substring(0, 15)));
+                        if (m) v = cs[m];
+                    }
+                    return parseVal(v);
+                }).filter(v => v > 0);
                 return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
             });
             chartInstances.struct = new Chart(document.getElementById('chartStruct'), {
@@ -1846,7 +1925,7 @@
                         <div>
                             <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-100 text-indigo-800">Section B</span>
                             <h3 class="text-lg font-black text-slate-900 mt-1">Overall Effectiveness of Current Curriculum</h3>
-                            <p class="text-xs text-slate-500">12 Core Dimensions evaluated on 5-point Likert Scale</p>
+                            <p class="text-xs text-slate-500">12 Core Dimensions evaluated on 5-point Likert Rating Scale</p>
                         </div>
                         <div class="flex items-center gap-3 self-start sm:self-auto bg-white px-4 py-2 rounded-2xl border border-slate-200 shadow-xs">
                             <div class="text-right">
@@ -1917,7 +1996,14 @@
                             const counts = { 'Adequate': 0, 'Inadequate': 0, 'Excess': 0, 'Absent': 0 };
                             let vCount = 0;
                             latestAnalyticsResponses.forEach(r => {
-                                const val = parseAdequacy(r.curriculum_structure?.[item]);
+                                const cs = r.curriculum_structure || {};
+                                let rawVal = cs[item];
+                                if (rawVal === undefined) rawVal = cs[`D${idx+1}. ${item}`];
+                                if (rawVal === undefined) {
+                                    const m = Object.keys(cs).find(k => k.startsWith(`D${idx+1}.`) || k.toLowerCase().includes(item.toLowerCase().substring(0, 15)));
+                                    if (m) rawVal = cs[m];
+                                }
+                                const val = parseAdequacy(rawVal);
                                 if (counts[val] !== undefined) {
                                     counts[val]++;
                                     vCount++;
@@ -2315,8 +2401,11 @@
 
             list.splice(idx, 1);
             localStorage.setItem("sjc_feedback_responses", JSON.stringify(list));
+            localStorage.setItem("sjc_faculty_feedback_records_2025", JSON.stringify(list));
+            window.__cachedAdminResponses = list;
             renderResponsesTable();
             renderRosterTable();
+            renderAnalyticsDashboard();
             showToast('Response deleted successfully.');
         }
 
@@ -2582,7 +2671,16 @@
                 // Section C ratings
                 obeItems.forEach(q => row.push(r.obe_evaluation?.[q] || 'N/A'));
                 // Section D ratings
-                structItems.forEach(q => row.push(r.curriculum_structure?.[q] || 'N/A'));
+                structItems.forEach((q, idx) => {
+                    const cs = r.curriculum_structure || {};
+                    let val = cs[q];
+                    if (val === undefined) val = cs[`D${idx+1}. ${q}`];
+                    if (val === undefined) {
+                        const m = Object.keys(cs).find(k => k.startsWith(`D${idx+1}.`) || k.toLowerCase().includes(q.toLowerCase().substring(0, 15)));
+                        if (m) val = cs[m];
+                    }
+                    row.push(val || 'N/A');
+                });
                 // Section E
                 row.push(Array.isArray(r.emerging_areas) ? r.emerging_areas.join("; ") : (r.emerging_areas || 'N/A'));
                 row.push(r.emerging_other || 'N/A');
