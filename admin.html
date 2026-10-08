@@ -42,7 +42,7 @@
 <!-- Firebase App (the core Firebase SDK) -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyC7FuA4XE3DYQevwoaSd7_G0G0Z7UPi2ms",
@@ -56,33 +56,71 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
-    // Load responses from Firestore globally so the rest of the script can use them
     window.db = db;
+    window.collection = collection;
+    window.getDocs = getDocs;
+    window.addDoc = addDoc;
+
+    window.loadFirebaseCustomFaculty = async function() {
+        try {
+            const querySnapshot = await getDocs(collection(db, "custom_faculty"));
+            let cloudFaculty = [];
+            querySnapshot.forEach((doc) => {
+                cloudFaculty.push(doc.data());
+            });
+            if (cloudFaculty.length > 0) {
+                let localCustom = JSON.parse(localStorage.getItem('sjc_custom_faculty_list') || '[]');
+                let updated = false;
+                cloudFaculty.forEach(cf => {
+                    const exists = localCustom.some(f => 
+                        (f.name || '').trim().toLowerCase() === (cf.name || '').trim().toLowerCase() && 
+                        (f.department || '').trim().toLowerCase() === (cf.department || '').trim().toLowerCase()
+                    );
+                    if (!exists) {
+                        localCustom.push(cf);
+                        updated = true;
+                    }
+                });
+                if (updated) {
+                    localStorage.setItem('sjc_custom_faculty_list', JSON.stringify(localCustom));
+                }
+                if (window.syncCustomFacultyFromStorage) window.syncCustomFacultyFromStorage();
+                if (typeof initDropdowns === 'function') initDropdowns();
+                if (typeof renderRosterTable === 'function') renderRosterTable();
+            }
+        } catch (e) {
+            console.warn("Could not sync custom faculty from cloud:", e);
+        }
+    };
+
+    // Load responses from Firestore globally so the rest of the script can use them
     window.loadFirebaseResponses = async function() {
-        const querySnapshot = await getDocs(collection(db, "responses"));
-        let firebaseRecords = [];
-        querySnapshot.forEach((doc) => {
-            firebaseRecords.push(doc.data());
-        });
-        
-        // Cache them into localStorage for the legacy functions to pick up for now
-        // This makes sure the rest of admin.html works instantly without rewriting every function
-        localStorage.setItem("sjc_faculty_feedback_records_2025", JSON.stringify(firebaseRecords));
-        console.log("Firebase synced!", firebaseRecords.length, "records pulled.");
-        
-        // Trigger a re-render
-        if(typeof renderRosterTable === 'function') renderRosterTable();
-        if(typeof renderAnalyticsDashboard === 'function') renderAnalyticsDashboard();
-        if(typeof renderResponsesTable === 'function') renderResponsesTable();
+        try {
+            const querySnapshot = await getDocs(collection(db, "responses"));
+            let firebaseRecords = [];
+            querySnapshot.forEach((doc) => {
+                firebaseRecords.push(doc.data());
+            });
+            
+            localStorage.setItem("sjc_faculty_feedback_records_2025", JSON.stringify(firebaseRecords));
+            console.log("Firebase synced!", firebaseRecords.length, "records pulled.");
+            
+            if(typeof renderRosterTable === 'function') renderRosterTable();
+            if(typeof renderAnalyticsDashboard === 'function') renderAnalyticsDashboard();
+            if(typeof renderResponsesTable === 'function') renderResponsesTable();
+        } catch(e) {
+            console.warn("Could not sync responses from cloud:", e);
+        }
     };
     
     // Trigger sync on load
     window.loadFirebaseResponses();
+    window.loadFirebaseCustomFaculty();
 </script>
 <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v2"></script>
+    <script src="faculty_roster_data.js?v=20261008_v3"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -922,15 +960,32 @@
             const rosterSelect = document.getElementById('rosterDeptSelect');
             const anaSelect = document.getElementById('analyticsDeptSelect');
 
-            depts.forEach(d => {
-                const opt1 = document.createElement('option');
-                opt1.value = d; opt1.innerText = d;
-                rosterSelect.appendChild(opt1);
+            const curRosterDept = rosterSelect ? rosterSelect.value : 'All';
+            const curAnaDept = anaSelect ? anaSelect.value : 'All';
 
-                const opt2 = document.createElement('option');
-                opt2.value = d; opt2.innerText = d;
-                anaSelect.appendChild(opt2);
-            });
+            if (rosterSelect) {
+                rosterSelect.innerHTML = '<option value="All">All Departments</option>';
+                depts.forEach(d => {
+                    const opt1 = document.createElement('option');
+                    opt1.value = d; opt1.innerText = d;
+                    rosterSelect.appendChild(opt1);
+                });
+                if (curRosterDept && (curRosterDept === 'All' || depts.includes(curRosterDept))) {
+                    rosterSelect.value = curRosterDept;
+                }
+            }
+
+            if (anaSelect) {
+                anaSelect.innerHTML = '<option value="All">All Departments</option>';
+                depts.forEach(d => {
+                    const opt2 = document.createElement('option');
+                    opt2.value = d; opt2.innerText = d;
+                    anaSelect.appendChild(opt2);
+                });
+                if (curAnaDept && (curAnaDept === 'All' || depts.includes(curAnaDept))) {
+                    anaSelect.value = curAnaDept;
+                }
+            }
         }
 
         // Roster Table & Progress
@@ -1034,10 +1089,10 @@
                     </td>
                     <td class="p-3 text-right">
                         <div class="flex items-center justify-end space-x-1">
-                            <button onclick="document.getElementById('editFacultyModal').classList.remove('hidden')" class="px-2.5 py-1 text-slate-400 hover:text-amber-500 rounded-lg text-xs font-semibold transition" title="Edit">
+                            <button onclick="openEditFacultyModal('${encodeURIComponent(f.name).replace(/'/g, "%27")}', '${encodeURIComponent(f.department).replace(/'/g, "%27")}')" class="px-2.5 py-1 text-slate-400 hover:text-amber-500 rounded-lg text-xs font-semibold transition" title="Edit">
                                 <i class="fa-solid fa-pen"></i>
                             </button>
-                            <button onclick="deleteFacultyFromRoster('${f.name}', '${f.department}')" class="px-2.5 py-1 text-slate-400 hover:text-rose-500 rounded-lg text-xs font-semibold transition" title="Delete">
+                            <button onclick="deleteFacultyFromRoster('${encodeURIComponent(f.name).replace(/'/g, "%27")}', '${encodeURIComponent(f.department).replace(/'/g, "%27")}')" class="px-2.5 py-1 text-slate-400 hover:text-rose-500 rounded-lg text-xs font-semibold transition" title="Delete">
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                             <button onclick="copySingleEmail('${f.email}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold border border-slate-300 transition" title="Copy Email">
@@ -1055,11 +1110,26 @@
             showToast("Copied: " + email);
         }
 
-        function deleteFacultyFromRoster(name, dept) {
+        function deleteFacultyFromRoster(encName, encDept) {
+            const name = decodeURIComponent(encName);
+            const dept = decodeURIComponent(encDept);
             if (!confirm(`Are you sure you want to remove ${name} (${dept}) from the Master Roster?`)) return;
             const idx = MASTER_FACULTY_ROSTER.findIndex(f => f.name === name && f.department === dept);
             if (idx !== -1) {
                 MASTER_FACULTY_ROSTER.splice(idx, 1);
+                try {
+                    let customList = JSON.parse(localStorage.getItem('sjc_custom_faculty_list') || '[]');
+                    customList = customList.filter(f => !(f.name.toLowerCase() === name.toLowerCase() && f.department.toLowerCase() === dept.toLowerCase()));
+                    localStorage.setItem('sjc_custom_faculty_list', JSON.stringify(customList));
+
+                    let deletedList = JSON.parse(localStorage.getItem('sjc_deleted_faculty_list') || '[]');
+                    deletedList.push({ name, department: dept });
+                    localStorage.setItem('sjc_deleted_faculty_list', JSON.stringify(deletedList));
+                } catch (e) {
+                    console.error(e);
+                }
+
+                initDropdowns();
                 renderRosterTable();
                 showToast(`Removed ${name} from Master Roster.`);
             }
@@ -2095,7 +2165,7 @@
 
                     ${revs ? `
                         <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-2">
-                            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Section J: Course Revision Proposals</h4>
+                            <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Section J: Course Revisions</h4>
                             <div class="overflow-x-auto">
                                 <table class="w-full text-left text-xs bg-white rounded-xl overflow-hidden border border-slate-200">
                                     <thead><tr class="bg-slate-100 text-slate-700 font-bold"><th class="p-2">Course</th><th class="p-2 text-center">Sem</th><th class="p-2">Change</th><th class="p-2">Reason</th></tr></thead>
@@ -2645,11 +2715,36 @@
             document.getElementById('questionModal').classList.add('hidden');
         }
 
+        let editingFacultyOriginal = null;
+
         function openAddFacultyModal() {
+            editingFacultyOriginal = null;
+            document.getElementById('facModalTitle').innerText = 'Add Faculty Member';
             document.getElementById('facModalName').value = '';
             document.getElementById('facModalEmail').value = '';
             document.getElementById('facModalDesig').value = 'Assistant Professor';
+            document.getElementById('facModalShift').value = 'I';
             initFacultyModalDepts();
+            const newDeptInput = document.getElementById('facModalNewDept');
+            if (newDeptInput) { newDeptInput.value = ''; newDeptInput.classList.add('hidden'); }
+            document.getElementById('editFacultyModal').classList.remove('hidden');
+        }
+
+        function openEditFacultyModal(encName, encDept) {
+            const name = decodeURIComponent(encName);
+            const dept = decodeURIComponent(encDept);
+            const f = MASTER_FACULTY_ROSTER.find(x => x.name === name && x.department === dept);
+            if (!f) return;
+            editingFacultyOriginal = { name: f.name, department: f.department };
+            document.getElementById('facModalTitle').innerText = 'Edit Faculty Member';
+            document.getElementById('facModalName').value = f.name || '';
+            document.getElementById('facModalEmail').value = f.email || '';
+            document.getElementById('facModalDesig').value = f.designation || 'Assistant Professor';
+            initFacultyModalDepts();
+            document.getElementById('facModalDept').value = f.department || '';
+            document.getElementById('facModalShift').value = f.shift || 'I';
+            const newDeptInput = document.getElementById('facModalNewDept');
+            if (newDeptInput) { newDeptInput.value = ''; newDeptInput.classList.add('hidden'); }
             document.getElementById('editFacultyModal').classList.remove('hidden');
         }
 
@@ -2657,6 +2752,7 @@
             const depts = Array.from(new Set(MASTER_FACULTY_ROSTER.map(f => f.department))).filter(Boolean).sort();
             const sel = document.getElementById('facModalDept');
             if (!sel) return;
+            const currentVal = sel.value;
             sel.innerHTML = '<option value="">Select Department...</option>';
             depts.forEach(d => {
                 const opt = document.createElement('option');
@@ -2664,29 +2760,139 @@
                 opt.innerText = d;
                 sel.appendChild(opt);
             });
+            const newOpt = document.createElement('option');
+            newOpt.value = '__NEW__';
+            newOpt.innerText = '+ Add New Department...';
+            sel.appendChild(newOpt);
+            if (currentVal) sel.value = currentVal;
+        }
+
+        function checkCustomDept(val) {
+            const newDeptInput = document.getElementById('facModalNewDept');
+            if (!newDeptInput) return;
+            if (val === '__NEW__') {
+                newDeptInput.classList.remove('hidden');
+                newDeptInput.focus();
+            } else {
+                newDeptInput.classList.add('hidden');
+            }
         }
 
         function saveFacultyRosterMember() {
             const name = document.getElementById('facModalName').value.trim();
             const email = document.getElementById('facModalEmail').value.trim();
-            const dept = document.getElementById('facModalDept').value;
+            let dept = document.getElementById('facModalDept').value;
+            const newDeptInput = document.getElementById('facModalNewDept');
+            if (dept === '__NEW__' && newDeptInput) {
+                dept = newDeptInput.value.trim();
+            }
             const desig = document.getElementById('facModalDesig').value;
+            const shift = document.getElementById('facModalShift').value || 'I';
 
             if (!name || !dept) {
                 showToast('Faculty Name and Department are required.', 'error');
                 return;
             }
 
-            MASTER_FACULTY_ROSTER.push({
-                name,
-                email,
-                department: dept,
-                designation: desig
-            });
+            const school = getSchoolForDepartment(dept);
+
+            if (editingFacultyOriginal) {
+                const origIdx = MASTER_FACULTY_ROSTER.findIndex(f => 
+                    f.name === editingFacultyOriginal.name && f.department === editingFacultyOriginal.department
+                );
+                const existingSNo = origIdx !== -1 ? MASTER_FACULTY_ROSTER[origIdx].s_no : (MASTER_FACULTY_ROSTER.length + 1);
+                const updatedFaculty = {
+                    s_no: existingSNo,
+                    school: school,
+                    department: dept,
+                    name: name,
+                    designation: desig,
+                    email: email,
+                    shift: shift,
+                    category: 'Teaching Faculty',
+                    is_custom: true
+                };
+
+                if (origIdx !== -1) {
+                    MASTER_FACULTY_ROSTER[origIdx] = updatedFaculty;
+                } else {
+                    MASTER_FACULTY_ROSTER.push(updatedFaculty);
+                }
+
+                try {
+                    let customList = JSON.parse(localStorage.getItem('sjc_custom_faculty_list') || '[]');
+                    customList = customList.filter(f => !(f.name === editingFacultyOriginal.name && f.department === editingFacultyOriginal.department));
+                    customList.push(updatedFaculty);
+                    localStorage.setItem('sjc_custom_faculty_list', JSON.stringify(customList));
+                } catch(e) { console.error(e); }
+
+                if (window.db && window.addDoc && window.collection) {
+                    try {
+                        window.addDoc(window.collection(window.db, "custom_faculty"), updatedFaculty)
+                            .catch(e => console.error("Firestore sync error:", e));
+                    } catch(e) {}
+                }
+
+                editingFacultyOriginal = null;
+                showToast(`Updated ${name} successfully!`, 'success');
+            } else {
+                const newFaculty = {
+                    s_no: MASTER_FACULTY_ROSTER.length + 1,
+                    school: school,
+                    department: dept,
+                    name: name,
+                    designation: desig,
+                    email: email,
+                    shift: shift,
+                    category: 'Teaching Faculty',
+                    is_custom: true
+                };
+
+                const existingIdx = MASTER_FACULTY_ROSTER.findIndex(f => 
+                    f.name.toLowerCase() === name.toLowerCase() && f.department.toLowerCase() === dept.toLowerCase()
+                );
+
+                if (existingIdx !== -1) {
+                    MASTER_FACULTY_ROSTER[existingIdx] = { ...MASTER_FACULTY_ROSTER[existingIdx], ...newFaculty };
+                } else {
+                    MASTER_FACULTY_ROSTER.push(newFaculty);
+                }
+
+                try {
+                    let customList = JSON.parse(localStorage.getItem('sjc_custom_faculty_list') || '[]');
+                    const cIdx = customList.findIndex(f => f.name.toLowerCase() === name.toLowerCase() && f.department.toLowerCase() === dept.toLowerCase());
+                    if (cIdx !== -1) {
+                        customList[cIdx] = { ...customList[cIdx], ...newFaculty };
+                    } else {
+                        customList.push(newFaculty);
+                    }
+                    localStorage.setItem('sjc_custom_faculty_list', JSON.stringify(customList));
+
+                    let deletedList = JSON.parse(localStorage.getItem('sjc_deleted_faculty_list') || '[]');
+                    deletedList = deletedList.filter(f => !(f.name.toLowerCase() === name.toLowerCase() && f.department.toLowerCase() === dept.toLowerCase()));
+                    localStorage.setItem('sjc_deleted_faculty_list', JSON.stringify(deletedList));
+                } catch(e) { console.error(e); }
+
+                if (window.db && window.addDoc && window.collection) {
+                    try {
+                        window.addDoc(window.collection(window.db, "custom_faculty"), newFaculty)
+                            .catch(e => console.error("Firestore add error:", e));
+                    } catch(e) {}
+                }
+
+                showToast(`Added ${name} to Master Roster!`, 'success');
+            }
+
+            initDropdowns();
+
+            // Set filters to display the newly added / edited faculty member
+            document.getElementById('rosterSearch').value = '';
+            document.getElementById('rosterDeptSelect').value = dept;
+            document.getElementById('rosterShiftSelect').value = 'All';
+            setRosterFilterStatus('ALL');
 
             renderRosterTable();
             document.getElementById('editFacultyModal').classList.add('hidden');
-            showToast(`Added ${name} to Master Roster!`, 'success');
         }
 
         function showToast(message, type = 'success') {
@@ -2713,19 +2919,32 @@
     <!-- Add / Edit Faculty Modal -->
     <div id="editFacultyModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
-            <h3 class="font-bold text-lg text-slate-900 border-b pb-2">Manage Faculty Link</h3>
+            <h3 id="facModalTitle" class="font-bold text-lg text-slate-900 border-b pb-2">Manage Faculty Member</h3>
             <p class="text-xs text-slate-500 pb-2">Add or update faculty roster credentials below.</p>
-            <input type="text" id="facModalName" placeholder="Full Name" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+            <input type="text" id="facModalName" placeholder="Full Name (e.g. Dr. John Doe)" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none">
             <input type="email" id="facModalEmail" placeholder="Institutional Email" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none">
-            <select id="facModalDept" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white">
+            <select id="facModalDept" onchange="checkCustomDept(this.value)" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white">
                 <option value="">Select Department...</option>
             </select>
-            <select id="facModalDesig" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none bg-white">
-                <option value="Assistant Professor">Assistant Professor</option>
-                <option value="Associate Professor">Associate Professor</option>
-                <option value="Professor">Professor</option>
-                <option value="Head of Department">Head of Department</option>
-            </select>
+            <input type="text" id="facModalNewDept" placeholder="Enter New Department Name" class="w-full px-4 py-2 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none hidden">
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Designation</label>
+                    <select id="facModalDesig" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-amber-500 outline-none bg-white">
+                        <option value="Assistant Professor">Assistant Professor</option>
+                        <option value="Associate Professor">Associate Professor</option>
+                        <option value="Professor">Professor</option>
+                        <option value="Head of Department">Head of Department</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-500 mb-1">Shift</label>
+                    <select id="facModalShift" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs focus:ring-2 focus:ring-amber-500 outline-none bg-white">
+                        <option value="I">Shift I</option>
+                        <option value="II">Shift II</option>
+                    </select>
+                </div>
+            </div>
             <div class="flex justify-end space-x-2 pt-4">
                 <button onclick="document.getElementById('editFacultyModal').classList.add('hidden')" class="px-5 py-2.5 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-xl text-xs font-bold transition">Cancel</button>
                 <button onclick="saveFacultyRosterMember()" class="px-5 py-2.5 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold shadow-md transition">Save Faculty</button>

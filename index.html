@@ -31,7 +31,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC7FuA4XE3DYQevwoaSd7_G0G0Z7UPi2ms",
@@ -47,6 +47,38 @@
         window.db = db;
         window.addDoc = addDoc;
         window.collection = collection;
+        window.getDocs = getDocs;
+
+        window.loadFirebaseCustomFaculty = async function() {
+            try {
+                const snap = await getDocs(collection(db, "custom_faculty"));
+                let cloudFaculty = [];
+                snap.forEach(doc => cloudFaculty.push(doc.data()));
+                if (cloudFaculty.length > 0) {
+                    let localCustom = JSON.parse(localStorage.getItem('sjc_custom_faculty_list') || '[]');
+                    let updated = false;
+                    cloudFaculty.forEach(cf => {
+                        const exists = localCustom.some(f => 
+                            (f.name || '').trim().toLowerCase() === (cf.name || '').trim().toLowerCase() && 
+                            (f.department || '').trim().toLowerCase() === (cf.department || '').trim().toLowerCase()
+                        );
+                        if (!exists) {
+                            localCustom.push(cf);
+                            updated = true;
+                        }
+                    });
+                    if (updated) {
+                        localStorage.setItem('sjc_custom_faculty_list', JSON.stringify(localCustom));
+                    }
+                    if (window.syncCustomFacultyFromStorage) window.syncCustomFacultyFromStorage();
+                    if (typeof initDepartmentOptions === 'function') initDepartmentOptions();
+                }
+            } catch(e) {
+                console.warn("Could not sync custom faculty from cloud:", e);
+            }
+        };
+
+        window.loadFirebaseCustomFaculty();
     </script>
 
     <!-- FontAwesome & Google Fonts -->
@@ -127,7 +159,7 @@
     </style>
 
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v2"></script>
+    <script src="faculty_roster_data.js?v=20261008_v3"></script>
 </head>
 <body class="text-slate-800 py-8 px-4 sm:px-6 lg:px-8">
 
@@ -1005,7 +1037,7 @@
                         <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
                             <i class="fa-solid fa-pen-to-square text-indigo-600"></i> Section J: Open-ended Suggestions & Final Review
                         </h2>
-                        <p class="text-xs text-slate-500 mt-1">Course proposals for revision (J1) and additional recommendations (J2).</p>
+                        <p class="text-xs text-slate-500 mt-1">Course revisions (J1) and additional recommendations (J2).</p>
                     </div>
 
                     <!-- Courses to Revise (Section J1 Structured Input) -->
@@ -1015,10 +1047,10 @@
                                 <i class="fa-solid fa-table-list text-indigo-600"></i> J1. Identify the courses requiring revision
                             </label>
                             <button type="button" onclick="openRevisionModal()" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow transition flex items-center gap-1.5">
-                                <i class="fa-solid fa-plus"></i> Add Course Proposal
+                                <i class="fa-solid fa-plus"></i> Add Course
                             </button>
                         </div>
-                        <p class="text-xs text-slate-500">Add courses where changes in code, title, semester, nature of change, or syllabus content are proposed.</p>
+                        <p class="text-xs text-slate-500">Add courses where changes in code, title, semester, nature of change, or syllabus content are recommended.</p>
 
                         <!-- Table display -->
                         <div class="overflow-x-auto rounded-xl border border-slate-200 bg-white">
@@ -1034,7 +1066,7 @@
                                 </thead>
                                 <tbody id="revisionTableBody" class="divide-y divide-slate-100 text-slate-700 font-medium">
                                     <tr id="emptyRevisionRow">
-                                        <td colspan="5" class="p-4 text-center text-slate-400 italic">No course revision proposals added yet. Click "Add Course Proposal" above to add.</td>
+                                        <td colspan="5" class="p-4 text-center text-slate-400 italic">No courses added for revision yet. Click "Add Course" above to add.</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1100,13 +1132,13 @@
         </div>
     </div>
 
-    <!-- Course Revision Proposal Modal -->
+    <!-- Course Revision Modal -->
     <div id="revisionModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[100] flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl border border-slate-100">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div class="flex items-center space-x-2 text-indigo-900 font-bold text-base">
                     <i class="fa-solid fa-file-pen text-indigo-600"></i>
-                    <span>J1. Course Revision Proposal</span>
+                    <span>J1. Course Revision</span>
                 </div>
                 <button type="button" onclick="closeRevisionModal()" class="text-slate-400 hover:text-slate-600 p-1">
                     <i class="fa-solid fa-xmark text-lg"></i>
@@ -1152,7 +1184,7 @@
             <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
                 <button type="button" onclick="closeRevisionModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition">Cancel</button>
                 <button type="button" onclick="saveCourseRevision()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-check"></i> Save Proposal
+                    <i class="fa-solid fa-check"></i> Save Course
                 </button>
             </div>
         </div>
@@ -1664,13 +1696,19 @@
 
         function initDepartmentOptions() {
             const deptSelect = document.getElementById('deptSelect');
+            if (!deptSelect) return;
+            const currentVal = deptSelect.value;
             const depts = Array.from(new Set(MASTER_FACULTY_ROSTER.map(f => f.department))).filter(Boolean).sort();
+            deptSelect.innerHTML = '<option value="" disabled selected>-- Select your department --</option>';
             depts.forEach(d => {
                 const opt = document.createElement('option');
                 opt.value = d;
                 opt.innerText = d;
                 deptSelect.appendChild(opt);
             });
+            if (currentVal && depts.includes(currentVal)) {
+                deptSelect.value = currentVal;
+            }
         }
 
         function onDepartmentChange() {
@@ -1754,7 +1792,7 @@
             const reason = document.getElementById('modalCourseReason').value.trim();
 
             if (!title || !sem || !reason) {
-                alert('Please fill out all course proposal fields.');
+                alert('Please fill out all course revision fields.');
                 return;
             }
 
@@ -1775,7 +1813,7 @@
             if (courseRevisionsList.length === 0) {
                 tbody.innerHTML = `
                     <tr id="emptyRevisionRow">
-                        <td colspan="5" class="p-4 text-center text-slate-400 italic">No course revision proposals added yet. Click "Add Course Proposal" above to add.</td>
+                        <td colspan="5" class="p-4 text-center text-slate-400 italic">No courses added for revision yet. Click "Add Course" above to add.</td>
                     </tr>
                 `;
                 return;

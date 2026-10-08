@@ -284,7 +284,7 @@
                             <p class="text-xs text-slate-500">Specific course codes & requested syllabus revisions</p>
                         </div>
                     </div>
-                    <span id="revisionBadge" class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200">0 Proposals</span>
+                    <span id="revisionBadge" class="px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200">0 Revisions</span>
                 </div>
                 <div id="revisionListContainer" class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
                     <!-- Populated dynamically -->
@@ -534,7 +534,7 @@
 
             // 9. Populate Course Revision Container
             const revisionContainer = document.getElementById('revisionListContainer');
-            document.getElementById('revisionBadge').innerText = `${data.course_revision_list.length} Proposals`;
+            document.getElementById('revisionBadge').innerText = `${data.course_revision_list.length} Revisions`;
             if (data.course_revision_list.length === 0) {
                 revisionContainer.innerHTML = '<div class="text-xs text-slate-400 p-4 text-center">No specific course redesigns submitted for current filter.</div>';
             } else {

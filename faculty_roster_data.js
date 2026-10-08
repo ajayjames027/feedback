@@ -3487,3 +3487,47 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     }
 ];
+
+// Auto-sync custom added and deleted faculty from localStorage
+(function initFacultyStorageSync() {
+    if (typeof window === 'undefined') return;
+
+    window.syncCustomFacultyFromStorage = function() {
+        try {
+            const custom = JSON.parse(localStorage.getItem('sjc_custom_faculty_list') || '[]');
+            const deleted = JSON.parse(localStorage.getItem('sjc_deleted_faculty_list') || '[]');
+
+            // Remove locally deleted faculty
+            if (Array.isArray(deleted) && deleted.length > 0) {
+                deleted.forEach(del => {
+                    const idx = MASTER_FACULTY_ROSTER.findIndex(f => 
+                        (f.name || '').trim().toLowerCase() === (del.name || '').trim().toLowerCase() && 
+                        (f.department || '').trim().toLowerCase() === (del.department || '').trim().toLowerCase()
+                    );
+                    if (idx !== -1) {
+                        MASTER_FACULTY_ROSTER.splice(idx, 1);
+                    }
+                });
+            }
+
+            // Append or update custom faculty
+            if (Array.isArray(custom)) {
+                custom.forEach(cf => {
+                    const idx = MASTER_FACULTY_ROSTER.findIndex(f => 
+                        (f.name || '').trim().toLowerCase() === (cf.name || '').trim().toLowerCase() && 
+                        (f.department || '').trim().toLowerCase() === (cf.department || '').trim().toLowerCase()
+                    );
+                    if (idx !== -1) {
+                        MASTER_FACULTY_ROSTER[idx] = { ...MASTER_FACULTY_ROSTER[idx], ...cf };
+                    } else {
+                        MASTER_FACULTY_ROSTER.push(cf);
+                    }
+                });
+            }
+        } catch (e) {
+            console.warn('Storage sync error:', e);
+        }
+    };
+
+    window.syncCustomFacultyFromStorage();
+})();
