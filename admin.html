@@ -82,7 +82,7 @@
 <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js"></script>
+    <script src="faculty_roster_data.js?v=20261008"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -599,6 +599,61 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ==================== SECTION & QUESTION-WISE IN-DEPTH ANALYTICS ==================== -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200 space-y-6" id="sectionWiseAnalyticsBlock">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+                    <div>
+                        <div class="flex items-center space-x-2 text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">
+                            <i class="fa-solid fa-list-check"></i>
+                            <span>Comprehensive Evaluation Matrix</span>
+                        </div>
+                        <h2 class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">
+                            Section & Question-Wise Detailed Analytics
+                        </h2>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Itemized question breakdown, Likert rating distributions, attainment percentages, and feedback analysis across all sections.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="flex items-center space-x-2 bg-slate-50 px-3 py-1.5 rounded-2xl border border-slate-200">
+                            <label for="sectionFilterSelect" class="text-xs font-bold text-slate-600">Section:</label>
+                            <select id="sectionFilterSelect" onchange="filterSectionWiseAnalytics()" class="bg-white border border-slate-300 rounded-xl px-3 py-1 text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-200">
+                                <option value="ALL">All Sections (Complete Evaluation)</option>
+                                <option value="SEC_B">Section B: Overall Effectiveness (12 Qs)</option>
+                                <option value="SEC_C">Section C: Outcome-Based Education (8 Qs)</option>
+                                <option value="SEC_D">Section D: Curriculum Structure Balance (8 Items)</option>
+                                <option value="SEC_E">Section E: NEP Components & Learning Paths</option>
+                                <option value="SEC_F">Section F: Emerging Trends & Future Skills</option>
+                                <option value="SEC_G">Section G: NSQF Alignment</option>
+                                <option value="SEC_H">Section H: Stakeholder Feedback Incorporation</option>
+                                <option value="SEC_I">Section I: Indian Knowledge Systems (IKS)</option>
+                                <option value="SEC_J">Section J: Overlap Audit & Course Revisions</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Quick Navigation Pills -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar text-xs border-b border-slate-100">
+                    <button type="button" onclick="setSectionFilter('ALL')" id="sec-pill-ALL" class="sec-filter-pill px-3 py-1.5 rounded-xl font-bold bg-indigo-600 text-white shadow-sm whitespace-nowrap transition">All Sections</button>
+                    <button type="button" onclick="setSectionFilter('SEC_B')" id="sec-pill-SEC_B" class="sec-filter-pill px-3 py-1.5 rounded-xl font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">Sec B: Effectiveness</button>
+                    <button type="button" onclick="setSectionFilter('SEC_C')" id="sec-pill-SEC_C" class="sec-filter-pill px-3 py-1.5 rounded-xl font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">Sec C: OBE</button>
+                    <button type="button" onclick="setSectionFilter('SEC_D')" id="sec-pill-SEC_D" class="sec-filter-pill px-3 py-1.5 rounded-xl font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">Sec D: Structure</button>
+                    <button type="button" onclick="setSectionFilter('SEC_E')" id="sec-pill-SEC_E" class="sec-filter-pill px-3 py-1.5 rounded-xl font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">Sec E: NEP</button>
+                    <button type="button" onclick="setSectionFilter('SEC_F')" id="sec-pill-SEC_F" class="sec-filter-pill px-3 py-1.5 rounded-xl font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">Sec F: Emerging Skills</button>
+                    <button type="button" onclick="setSectionFilter('SEC_G')" id="sec-pill-SEC_G" class="sec-filter-pill px-3 py-1.5 rounded-xl font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">Sec G: NSQF</button>
+                    <button type="button" onclick="setSectionFilter('SEC_H')" id="sec-pill-SEC_H" class="sec-filter-pill px-3 py-1.5 rounded-xl font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">Sec H: Stakeholders</button>
+                    <button type="button" onclick="setSectionFilter('SEC_I')" id="sec-pill-SEC_I" class="sec-filter-pill px-3 py-1.5 rounded-xl font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">Sec I: IKS</button>
+                    <button type="button" onclick="setSectionFilter('SEC_J')" id="sec-pill-SEC_J" class="sec-filter-pill px-3 py-1.5 rounded-xl font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition">Sec J: Revisions & Overlap</button>
+                </div>
+
+                <!-- Dynamic Container for Sections -->
+                <div id="sectionWiseAnalyticsContainer" class="space-y-8">
+                    <!-- Populated dynamically via renderQuestionAndSectionWiseAnalytics -->
+                </div>
+            </div>
         </section>
 
         <!-- ==================== TAB 3: RESPONSES RECORD EXPLORER ==================== -->
@@ -1109,6 +1164,7 @@
                 document.getElementById('kpiAnaObe').innerText = "0%";
                 document.getElementById('kpiAnaMulti').innerText = "0 / 5";
                 document.getElementById('kpiAnaIks').innerText = "0 / 5";
+                renderQuestionAndSectionWiseAnalytics([]);
                 return;
             }
 
@@ -1284,6 +1340,590 @@
                     `).join('');
                 }
             }
+
+            // 7. Render Detailed Section & Question-Wise Analytics
+            renderQuestionAndSectionWiseAnalytics(responses);
+        }
+
+        let latestAnalyticsResponses = [];
+        let activeSectionFilter = 'ALL';
+
+        function setSectionFilter(secId) {
+            activeSectionFilter = secId;
+            const selectEl = document.getElementById('sectionFilterSelect');
+            if (selectEl) selectEl.value = secId;
+
+            // Update pills
+            document.querySelectorAll('.sec-filter-pill').forEach(btn => {
+                btn.className = "sec-filter-pill px-3 py-1.5 rounded-xl font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200 whitespace-nowrap transition";
+            });
+            const activeBtn = document.getElementById(`sec-pill-${secId}`);
+            if (activeBtn) {
+                activeBtn.className = "sec-filter-pill px-3 py-1.5 rounded-xl font-bold bg-indigo-600 text-white shadow-sm whitespace-nowrap transition";
+            }
+
+            // Filter visibility of section cards
+            const sectionCards = document.querySelectorAll('.sec-card-block');
+            sectionCards.forEach(card => {
+                if (secId === 'ALL' || card.dataset.section === secId) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        function filterSectionWiseAnalytics() {
+            const val = document.getElementById('sectionFilterSelect')?.value || 'ALL';
+            setSectionFilter(val);
+        }
+
+        function renderQuestionAndSectionWiseAnalytics(responses) {
+            latestAnalyticsResponses = responses || [];
+            const container = document.getElementById('sectionWiseAnalyticsContainer');
+            if (!container) return;
+
+            if (latestAnalyticsResponses.length === 0) {
+                container.innerHTML = `
+                    <div class="p-12 text-center rounded-2xl border border-dashed border-slate-300 bg-slate-50/50 space-y-3">
+                        <i class="fa-solid fa-chart-pie text-3xl text-slate-400"></i>
+                        <h4 class="font-bold text-slate-700 text-sm">No Response Records Available</h4>
+                        <p class="text-xs text-slate-500 max-w-md mx-auto">No faculty feedback records match the current department or course level filter. Switch filters above to inspect responses.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const totalN = latestAnalyticsResponses.length;
+
+            const parseNum = v => {
+                if (v === null || v === undefined || v === '') return null;
+                const n = parseInt(String(v)[0], 10);
+                return isNaN(n) || n < 1 || n > 5 ? null : n;
+            };
+
+            // Helper to generate a Likert Question Card
+            const buildLikertCard = (qIdx, qTitle, responsesMapKey, itemName) => {
+                const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+                let sum = 0;
+                let validCount = 0;
+
+                latestAnalyticsResponses.forEach(r => {
+                    const rawVal = r[responsesMapKey]?.[itemName];
+                    const num = parseNum(rawVal);
+                    if (num !== null && counts[num] !== undefined) {
+                        counts[num]++;
+                        sum += num;
+                        validCount++;
+                    }
+                });
+
+                const mean = validCount > 0 ? (sum / validCount) : 0;
+                const attainmentPct = Math.round((mean / 5.0) * 100);
+
+                const pct5 = validCount > 0 ? Math.round((counts[5] / validCount) * 100) : 0;
+                const pct4 = validCount > 0 ? Math.round((counts[4] / validCount) * 100) : 0;
+                const pct3 = validCount > 0 ? Math.round((counts[3] / validCount) * 100) : 0;
+                const pct2 = validCount > 0 ? Math.round((counts[2] / validCount) * 100) : 0;
+                const pct1 = validCount > 0 ? Math.round((counts[1] / validCount) * 100) : 0;
+
+                const scoreColor = mean >= 4.0 ? 'text-emerald-700 bg-emerald-50 border-emerald-200' :
+                                   mean >= 3.0 ? 'text-blue-700 bg-blue-50 border-blue-200' :
+                                   'text-amber-700 bg-amber-50 border-amber-200';
+
+                return `
+                    <div class="p-4 md:p-5 rounded-2xl border border-slate-200/90 bg-white hover:border-slate-300 transition space-y-3 shadow-xs">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div class="flex items-start gap-3">
+                                <span class="px-2 py-0.5 rounded-lg text-xs font-black bg-slate-100 text-slate-700 border border-slate-200/60 mt-0.5">Q${qIdx}</span>
+                                <span class="text-sm font-bold text-slate-900 leading-snug">${qTitle}</span>
+                            </div>
+                            <div class="flex items-center gap-2 self-end sm:self-auto shrink-0">
+                                <span class="px-2.5 py-1 rounded-xl text-xs font-extrabold border ${scoreColor}">
+                                    ${mean.toFixed(2)} / 5.0
+                                </span>
+                                <span class="px-2.5 py-1 rounded-xl text-xs font-bold bg-slate-100 text-slate-700">
+                                    ${attainmentPct}% Attainment
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- 5-segment Visual Stacked Bar -->
+                        <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden flex shadow-inner">
+                            <div class="bg-emerald-500 h-full transition-all" style="width: ${pct5}%" title="5 (Strongly Agree): ${counts[5]} (${pct5}%)"></div>
+                            <div class="bg-blue-500 h-full transition-all" style="width: ${pct4}%" title="4 (Agree): ${counts[4]} (${pct4}%)"></div>
+                            <div class="bg-amber-400 h-full transition-all" style="width: ${pct3}%" title="3 (Neutral): ${counts[3]} (${pct3}%)"></div>
+                            <div class="bg-orange-400 h-full transition-all" style="width: ${pct2}%" title="2 (Disagree): ${counts[2]} (${pct2}%)"></div>
+                            <div class="bg-rose-500 h-full transition-all" style="width: ${pct1}%" title="1 (Strongly Disagree): ${counts[1]} (${pct1}%)"></div>
+                        </div>
+
+                        <!-- Granular Breakdown Labels -->
+                        <div class="flex flex-wrap items-center justify-between gap-1.5 text-[11px] text-slate-500 pt-1 border-t border-slate-100">
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                <span><strong>5 SA:</strong> ${counts[5]} (${pct5}%)</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                <span><strong>4 A:</strong> ${counts[4]} (${pct4}%)</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                                <span><strong>3 N:</strong> ${counts[3]} (${pct3}%)</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-orange-400"></span>
+                                <span><strong>2 D:</strong> ${counts[2]} (${pct2}%)</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                                <span><strong>1 SD:</strong> ${counts[1]} (${pct1}%)</span>
+                            </div>
+                            <div class="text-slate-400 ml-auto font-mono text-[10px]">
+                                n=${validCount}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            };
+
+            let html = '';
+
+            // -------------------- SECTION B -------------------- //
+            const effValidScores = [];
+            effItems.forEach(item => {
+                latestAnalyticsResponses.forEach(r => {
+                    const n = parseNum(r.overall_effectiveness?.[item]);
+                    if (n !== null) effValidScores.push(n);
+                });
+            });
+            const secBMean = effValidScores.length ? (effValidScores.reduce((a,b)=>a+b,0)/effValidScores.length) : 0;
+            const secBPct = Math.round((secBMean / 5.0) * 100);
+
+            html += `
+                <div class="sec-card-block rounded-3xl border border-slate-200 bg-slate-50/60 p-5 md:p-7 space-y-5" data-section="SEC_B">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
+                        <div>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-100 text-indigo-800">Section B</span>
+                            <h3 class="text-lg font-black text-slate-900 mt-1">Overall Effectiveness of Current Curriculum</h3>
+                            <p class="text-xs text-slate-500">12 Core Dimensions evaluated on 5-point Likert Scale</p>
+                        </div>
+                        <div class="flex items-center gap-3 self-start sm:self-auto bg-white px-4 py-2 rounded-2xl border border-slate-200 shadow-xs">
+                            <div class="text-right">
+                                <div class="text-xs font-semibold text-slate-500">Section Aggregate</div>
+                                <div class="text-base font-black text-indigo-600">${secBMean.toFixed(2)} / 5.0 (${secBPct}%)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3.5">
+                        ${effItems.map((item, idx) => buildLikertCard(idx + 1, item, 'overall_effectiveness', item)).join('')}
+                    </div>
+                </div>
+            `;
+
+            // -------------------- SECTION C -------------------- //
+            const obeValidScores = [];
+            obeItems.forEach(item => {
+                latestAnalyticsResponses.forEach(r => {
+                    const n = parseNum(r.obe_evaluation?.[item]);
+                    if (n !== null) obeValidScores.push(n);
+                });
+            });
+            const secCMean = obeValidScores.length ? (obeValidScores.reduce((a,b)=>a+b,0)/obeValidScores.length) : 0;
+            const secCPct = Math.round((secCMean / 5.0) * 100);
+
+            html += `
+                <div class="sec-card-block rounded-3xl border border-slate-200 bg-slate-50/60 p-5 md:p-7 space-y-5" data-section="SEC_C">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
+                        <div>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-100 text-indigo-800">Section C</span>
+                            <h3 class="text-lg font-black text-slate-900 mt-1">Outcome-Based Education (OBE) Implementation</h3>
+                            <p class="text-xs text-slate-500">8 Measurable PO-PSO-CO Alignment Metrics</p>
+                        </div>
+                        <div class="flex items-center gap-3 self-start sm:self-auto bg-white px-4 py-2 rounded-2xl border border-slate-200 shadow-xs">
+                            <div class="text-right">
+                                <div class="text-xs font-semibold text-slate-500">OBE Attainment</div>
+                                <div class="text-base font-black text-indigo-600">${secCMean.toFixed(2)} / 5.0 (${secCPct}%)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3.5">
+                        ${obeItems.map((item, idx) => buildLikertCard(idx + 1, item, 'obe_evaluation', item)).join('')}
+                    </div>
+                </div>
+            `;
+
+            // -------------------- SECTION D -------------------- //
+            const parseAdequacy = val => {
+                if (!val) return 'Adequate';
+                const s = String(val).toLowerCase();
+                if (s.includes('excess') || s.startsWith('4')) return 'Excess';
+                if (s.includes('inadequate') || s.startsWith('2')) return 'Inadequate';
+                if (s.includes('absent') || s.startsWith('1')) return 'Absent';
+                return 'Adequate';
+            };
+
+            html += `
+                <div class="sec-card-block rounded-3xl border border-slate-200 bg-slate-50/60 p-5 md:p-7 space-y-5" data-section="SEC_D">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
+                        <div>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800">Section D</span>
+                            <h3 class="text-lg font-black text-slate-900 mt-1">Curriculum Structure Balance & Credit Allocation</h3>
+                            <p class="text-xs text-slate-500">Adequacy breakdown across 8 Curricular Components</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        ${structItems.map((item, idx) => {
+                            const counts = { 'Adequate': 0, 'Inadequate': 0, 'Excess': 0, 'Absent': 0 };
+                            let vCount = 0;
+                            latestAnalyticsResponses.forEach(r => {
+                                const val = parseAdequacy(r.curriculum_structure?.[item]);
+                                if (counts[val] !== undefined) {
+                                    counts[val]++;
+                                    vCount++;
+                                }
+                            });
+                            const pAdequate = vCount ? Math.round((counts['Adequate'] / vCount) * 100) : 0;
+                            const pInadequate = vCount ? Math.round((counts['Inadequate'] / vCount) * 100) : 0;
+                            const pExcess = vCount ? Math.round((counts['Excess'] / vCount) * 100) : 0;
+                            const pAbsent = vCount ? Math.round((counts['Absent'] / vCount) * 100) : 0;
+
+                            return `
+                                <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-2.5 shadow-xs">
+                                    <div class="flex items-center justify-between text-xs font-bold text-slate-800">
+                                        <span>D${idx+1}. ${item}</span>
+                                        <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200 text-[11px]">${pAdequate}% Adequate</span>
+                                    </div>
+                                    <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden flex">
+                                        <div class="bg-emerald-500 h-full" style="width: ${pAdequate}%" title="Adequate: ${counts['Adequate']} (${pAdequate}%)"></div>
+                                        <div class="bg-amber-400 h-full" style="width: ${pInadequate}%" title="Inadequate: ${counts['Inadequate']} (${pInadequate}%)"></div>
+                                        <div class="bg-blue-400 h-full" style="width: ${pExcess}%" title="Excess: ${counts['Excess']} (${pExcess}%)"></div>
+                                        <div class="bg-rose-400 h-full" style="width: ${pAbsent}%" title="Absent: ${counts['Absent']} (${pAbsent}%)"></div>
+                                    </div>
+                                    <div class="flex items-center justify-between text-[11px] text-slate-500 font-medium">
+                                        <span class="text-emerald-600">Adequate: ${counts['Adequate']}</span>
+                                        <span class="text-amber-600">Inadequate: ${counts['Inadequate']}</span>
+                                        <span class="text-blue-600">Excess: ${counts['Excess']}</span>
+                                        <span class="text-rose-500">Absent: ${counts['Absent']}</span>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+
+            // -------------------- SECTION E -------------------- //
+            const multiRatings = latestAnalyticsResponses.map(r => parseNum(r.multidisciplinary_rating)).filter(v => v !== null);
+            const multiAvg = multiRatings.length ? (multiRatings.reduce((a,b)=>a+b,0)/multiRatings.length).toFixed(2) : '0.00';
+
+            const learningPathsCount = {};
+            latestAnalyticsResponses.forEach(r => {
+                const arr = Array.isArray(r.flexible_learning_paths) ? r.flexible_learning_paths : [];
+                arr.forEach(p => { learningPathsCount[p] = (learningPathsCount[p] || 0) + 1; });
+            });
+
+            html += `
+                <div class="sec-card-block rounded-3xl border border-slate-200 bg-slate-50/60 p-5 md:p-7 space-y-5" data-section="SEC_E">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
+                        <div>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-100 text-purple-800">Section E</span>
+                            <h3 class="text-lg font-black text-slate-900 mt-1">NEP Components & Learning Paths</h3>
+                            <p class="text-xs text-slate-500">Multidisciplinary Flexibility & Choice-Based Structures</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-800">Multidisciplinary Component Rating</span>
+                                <span class="px-2.5 py-1 rounded-xl text-xs font-black bg-purple-50 text-purple-700 border border-purple-200">${multiAvg} / 5.0</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                                <div class="bg-purple-600 h-full rounded-full" style="width: ${(multiAvg/5)*100}%"></div>
+                            </div>
+                            <p class="text-[11px] text-slate-500">${multiRatings.length} faculty responses evaluated for multidisciplinary curriculum breadth.</p>
+                        </div>
+
+                        <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
+                            <span class="text-xs font-bold text-slate-800">Flexible Learning Pathways Active</span>
+                            <div class="space-y-1.5 max-h-48 overflow-y-auto">
+                                ${Object.keys(learningPathsCount).length === 0 ? '<p class="text-xs text-slate-400">None selected</p>' : 
+                                    Object.entries(learningPathsCount).map(([path, cnt]) => `
+                                        <div class="flex items-center justify-between text-xs py-1 border-b border-slate-100">
+                                            <span class="text-slate-700 truncate max-w-[220px]" title="${path}">${path}</span>
+                                            <span class="font-bold text-purple-700 bg-purple-50 px-2 py-0.5 rounded text-[11px]">${cnt} (${Math.round((cnt/totalN)*100)}%)</span>
+                                        </div>
+                                    `).join('')
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // -------------------- SECTION F -------------------- //
+            const emCounts = {};
+            emergingPool.forEach(e => emCounts[e] = 0);
+            latestAnalyticsResponses.forEach(r => {
+                const arr = Array.isArray(r.emerging_areas) ? r.emerging_areas : [];
+                arr.forEach(a => { if (emCounts[a] !== undefined) emCounts[a]++; else emCounts[a] = 1; });
+            });
+            const sortedEmerging = Object.entries(emCounts).sort((a,b) => b[1] - a[1]);
+
+            const writeInEmerging = latestAnalyticsResponses.map(r => r.emerging_other).filter(Boolean);
+
+            html += `
+                <div class="sec-card-block rounded-3xl border border-slate-200 bg-slate-50/60 p-5 md:p-7 space-y-5" data-section="SEC_F">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
+                        <div>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-100 text-rose-800">Section F</span>
+                            <h3 class="text-lg font-black text-slate-900 mt-1">Emerging Trends, Future Skills and Industry Readiness</h3>
+                            <p class="text-xs text-slate-500">Demanded specialized disciplines and frontier skill areas</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
+                            <span class="text-xs font-bold text-slate-800">Frontier Skill Domain Endorsements</span>
+                            <div class="space-y-2">
+                                ${sortedEmerging.slice(0, 7).map(([domain, cnt]) => {
+                                    const pct = totalN ? Math.round((cnt / totalN) * 100) : 0;
+                                    return `
+                                        <div class="space-y-1">
+                                            <div class="flex items-center justify-between text-xs">
+                                                <span class="font-medium text-slate-700 truncate max-w-[240px]" title="${domain}">${domain}</span>
+                                                <span class="font-bold text-rose-700">${cnt} (${pct}%)</span>
+                                            </div>
+                                            <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                                                <div class="bg-rose-500 h-full rounded-full" style="width: ${pct}%"></div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
+                            <span class="text-xs font-bold text-slate-800">Other Write-in Emerging Specializations Logged</span>
+                            <div class="space-y-1.5 max-h-60 overflow-y-auto">
+                                ${writeInEmerging.length === 0 ? '<p class="text-xs text-slate-400">No write-in emerging subjects specified.</p>' :
+                                    writeInEmerging.map(s => `
+                                        <div class="p-2 rounded-xl bg-slate-50 border border-slate-200/70 text-xs text-slate-700 font-medium">
+                                            ${s}
+                                        </div>
+                                    `).join('')
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // -------------------- SECTION G -------------------- //
+            const nsqfCounts = {};
+            latestAnalyticsResponses.forEach(r => {
+                if (r.nsqf_alignment) {
+                    nsqfCounts[r.nsqf_alignment] = (nsqfCounts[r.nsqf_alignment] || 0) + 1;
+                }
+            });
+
+            html += `
+                <div class="sec-card-block rounded-3xl border border-slate-200 bg-slate-50/60 p-5 md:p-7 space-y-5" data-section="SEC_G">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
+                        <div>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-teal-100 text-teal-800">Section G</span>
+                            <h3 class="text-lg font-black text-slate-900 mt-1">National Skills Qualifications Framework (NSQF) Alignment</h3>
+                            <p class="text-xs text-slate-500">Employability and vocational competence alignment</p>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            ${Object.keys(nsqfCounts).length === 0 ? '<p class="text-xs text-slate-400 col-span-4">No NSQF alignment responses logged.</p>' :
+                                Object.entries(nsqfCounts).map(([lvl, cnt]) => `
+                                    <div class="p-3 rounded-xl border border-slate-200 bg-slate-50 text-center space-y-1">
+                                        <div class="text-lg font-black text-teal-700">${cnt}</div>
+                                        <div class="text-xs font-bold text-slate-700 truncate" title="${lvl}">${lvl}</div>
+                                        <div class="text-[10px] text-slate-500">${Math.round((cnt/totalN)*100)}% of faculty</div>
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // -------------------- SECTION H -------------------- //
+            const stkCounts = {};
+            latestAnalyticsResponses.forEach(r => {
+                const arr = Array.isArray(r.stakeholder_sources) ? r.stakeholder_sources : [];
+                arr.forEach(s => { stkCounts[s] = (stkCounts[s] || 0) + 1; });
+            });
+
+            html += `
+                <div class="sec-card-block rounded-3xl border border-slate-200 bg-slate-50/60 p-5 md:p-7 space-y-5" data-section="SEC_H">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
+                        <div>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-sky-100 text-sky-800">Section H</span>
+                            <h3 class="text-lg font-black text-slate-900 mt-1">Stakeholder Feedback Incorporation</h3>
+                            <p class="text-xs text-slate-500">Inputs incorporated from Industry, Alumni, Peers & Students</p>
+                        </div>
+                    </div>
+                    <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            ${Object.keys(stkCounts).length === 0 ? '<p class="text-xs text-slate-400 col-span-3">No stakeholder sources recorded.</p>' :
+                                Object.entries(stkCounts).map(([src, cnt]) => `
+                                    <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-xs font-bold text-slate-800">${src}</span>
+                                            <span class="font-black text-sky-700 text-sm">${cnt}</span>
+                                        </div>
+                                        <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                                            <div class="bg-sky-500 h-full rounded-full" style="width: ${(cnt/totalN)*100}%"></div>
+                                        </div>
+                                        <div class="text-[10px] text-slate-500">${Math.round((cnt/totalN)*100)}% coverage</div>
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // -------------------- SECTION I -------------------- //
+            const iksRatings = latestAnalyticsResponses.map(r => parseNum(r.iks_effectiveness)).filter(v => v !== null);
+            const iksAvg = iksRatings.length ? (iksRatings.reduce((a,b)=>a+b,0)/iksRatings.length).toFixed(2) : '0.00';
+
+            const iksModesCount = {};
+            latestAnalyticsResponses.forEach(r => {
+                const arr = Array.isArray(r.iks_integration_modes) ? r.iks_integration_modes : [];
+                arr.forEach(m => { iksModesCount[m] = (iksModesCount[m] || 0) + 1; });
+            });
+
+            html += `
+                <div class="sec-card-block rounded-3xl border border-slate-200 bg-slate-50/60 p-5 md:p-7 space-y-5" data-section="SEC_I">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
+                        <div>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800">Section I</span>
+                            <h3 class="text-lg font-black text-slate-900 mt-1">Indian Knowledge Systems (IKS)</h3>
+                            <p class="text-xs text-slate-500">Integration modalities and effectiveness rating</p>
+                        </div>
+                        <div class="flex items-center gap-3 self-start sm:self-auto bg-white px-4 py-2 rounded-2xl border border-slate-200 shadow-xs">
+                            <div class="text-right">
+                                <div class="text-xs font-semibold text-slate-500">IKS Rating</div>
+                                <div class="text-base font-black text-emerald-600">${iksAvg} / 5.0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
+                            <span class="text-xs font-bold text-slate-800">Preferred IKS Integration Modes</span>
+                            <div class="space-y-1.5">
+                                ${Object.keys(iksModesCount).length === 0 ? '<p class="text-xs text-slate-400">No integration modes checked.</p>' :
+                                    Object.entries(iksModesCount).map(([mode, cnt]) => `
+                                        <div class="flex items-center justify-between text-xs py-1 border-b border-slate-100">
+                                            <span class="text-slate-700 truncate max-w-[220px]" title="${mode}">${mode}</span>
+                                            <span class="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[11px]">${cnt} (${Math.round((cnt/totalN)*100)}%)</span>
+                                        </div>
+                                    `).join('')
+                                }
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
+                            <span class="text-xs font-bold text-slate-800">IKS Implementation Suggestions</span>
+                            <div class="space-y-1.5 max-h-48 overflow-y-auto">
+                                ${latestAnalyticsResponses.map(r => r.iks_other).filter(Boolean).length === 0 ?
+                                    '<p class="text-xs text-slate-400">No write-in IKS feedback provided.</p>' :
+                                    latestAnalyticsResponses.map(r => r.iks_other).filter(Boolean).map(txt => `
+                                        <div class="p-2 rounded-xl bg-slate-50 border border-slate-200/70 text-xs text-slate-700 font-medium">
+                                            ${txt}
+                                        </div>
+                                    `).join('')
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // -------------------- SECTION J -------------------- //
+            const revisionsAll = [];
+            latestAnalyticsResponses.forEach(r => {
+                if (Array.isArray(r.course_revisions)) {
+                    r.course_revisions.forEach(rev => {
+                        revisionsAll.push({ ...rev, faculty: r.faculty_name, dept: r.department });
+                    });
+                }
+            });
+
+            const genFeedback = latestAnalyticsResponses.map(r => ({ text: r.other_recommendations || r.general_feedback, faculty: r.faculty_name, dept: r.department })).filter(f => f.text && f.text.trim().length > 0);
+
+            html += `
+                <div class="sec-card-block rounded-3xl border border-slate-200 bg-slate-50/60 p-5 md:p-7 space-y-5" data-section="SEC_J">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
+                        <div>
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-rose-100 text-rose-800">Section J</span>
+                            <h3 class="text-lg font-black text-slate-900 mt-1">Proposed Course Revisions & General Recommendations</h3>
+                            <p class="text-xs text-slate-500">${revisionsAll.length} courses marked for revision, ${genFeedback.length} strategic recommendations</p>
+                        </div>
+                    </div>
+
+                    <!-- Course Revisions Table -->
+                    <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-slate-800">Structured Course Revisions Table</span>
+                            <span class="text-xs text-slate-500">${revisionsAll.length} courses</span>
+                        </div>
+                        ${revisionsAll.length === 0 ? '<p class="text-xs text-slate-400 py-3">No specific course revisions requested in this dataset.</p>' : `
+                            <div class="overflow-x-auto max-h-64 overflow-y-auto">
+                                <table class="w-full text-left text-xs">
+                                    <thead>
+                                        <tr class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                                            <th class="p-2">Dept</th>
+                                            <th class="p-2">Course</th>
+                                            <th class="p-2">Sem</th>
+                                            <th class="p-2">Proposed Change</th>
+                                            <th class="p-2">Academic Rationale</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${revisionsAll.map(rev => `
+                                            <tr class="hover:bg-slate-50/60">
+                                                <td class="p-2 font-semibold text-slate-900 whitespace-nowrap">${rev.dept || '-'}</td>
+                                                <td class="p-2 font-bold text-indigo-700 whitespace-nowrap">${rev.title || rev.code || '-'}</td>
+                                                <td class="p-2 text-slate-500 whitespace-nowrap">${rev.sem || '-'}</td>
+                                                <td class="p-2 text-slate-800">${rev.change || '-'}</td>
+                                                <td class="p-2 text-slate-600">${rev.reason || '-'}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        `}
+                    </div>
+
+                    <!-- General Suggestions -->
+                    <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-3">
+                        <span class="text-xs font-bold text-slate-800">Open-ended Strategic Recommendations</span>
+                        <div class="space-y-2 max-h-60 overflow-y-auto">
+                            ${genFeedback.length === 0 ? '<p class="text-xs text-slate-400">No open-ended comments logged.</p>' :
+                                genFeedback.map(f => `
+                                    <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
+                                        <div class="flex items-center justify-between text-[11px] font-bold text-slate-800">
+                                            <span>${f.dept || 'Department'} • ${f.faculty || 'Faculty Member'}</span>
+                                        </div>
+                                        <p class="text-xs text-slate-700 leading-relaxed font-medium">${f.text}</p>
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+
+            // Apply active section filter
+            setSectionFilter(activeSectionFilter);
         }
 
         // Responses Explorer Table

@@ -127,7 +127,7 @@
     </style>
 
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js"></script>
+    <script src="faculty_roster_data.js?v=20261008"></script>
 </head>
 <body class="text-slate-800 py-8 px-4 sm:px-6 lg:px-8">
 
@@ -1129,7 +1129,7 @@
             const selectEl = document.getElementById('facultyNameSelect');
             document.getElementById('facultyMetaBadge').classList.add('hidden');
             selectEl.innerHTML = '<option value="" disabled selected>-- Select your name --</option>';
-            const facultyList = MASTER_FACULTY_ROSTER.filter(f => f.department === dept).sort((a, b) => a.name.localeCompare(b.name));
+            const facultyList = MASTER_FACULTY_ROSTER.filter(f => f.department === dept);
             facultyList.forEach(f => {
                 const opt = document.createElement('option');
                 opt.value = f.name;

@@ -205,9 +205,9 @@ def get_faculty_by_dept(department=None):
     conn = get_db_connection()
     cursor = conn.cursor()
     if department and department != "All":
-        rows = cursor.execute("SELECT * FROM faculty_roster WHERE department = ? ORDER BY name ASC", (department,)).fetchall()
+        rows = cursor.execute("SELECT * FROM faculty_roster WHERE department = ? ORDER BY s_no ASC, id ASC", (department,)).fetchall()
     else:
-        rows = cursor.execute("SELECT * FROM faculty_roster ORDER BY department ASC, name ASC").fetchall()
+        rows = cursor.execute("SELECT * FROM faculty_roster ORDER BY s_no ASC, id ASC").fetchall()
     conn.close()
     return [dict(r) for r in rows]
 
@@ -265,7 +265,7 @@ def get_faculty_tracking(department=None, status=None, search=None, shift=None):
         sql += " AND (LOWER(f.name) LIKE ? OR LOWER(f.department) LIKE ? OR LOWER(f.email) LIKE ?)"
         params.extend([search_param, search_param, search_param])
         
-    sql += " ORDER BY f.department ASC, f.name ASC"
+    sql += " ORDER BY f.s_no ASC, f.id ASC"
     
     rows = cursor.execute(sql, params).fetchall()
     roster_list = [dict(r) for r in rows]
