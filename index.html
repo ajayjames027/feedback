@@ -197,7 +197,7 @@
     </style>
 
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v6"></script>
+    <script src="faculty_roster_data.js?v=20261008_v7"></script>
 </head>
 <body class="text-slate-800 py-8 px-4 sm:px-6 lg:px-8">
 
@@ -2001,7 +2001,9 @@
             const deptSelect = document.getElementById('deptSelect');
             if (!deptSelect) return;
             const currentVal = deptSelect.value;
-            const depts = Array.from(new Set(MASTER_FACULTY_ROSTER.map(f => f.department))).filter(Boolean).sort();
+            const currentFacultyVal = document.getElementById('facultyNameSelect') ? document.getElementById('facultyNameSelect').value : '';
+            const depts = Array.from(new Set(MASTER_FACULTY_ROSTER.map(f => (f.department || '').trim()))).filter(Boolean).sort();
+            
             deptSelect.innerHTML = '<option value="" disabled selected>-- Select your department --</option>';
             depts.forEach(d => {
                 const opt = document.createElement('option');
@@ -2009,17 +2011,31 @@
                 opt.innerText = d;
                 deptSelect.appendChild(opt);
             });
+
             if (currentVal && depts.includes(currentVal)) {
                 deptSelect.value = currentVal;
+                onDepartmentChange();
+                if (currentFacultyVal) {
+                    const facSelect = document.getElementById('facultyNameSelect');
+                    if (facSelect) {
+                        facSelect.value = currentFacultyVal;
+                        onFacultySelectChange();
+                    }
+                }
             }
         }
 
         function onDepartmentChange() {
-            const dept = document.getElementById('deptSelect').value;
+            const dept = (document.getElementById('deptSelect').value || '').trim();
             const selectEl = document.getElementById('facultyNameSelect');
             document.getElementById('facultyMetaBadge').classList.add('hidden');
+            document.getElementById('facultyNameInput').value = '';
+            document.getElementById('facultyEmailInput').value = '';
             selectEl.innerHTML = '<option value="" disabled selected>-- Select your name --</option>';
-            const facultyList = MASTER_FACULTY_ROSTER.filter(f => f.department === dept);
+            
+            if (!dept) return;
+
+            const facultyList = MASTER_FACULTY_ROSTER.filter(f => (f.department || '').trim().toLowerCase() === dept.toLowerCase());
             facultyList.forEach(f => {
                 const opt = document.createElement('option');
                 opt.value = f.name;
@@ -2230,6 +2246,27 @@
             const section = document.getElementById('form-section-' + stepNum);
             if (!section) return true;
             
+            if (stepNum === 1) {
+                const deptSelect = document.getElementById('deptSelect');
+                if (!deptSelect || !deptSelect.value) {
+                    if (deptSelect) deptSelect.focus();
+                    showToast('Please select your Department to proceed.', 'error');
+                    return false;
+                }
+                const facultySelect = document.getElementById('facultyNameSelect');
+                if (!facultySelect || !facultySelect.value) {
+                    if (facultySelect) facultySelect.focus();
+                    showToast('Please select your Name from the teaching staff dropdown.', 'error');
+                    return false;
+                }
+                const courseLevelChecked = section.querySelector('input[name="course_level"]:checked');
+                if (!courseLevelChecked) {
+                    showToast('Please select whether you handle courses for UG, PG, or Both.', 'error');
+                    return false;
+                }
+                return true;
+            }
+
             const reqInputs = section.querySelectorAll('input[required], select[required]');
             for (const input of reqInputs) {
                 if (input.type === 'radio' || input.type === 'checkbox') continue;
@@ -2326,9 +2363,9 @@
                 if (checked) stkObj[item] = checked.value;
             });
 
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-            const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            const submissionDateObj = now;
+            const dateStr = submissionDateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+            const timeStr = submissionDateObj.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
 
             const payload = {
                 id: Date.now(),
