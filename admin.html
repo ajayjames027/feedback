@@ -3235,26 +3235,30 @@
             // 4. Delete from Cloud Firestore permanently
             try {
                 if (window.db && window.deleteDoc && window.doc) {
+                    const deletePromises = [];
                     if (r._firestoreId) {
-                        await window.deleteDoc(window.doc(window.db, "responses", r._firestoreId));
-                        console.log("Deleted Firestore doc by _firestoreId:", r._firestoreId);
-                    } else if (window.collection && window.getDocs) {
-                        // Find matching documents in Firestore by id or faculty_name + department
+                        deletePromises.push(window.deleteDoc(window.doc(window.db, "responses", r._firestoreId)));
+                    }
+                    const deterministicKey = ((r.faculty_email || `${r.faculty_name}_${r.department}`).toLowerCase().replace(/[^a-z0-9]/g, '_'));
+                    if (deterministicKey) {
+                        deletePromises.push(window.deleteDoc(window.doc(window.db, "responses", deterministicKey)).catch(()=>{}));
+                    }
+
+                    if (window.collection && window.getDocs) {
                         const snap = await window.getDocs(window.collection(window.db, "responses"));
-                        const deletePromises = [];
                         snap.forEach(d => {
                             const data = d.data();
                             const matchId = r.id && data.id && String(r.id) === String(data.id);
                             const matchNameDept = (data.faculty_name || '').trim().toLowerCase() === (r.faculty_name || '').trim().toLowerCase() &&
                                                   (data.department || '').trim().toLowerCase() === (r.department || '').trim().toLowerCase();
                             if (matchId || matchNameDept) {
-                                deletePromises.push(window.deleteDoc(window.doc(window.db, "responses", d.id)));
+                                deletePromises.push(window.deleteDoc(window.doc(window.db, "responses", d.id)).catch(()=>{}));
                             }
                         });
-                        if (deletePromises.length > 0) {
-                            await Promise.all(deletePromises);
-                            console.log(`Deleted ${deletePromises.length} matching Firestore docs.`);
-                        }
+                    }
+
+                    if (deletePromises.length > 0) {
+                        await Promise.all(deletePromises);
                     }
                 }
                 showToast('Response permanently deleted from cloud.', 'success');
