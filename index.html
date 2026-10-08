@@ -31,7 +31,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC7FuA4XE3DYQevwoaSd7_G0G0Z7UPi2ms",
@@ -48,6 +48,35 @@
         window.addDoc = addDoc;
         window.collection = collection;
         window.getDocs = getDocs;
+        window.doc = doc;
+        window.getDoc = getDoc;
+
+        window.loadSystemSettings = async function() {
+            let settings = {
+                isOpen: true,
+                deadline: "2026-10-17T23:59",
+                updatedAt: Date.now()
+            };
+            try {
+                const local = localStorage.getItem("sjc_system_settings");
+                if (local) settings = { ...settings, ...JSON.parse(local) };
+            } catch(e) {}
+
+            try {
+                const snap = await getDoc(doc(db, "system_settings", "form_control"));
+                if (snap.exists()) {
+                    settings = { ...settings, ...snap.data() };
+                    localStorage.setItem("sjc_system_settings", JSON.stringify(settings));
+                }
+            } catch(e) {
+                console.warn("Could not load settings from Firestore:", e);
+            }
+
+            if (typeof applyFormAccessControl === 'function') {
+                applyFormAccessControl(settings);
+            }
+            return settings;
+        };
 
         window.loadFirebaseCustomFaculty = async function() {
             try {
@@ -79,6 +108,7 @@
         };
 
         window.loadFirebaseCustomFaculty();
+        window.loadSystemSettings();
     </script>
 
     <!-- FontAwesome & Google Fonts -->
@@ -159,7 +189,7 @@
     </style>
 
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v4"></script>
+    <script src="faculty_roster_data.js?v=20261008_v5"></script>
 </head>
 <body class="text-slate-800 py-8 px-4 sm:px-6 lg:px-8">
 
@@ -199,6 +229,64 @@
                 </div>
             </div>
         </header>
+
+        <!-- Dynamic Deadline Countdown Banner -->
+        <div id="deadlineNoticeBanner" class="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-950 text-white rounded-2xl p-3.5 px-5 shadow-md border border-indigo-700/50 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center space-x-3 text-center sm:text-left">
+                <div class="w-9 h-9 rounded-xl bg-amber-400/20 text-amber-300 flex items-center justify-center shrink-0 border border-amber-300/30">
+                    <i class="fa-solid fa-hourglass-half animate-pulse text-sm"></i>
+                </div>
+                <div>
+                    <div class="text-[11px] font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5 justify-center sm:justify-start">
+                        <span>Due Date:</span>
+                        <span id="bannerDueDateText" class="text-white font-black">17.10.2026 (11:59 PM IST)</span>
+                    </div>
+                    <div class="text-xs text-slate-200 font-medium">Please submit your feedback on or before the specified deadline.</div>
+                </div>
+            </div>
+            <div class="shrink-0 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-white/20 text-center font-mono text-xs font-black tracking-wider text-amber-300 flex items-center gap-2" id="bannerCountdownBox">
+                <i class="fa-solid fa-stopwatch text-white"></i>
+                <span id="bannerCountdownText">Calculating...</span>
+            </div>
+        </div>
+
+        <!-- Official Deadline Exceeded / Form Locked View -->
+        <div id="deadlineExceededView" class="hidden portal-card p-8 md:p-12 text-center space-y-6 border-2 border-rose-200 bg-white">
+            <div class="w-20 h-20 bg-rose-50 border-2 border-rose-200 text-rose-600 rounded-3xl mx-auto flex items-center justify-center text-3xl shadow-lg">
+                <i class="fa-solid fa-calendar-xmark"></i>
+            </div>
+            <div class="space-y-2 max-w-xl mx-auto">
+                <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-200">
+                    Submission Portal Closed
+                </span>
+                <h2 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
+                    Thank You — Deadline Exceeded
+                </h2>
+                <p class="text-sm text-slate-600 leading-relaxed pt-1">
+                    The scheduled deadline for submitting the Teacher Curricular Feedback for the academic cycle has concluded, or portal responses have been closed by the administration.
+                </p>
+            </div>
+
+            <div class="bg-amber-50/80 border border-amber-200 rounded-2xl p-5 max-w-lg mx-auto text-left space-y-2.5">
+                <div class="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-info text-amber-600"></i> Next Steps & Enquiries
+                </div>
+                <p class="text-xs text-slate-700 leading-relaxed">
+                    If you require an extension or need to lodge a delayed submission, kindly contact the <strong>Internal Quality Assurance Cell (IQAC)</strong>:
+                </p>
+                <div class="pt-1 text-xs space-y-1 font-medium text-slate-800">
+                    <div><i class="fa-solid fa-building-columns text-slate-500 mr-2"></i><strong>Office:</strong> Internal Quality Assurance Cell (IQAC), St. Joseph’s College (Autonomous)</div>
+                    <div><i class="fa-solid fa-envelope text-slate-500 mr-2"></i><strong>Email:</strong> <a href="mailto:iqac@mail.sjctni.edu" class="text-blue-700 font-semibold underline">iqac@mail.sjctni.edu</a></div>
+                    <div><i class="fa-solid fa-location-dot text-slate-500 mr-2"></i>Tiruchirappalli – 620002, Tamil Nadu, India</div>
+                </div>
+            </div>
+
+            <div class="pt-2">
+                <button type="button" onclick="window.location.reload()" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition shadow">
+                    <i class="fa-solid fa-arrow-rotate-right mr-1.5"></i> Refresh Portal
+                </button>
+            </div>
+        </div>
 
         <!-- Stepper Navigation Bar with Lock Status Indicators (10 Sections A-J) -->
         <nav class="portal-card p-3 overflow-x-auto flex items-center gap-2 no-scrollbar" id="stepperNav">
@@ -1705,6 +1793,117 @@
             }
         }
 
+        // --- System Settings, Countdown Timer & Portal Lockout ---
+        let currentSystemSettings = {
+            isOpen: true,
+            deadline: "2026-10-17T23:59",
+            updatedAt: Date.now()
+        };
+        let countdownInterval = null;
+
+        function applyFormAccessControl(settings) {
+            if (!settings) return;
+            currentSystemSettings = { ...currentSystemSettings, ...settings };
+
+            const deadlineDate = new Date(currentSystemSettings.deadline);
+            const now = new Date();
+            const isExpired = !isNaN(deadlineDate.getTime()) && now.getTime() > deadlineDate.getTime();
+            const isClosed = (currentSystemSettings.isOpen === false) || isExpired;
+
+            if (isClosed) {
+                lockFormDeadlineExceeded();
+            } else {
+                unlockFormActive();
+            }
+
+            updateDueDateDisplay(deadlineDate);
+            startCountdownTimer(deadlineDate);
+        }
+
+        function lockFormDeadlineExceeded() {
+            const form = document.getElementById('facultyForm');
+            const stepper = document.getElementById('stepperNav');
+            const lockView = document.getElementById('deadlineExceededView');
+            const timerBanner = document.getElementById('deadlineNoticeBanner');
+
+            if (form) form.classList.add('hidden');
+            if (stepper) stepper.classList.add('hidden');
+            if (lockView) lockView.classList.remove('hidden');
+
+            const countdownBox = document.getElementById('bannerCountdownBox');
+            const countdownText = document.getElementById('bannerCountdownText');
+            if (countdownBox && countdownText) {
+                countdownBox.className = "shrink-0 bg-rose-500/20 px-3.5 py-1.5 rounded-xl border border-rose-400/40 text-center font-mono text-xs font-black tracking-wider text-rose-300 flex items-center gap-2";
+                countdownText.innerText = "SUBMISSION CLOSED";
+            }
+        }
+
+        function unlockFormActive() {
+            const form = document.getElementById('facultyForm');
+            const stepper = document.getElementById('stepperNav');
+            const lockView = document.getElementById('deadlineExceededView');
+
+            if (lockView) lockView.classList.add('hidden');
+            if (form) form.classList.remove('hidden');
+            if (stepper) stepper.classList.remove('hidden');
+        }
+
+        function updateDueDateDisplay(deadlineDate) {
+            const bannerDateText = document.getElementById('bannerDueDateText');
+            if (!bannerDateText) return;
+            if (isNaN(deadlineDate.getTime())) {
+                bannerDateText.innerText = "17.10.2026 (11:59 PM IST)";
+                return;
+            }
+            const d = String(deadlineDate.getDate()).padStart(2, '0');
+            const m = String(deadlineDate.getMonth() + 1).padStart(2, '0');
+            const y = deadlineDate.getFullYear();
+            let hours = deadlineDate.getHours();
+            const mins = String(deadlineDate.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            bannerDateText.innerText = `${d}.${m}.${y} (${hours}:${mins} ${ampm} IST)`;
+        }
+
+        function startCountdownTimer(deadlineDate) {
+            if (countdownInterval) clearInterval(countdownInterval);
+
+            const timerText = document.getElementById('bannerCountdownText');
+            if (!timerText) return;
+
+            function tick() {
+                const now = new Date().getTime();
+                const diff = deadlineDate.getTime() - now;
+
+                if (currentSystemSettings.isOpen === false) {
+                    timerText.innerText = "CLOSED BY IQAC";
+                    lockFormDeadlineExceeded();
+                    return;
+                }
+
+                if (diff <= 0) {
+                    timerText.innerText = "DEADLINE EXCEEDED";
+                    lockFormDeadlineExceeded();
+                    if (countdownInterval) clearInterval(countdownInterval);
+                    return;
+                }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+                let display = '';
+                if (days > 0) display += `${days}d `;
+                display += `${String(hours).padStart(2, '0')}h ${String(mins).padStart(2, '0')}m ${String(secs).padStart(2, '0')}s`;
+                timerText.innerText = "Due: " + display;
+            }
+
+            tick();
+            countdownInterval = setInterval(tick, 1000);
+        }
+
         let debounceDraftTimer = null;
         function debouncedSaveDraft() {
             clearTimeout(debounceDraftTimer);
@@ -1715,6 +1914,13 @@
             initDepartmentOptions();
             renderMatrixTables();
             renderEmergingCheckboxes();
+
+            // Check cached system settings immediately on load
+            if (window.loadSystemSettings) {
+                window.loadSystemSettings();
+            } else {
+                applyFormAccessControl({ isOpen: true, deadline: "2026-10-17T23:59" });
+            }
 
             // Restore draft (or initialize step 1 if no draft)
             restoreFormDraft();
@@ -1978,6 +2184,17 @@
 
         function submitFacultyFeedback(e) {
             e.preventDefault();
+
+            // Guard against closed form or exceeded deadline
+            const deadlineDate = new Date(currentSystemSettings.deadline);
+            const now = new Date();
+            const isExpired = !isNaN(deadlineDate.getTime()) && now.getTime() > deadlineDate.getTime();
+            if (currentSystemSettings.isOpen === false || isExpired) {
+                lockFormDeadlineExceeded();
+                showToast("Form submission is closed — deadline exceeded.", "error");
+                return;
+            }
+
             const form = document.getElementById('facultyForm');
 
             const facultyName = form.faculty_name ? form.faculty_name.value : document.getElementById('facultyNameSelect').value;
@@ -2029,9 +2246,17 @@
                 if (checked) stkObj[item] = checked.value;
             });
 
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+            const timeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+
             const payload = {
                 id: Date.now(),
-                timestamp: new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }),
+                timestamp: `${dateStr}, ${timeStr}`,
+                timestamp_iso: now.toISOString(),
+                submitted_at_epoch: now.getTime(),
+                received_date: dateStr,
+                received_time: timeStr,
                 department: dept,
                 faculty_name: facultyName,
                 faculty_email: email,

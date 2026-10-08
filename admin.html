@@ -42,7 +42,7 @@
 <!-- Firebase App (the core Firebase SDK) -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, addDoc, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyC7FuA4XE3DYQevwoaSd7_G0G0Z7UPi2ms",
@@ -60,6 +60,46 @@
     window.collection = collection;
     window.getDocs = getDocs;
     window.addDoc = addDoc;
+    window.doc = doc;
+    window.setDoc = setDoc;
+    window.getDoc = getDoc;
+
+    window.loadSystemSettings = async function() {
+        let settings = {
+            isOpen: true,
+            deadline: "2026-10-17T23:59",
+            updatedAt: Date.now()
+        };
+        try {
+            const local = localStorage.getItem("sjc_system_settings");
+            if (local) settings = { ...settings, ...JSON.parse(local) };
+        } catch(e) {}
+
+        try {
+            const snap = await getDoc(doc(db, "system_settings", "form_control"));
+            if (snap.exists()) {
+                settings = { ...settings, ...snap.data() };
+                localStorage.setItem("sjc_system_settings", JSON.stringify(settings));
+            }
+        } catch(e) {
+            console.warn("Could not load settings from Firestore:", e);
+        }
+
+        if (typeof applyAdminFormSettingsUI === 'function') {
+            applyAdminFormSettingsUI(settings);
+        }
+        return settings;
+    };
+
+    window.saveSystemSettings = async function(settings) {
+        localStorage.setItem("sjc_system_settings", JSON.stringify(settings));
+        try {
+            await setDoc(doc(db, "system_settings", "form_control"), settings);
+            console.log("Settings saved to Firestore");
+        } catch(e) {
+            console.warn("Could not save settings to Firestore:", e);
+        }
+    };
 
     window.loadFirebaseCustomFaculty = async function() {
         try {
@@ -116,11 +156,12 @@
     // Trigger sync on load
     window.loadFirebaseResponses();
     window.loadFirebaseCustomFaculty();
+    window.loadSystemSettings();
 </script>
 <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v4"></script>
+    <script src="faculty_roster_data.js?v=20261008_v5"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -266,6 +307,47 @@
                 </div>
             </div>
 
+            <!-- Form Submission Access & Due Date Control Card -->
+            <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 text-white shadow-xl border border-indigo-800/40 relative overflow-hidden">
+                <div class="absolute -right-12 -top-12 w-48 h-48 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
+                <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-2.5">
+                            <span class="px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 flex items-center gap-1.5">
+                                <i class="fa-solid fa-sliders text-amber-400"></i> Portal Governance
+                            </span>
+                            <span id="formStatusBadge" class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span>Form Active & Open</span>
+                            </span>
+                        </div>
+                        <h2 class="text-xl md:text-2xl font-black text-white tracking-tight">Survey Submission Access & Due Date Control</h2>
+                        <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+                            Control teacher feedback access in real time. When closed or when the deadline is reached, faculty portal automatically locks with the official IQAC deadline notice.
+                        </p>
+                    </div>
+
+                    <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/15 w-full lg:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                        <div class="space-y-1">
+                            <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-300">
+                                <i class="fa-solid fa-calendar-check text-amber-400 mr-1"></i> Submission Due Date & Time
+                            </label>
+                            <input type="datetime-local" id="adminDeadlineInput" value="2026-10-17T23:59" class="px-3 py-2 bg-slate-950/70 border border-slate-700 rounded-xl text-xs font-semibold text-white focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                        </div>
+                        <div class="flex items-end gap-2 pt-1 sm:pt-0">
+                            <button type="button" onclick="saveAdminDeadline()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition shadow flex items-center gap-1.5 h-[38px] self-end">
+                                <i class="fa-solid fa-floppy-disk"></i>
+                                <span>Save Due Date</span>
+                            </button>
+                            <button type="button" id="toggleFormAccessBtn" onclick="toggleFormStatus()" class="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition shadow flex items-center gap-1.5 h-[38px] self-end">
+                                <i class="fa-solid fa-lock"></i>
+                                <span id="toggleFormAccessBtnText">Disable Form</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- KPI Cards -->
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 <div class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm relative overflow-hidden">
@@ -360,6 +442,10 @@
                             <option value="I">Shift I</option>
                             <option value="II">Shift II</option>
                         </select>
+                        <button type="button" onclick="resetRosterFilters()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition flex items-center gap-1 border border-slate-200 shadow-xs" title="Reset all search filters">
+                            <i class="fa-solid fa-arrow-rotate-left text-slate-500"></i>
+                            <span>Reset Filters</span>
+                        </button>
                     </div>
                 </div>
 
@@ -1067,6 +1153,86 @@
             renderAnalyticsDashboard();
         }
 
+        // Reset all filters in faculty roster view
+        function resetRosterFilters() {
+            const searchInput = document.getElementById('rosterSearch');
+            const deptSelect = document.getElementById('rosterDeptSelect');
+            const shiftSelect = document.getElementById('rosterShiftSelect');
+            if (searchInput) searchInput.value = '';
+            if (deptSelect) deptSelect.value = 'All';
+            if (shiftSelect) shiftSelect.value = 'All';
+            setRosterFilterStatus('ALL');
+            showToast('All roster filters reset', 'info');
+        }
+
+        // Apply and save form access and due date controls
+        let currentSystemSettings = {
+            isOpen: true,
+            deadline: "2026-10-17T23:59",
+            updatedAt: Date.now()
+        };
+
+        function applyAdminFormSettingsUI(settings) {
+            if (!settings) return;
+            currentSystemSettings = { ...currentSystemSettings, ...settings };
+            const badge = document.getElementById('formStatusBadge');
+            const toggleBtn = document.getElementById('toggleFormAccessBtn');
+            const toggleBtnText = document.getElementById('toggleFormAccessBtnText');
+            const deadlineInput = document.getElementById('adminDeadlineInput');
+
+            if (deadlineInput && currentSystemSettings.deadline) {
+                deadlineInput.value = currentSystemSettings.deadline;
+            }
+
+            if (currentSystemSettings.isOpen) {
+                if (badge) {
+                    badge.className = "px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 flex items-center gap-1.5";
+                    badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span>Form Active & Open</span>';
+                }
+                if (toggleBtn) {
+                    toggleBtn.className = "px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition shadow flex items-center gap-1.5 h-[38px] self-end";
+                }
+                if (toggleBtnText) {
+                    toggleBtnText.innerText = "Disable Form";
+                }
+            } else {
+                if (badge) {
+                    badge.className = "px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide bg-rose-500/20 text-rose-300 border border-rose-400/40 flex items-center gap-1.5";
+                    badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-rose-400"></span><span>Form Disabled / Locked</span>';
+                }
+                if (toggleBtn) {
+                    toggleBtn.className = "px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition shadow flex items-center gap-1.5 h-[38px] self-end";
+                }
+                if (toggleBtnText) {
+                    toggleBtnText.innerText = "Reopen Form";
+                }
+            }
+        }
+
+        async function toggleFormStatus() {
+            currentSystemSettings.isOpen = !currentSystemSettings.isOpen;
+            currentSystemSettings.updatedAt = Date.now();
+            applyAdminFormSettingsUI(currentSystemSettings);
+            if (typeof window.saveSystemSettings === 'function') {
+                await window.saveSystemSettings(currentSystemSettings);
+            }
+            showToast(currentSystemSettings.isOpen ? 'Teacher feedback form has been OPENED.' : 'Teacher feedback form has been DISABLED & LOCKED.', currentSystemSettings.isOpen ? 'success' : 'error');
+        }
+
+        async function saveAdminDeadline() {
+            const val = document.getElementById('adminDeadlineInput').value;
+            if (!val) {
+                showToast('Please select a valid deadline date and time.', 'error');
+                return;
+            }
+            currentSystemSettings.deadline = val;
+            currentSystemSettings.updatedAt = Date.now();
+            if (typeof window.saveSystemSettings === 'function') {
+                await window.saveSystemSettings(currentSystemSettings);
+            }
+            showToast('Submission deadline saved: ' + val, 'success');
+        }
+
         // Roster Table & Progress
         function setRosterFilterStatus(status) {
             currentRosterStatus = status;
@@ -1148,7 +1314,21 @@
 
             const tbody = document.getElementById('rosterTableBody');
             if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-slate-400">No faculty matching criteria.</td></tr>`;
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="p-8 text-center">
+                            <div class="flex flex-col items-center justify-center space-y-2">
+                                <i class="fa-solid fa-filter-circle-xmark text-3xl text-slate-300"></i>
+                                <div class="text-sm font-bold text-slate-700">No faculty matching criteria</div>
+                                <p class="text-xs text-slate-400 max-w-sm">No roster records match your active search or filter selection.</p>
+                                <button type="button" onclick="resetRosterFilters()" class="mt-2 px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                                    <i class="fa-solid fa-arrow-rotate-left"></i>
+                                    <span>Reset All Filters</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
                 return;
             }
 
@@ -2087,10 +2267,17 @@
                 return;
             }
 
-            tbody.innerHTML = list.map((r, i) => `
+            tbody.innerHTML = list.map((r, i) => {
+                let timeDisplay = '-';
+                if (r.received_date && r.received_time) {
+                    timeDisplay = `<span class="font-bold text-slate-800">${r.received_date}</span> <span class="text-[11px] text-slate-500">${r.received_time}</span>`;
+                } else if (r.timestamp) {
+                    timeDisplay = `<span class="font-medium text-slate-700">${r.timestamp}</span>`;
+                }
+                return `
                 <tr class="hover:bg-slate-50/80 transition">
                     <td class="p-3.5 font-mono text-xs text-slate-400">#${i + 1}</td>
-                    <td class="p-3.5 text-xs text-slate-600 font-medium">${r.timestamp ? (isNaN(Date.parse(r.timestamp)) ? r.timestamp : new Date(r.timestamp).toLocaleString('en-IN', { dateStyle: 'short', timeStyle: 'short' })) : '-'}</td>
+                    <td class="p-3.5 text-xs text-slate-600">${timeDisplay}</td>
                     <td class="p-3.5 text-xs font-bold text-indigo-700 bg-indigo-50/50 rounded-lg">${getSchoolForDepartment(r.department)}</td>
                     <td class="p-3.5 font-semibold text-slate-900">${r.department || '-'}</td>
                     <td class="p-3.5 text-slate-700 font-medium">${r.faculty_name || '-'}</td>
@@ -2109,7 +2296,7 @@
                         </div>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
         function deleteSingleResponse(idx) {
