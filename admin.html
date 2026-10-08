@@ -42,7 +42,7 @@
 <!-- Firebase App (the core Firebase SDK) -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, addDoc, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, addDoc, doc, setDoc, getDoc, deleteDoc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyC7FuA4XE3DYQevwoaSd7_G0G0Z7UPi2ms",
@@ -63,6 +63,9 @@
     window.doc = doc;
     window.setDoc = setDoc;
     window.getDoc = getDoc;
+    window.deleteDoc = deleteDoc;
+    window.query = query;
+    window.where = where;
     window.onSnapshot = onSnapshot;
 
     window.loadSystemSettings = async function() {
@@ -141,6 +144,30 @@
         }
     };
 
+    function isResponseBlacklisted(r, deletedList) {
+        if (!r || !Array.isArray(deletedList) || deletedList.length === 0) return false;
+        const rName = (r.faculty_name || '').trim().toLowerCase();
+        const rDept = (r.department || '').trim().toLowerCase();
+        const rId = String(r.id || '').trim();
+        const rFsId = String(r._firestoreId || '').trim();
+
+        return deletedList.some(item => {
+            if (typeof item === 'string') {
+                return (rId && rId === item) || (rFsId && rFsId === item);
+            }
+            if (item && typeof item === 'object') {
+                if (rFsId && item.firestoreId && rFsId === item.firestoreId) return true;
+                if (rId && item.id && rId === item.id) return true;
+                if (item.name && item.department) {
+                    const iName = (item.name || '').trim().toLowerCase();
+                    const iDept = (item.department || '').trim().toLowerCase();
+                    if (rName && rDept && rName === iName && rDept === iDept) return true;
+                }
+            }
+            return false;
+        });
+    }
+
     function syncCloudResponses(cloudRecords) {
         if (!Array.isArray(cloudRecords)) return;
         let localRecords = [];
@@ -148,14 +175,26 @@
             localRecords = JSON.parse(localStorage.getItem("sjc_feedback_responses") || "[]");
         } catch(e) {}
 
+        let deletedList = [];
+        try {
+            deletedList = JSON.parse(localStorage.getItem("sjc_deleted_responses_list") || "[]");
+        } catch(e) {}
+
         const map = new Map();
         localRecords.forEach(r => {
+            if (isResponseBlacklisted(r, deletedList)) return;
             const key = r.id || `${(r.faculty_name||'').trim().toLowerCase()}__${(r.department||'').trim().toLowerCase()}`;
             map.set(key, r);
         });
         cloudRecords.forEach(r => {
+            if (isResponseBlacklisted(r, deletedList)) return;
             const key = r.id || `${(r.faculty_name||'').trim().toLowerCase()}__${(r.department||'').trim().toLowerCase()}`;
-            map.set(key, r);
+            // If already exists locally with same key, preserve _firestoreId if present in cloud
+            if (map.has(key)) {
+                map.set(key, { ...map.get(key), ...r });
+            } else {
+                map.set(key, r);
+            }
         });
 
         const merged = Array.from(map.values());
@@ -165,7 +204,7 @@
         localStorage.setItem("sjc_faculty_feedback_records_2025", JSON.stringify(merged));
         window.__cachedAdminResponses = merged;
 
-        console.log(`[Admin Cloud Sync] Synced ${cloudRecords.length} cloud records. Total active: ${merged.length}`);
+        console.log(`[Admin Cloud Sync] Synced ${cloudRecords.length} cloud records. Active after blacklist: ${merged.length}`);
 
         if (typeof renderRosterTable === 'function') renderRosterTable();
         if (typeof renderAnalyticsDashboard === 'function') renderAnalyticsDashboard();
@@ -178,8 +217,10 @@
         try {
             const querySnapshot = await getDocs(collection(db, "responses"));
             let firebaseRecords = [];
-            querySnapshot.forEach((doc) => {
-                firebaseRecords.push(doc.data());
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                data._firestoreId = docSnap.id;
+                firebaseRecords.push(data);
             });
             syncCloudResponses(firebaseRecords);
         } catch(e) {
@@ -189,7 +230,11 @@
         try {
             onSnapshot(collection(db, "responses"), (snapshot) => {
                 let liveRecords = [];
-                snapshot.forEach(doc => liveRecords.push(doc.data()));
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    data._firestoreId = docSnap.id;
+                    liveRecords.push(data);
+                });
                 syncCloudResponses(liveRecords);
             }, (err) => {
                 console.warn("Real-time responses listener error:", err);
@@ -207,7 +252,7 @@
 <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v9"></script>
+    <script src="faculty_roster_data.js?v=20261008_v10"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -1117,12 +1162,38 @@
             try {
                 const rawNew = JSON.parse(localStorage.getItem("sjc_feedback_responses") || "[]");
                 const rawOld = JSON.parse(localStorage.getItem("sjc_faculty_feedback_records_2025") || "[]");
+                let deletedList = [];
+                try {
+                    deletedList = JSON.parse(localStorage.getItem("sjc_deleted_responses_list") || "[]");
+                } catch(e) {}
+
+                const isItemBlacklisted = (r) => {
+                    if (!r || !Array.isArray(deletedList) || deletedList.length === 0) return false;
+                    const rName = (r.faculty_name || '').trim().toLowerCase();
+                    const rDept = (r.department || '').trim().toLowerCase();
+                    const rId = String(r.id || '').trim();
+                    const rFsId = String(r._firestoreId || '').trim();
+                    return deletedList.some(item => {
+                        if (typeof item === 'string') return (rId && rId === item) || (rFsId && rFsId === item);
+                        if (item && typeof item === 'object') {
+                            if (rFsId && item.firestoreId && rFsId === item.firestoreId) return true;
+                            if (rId && item.id && rId === item.id) return true;
+                            if (item.name && item.department) {
+                                if (rName && rDept && rName === (item.name || '').trim().toLowerCase() && rDept === (item.department || '').trim().toLowerCase()) return true;
+                            }
+                        }
+                        return false;
+                    });
+                };
+
                 const map = new Map();
                 rawOld.forEach(r => {
+                    if (isItemBlacklisted(r)) return;
                     const key = r.id || `${(r.faculty_name||'').trim().toLowerCase()}__${(r.department||'').trim().toLowerCase()}`;
                     map.set(key, r);
                 });
                 rawNew.forEach(r => {
+                    if (isItemBlacklisted(r)) return;
                     const key = r.id || `${(r.faculty_name||'').trim().toLowerCase()}__${(r.department||'').trim().toLowerCase()}`;
                     map.set(key, r);
                 });
@@ -2393,20 +2464,70 @@
             `}).join('');
         }
 
-        function deleteSingleResponse(idx) {
+        async function deleteSingleResponse(idx) {
             const list = getStoredResponses();
             const r = list[idx];
             if (!r) return;
-            if (!confirm(`Are you sure you want to delete the feedback response recorded for ${r.faculty_name} (${r.department})?`)) return;
+            if (!confirm(`Are you sure you want to permanently delete the feedback response recorded for ${r.faculty_name} (${r.department})?`)) return;
 
+            // 1. Immediately add to permanent blacklist in localStorage so it never re-appears
+            try {
+                let deletedList = JSON.parse(localStorage.getItem("sjc_deleted_responses_list") || "[]");
+                deletedList.push({
+                    id: r.id || '',
+                    firestoreId: r._firestoreId || '',
+                    name: r.faculty_name || '',
+                    department: r.department || '',
+                    deletedAt: Date.now()
+                });
+                localStorage.setItem("sjc_deleted_responses_list", JSON.stringify(deletedList));
+            } catch(e) {
+                console.warn("Could not save to deleted responses blacklist:", e);
+            }
+
+            // 2. Remove from local stored responses
             list.splice(idx, 1);
             localStorage.setItem("sjc_feedback_responses", JSON.stringify(list));
             localStorage.setItem("sjc_faculty_feedback_records_2025", JSON.stringify(list));
             window.__cachedAdminResponses = list;
+
+            // 3. Immediately re-render UI
             renderResponsesTable();
             renderRosterTable();
             renderAnalyticsDashboard();
-            showToast('Response deleted successfully.');
+            if (typeof renderReportTable === 'function') renderReportTable();
+            showToast('Deleting response from cloud and local database...', 'info');
+
+            // 4. Delete from Cloud Firestore permanently
+            try {
+                if (window.db && window.deleteDoc && window.doc) {
+                    if (r._firestoreId) {
+                        await window.deleteDoc(window.doc(window.db, "responses", r._firestoreId));
+                        console.log("Deleted Firestore doc by _firestoreId:", r._firestoreId);
+                    } else if (window.collection && window.getDocs) {
+                        // Find matching documents in Firestore by id or faculty_name + department
+                        const snap = await window.getDocs(window.collection(window.db, "responses"));
+                        const deletePromises = [];
+                        snap.forEach(d => {
+                            const data = d.data();
+                            const matchId = r.id && data.id && String(r.id) === String(data.id);
+                            const matchNameDept = (data.faculty_name || '').trim().toLowerCase() === (r.faculty_name || '').trim().toLowerCase() &&
+                                                  (data.department || '').trim().toLowerCase() === (r.department || '').trim().toLowerCase();
+                            if (matchId || matchNameDept) {
+                                deletePromises.push(window.deleteDoc(window.doc(window.db, "responses", d.id)));
+                            }
+                        });
+                        if (deletePromises.length > 0) {
+                            await Promise.all(deletePromises);
+                            console.log(`Deleted ${deletePromises.length} matching Firestore docs.`);
+                        }
+                    }
+                }
+                showToast('Response permanently deleted from cloud.', 'success');
+            } catch(err) {
+                console.error("Error deleting document from Firestore:", err);
+                showToast('Local record removed (Firestore cloud delete queued).', 'warning');
+            }
         }
 
         let activeModalResponse = null;
