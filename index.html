@@ -31,7 +31,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC7FuA4XE3DYQevwoaSd7_G0G0Z7UPi2ms",
@@ -50,6 +50,7 @@
         window.getDocs = getDocs;
         window.doc = doc;
         window.getDoc = getDoc;
+        window.setDoc = setDoc;
         window.onSnapshot = onSnapshot;
 
         window.loadSystemSettings = async function() {
@@ -113,10 +114,58 @@
             } catch(e) {
                 console.warn("Could not sync custom faculty from cloud:", e);
             }
+        window.loadFirebaseResponses = async function() {
+            try {
+                // Initial fetch
+                const snap = await getDocs(collection(db, "responses"));
+                const records = [];
+                snap.forEach(d => {
+                    const data = d.data();
+                    data._firestoreId = d.id;
+                    records.push(data);
+                });
+                window.__cloudResponses = records;
+                try {
+                    localStorage.setItem("sjc_feedback_responses", JSON.stringify(records));
+                } catch(e) {}
+            } catch(e) {
+                console.warn("Initial responses sync error:", e);
+            }
+
+            try {
+                // Real-time listener for responses across all devices
+                onSnapshot(collection(db, "responses"), (snapshot) => {
+                    const submitted = [];
+                    snapshot.forEach(docSnap => {
+                        const data = docSnap.data();
+                        data._firestoreId = docSnap.id;
+                        submitted.push(data);
+                    });
+                    window.__cloudResponses = submitted;
+                    try {
+                        localStorage.setItem("sjc_feedback_responses", JSON.stringify(submitted));
+                    } catch(e) {}
+
+                    // Refresh faculty dropdown if user is currently choosing
+                    const deptEl = document.getElementById('deptSelect');
+                    if (deptEl && deptEl.value && typeof onDepartmentChange === 'function') {
+                        const curFac = document.getElementById('facultyNameSelect') ? document.getElementById('facultyNameSelect').value : '';
+                        onDepartmentChange();
+                        if (curFac && document.getElementById('facultyNameSelect')) {
+                            document.getElementById('facultyNameSelect').value = curFac;
+                        }
+                    }
+                }, (err) => {
+                    console.warn("Real-time responses listener error:", err);
+                });
+            } catch(e) {
+                console.warn("Could not attach responses listener:", e);
+            }
         };
 
         window.loadFirebaseCustomFaculty();
         window.loadSystemSettings();
+        window.loadFirebaseResponses();
     </script>
 
     <!-- FontAwesome & Google Fonts -->
@@ -197,7 +246,7 @@
     </style>
 
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v11"></script>
+    <script src="faculty_roster_data.js?v=20261008_v12"></script>
 </head>
 <body class="text-slate-800 py-8 px-4 sm:px-6 lg:px-8">
 
@@ -2087,11 +2136,18 @@
 
             const facultyList = MASTER_FACULTY_ROSTER.filter(f => (f.department || '').trim().toLowerCase() === dept.toLowerCase());
             facultyList.forEach(f => {
+                const isSubmitted = checkDuplicateSubmission(f.name, dept, f.email);
                 const opt = document.createElement('option');
                 opt.value = f.name;
                 opt.dataset.email = f.email || '';
                 opt.dataset.desig = f.designation || '';
-                opt.innerText = `${f.name} (${f.designation || 'Faculty'})`;
+                opt.dataset.submitted = isSubmitted ? '1' : '0';
+                if (isSubmitted) {
+                    opt.innerText = `${f.name} (${f.designation || 'Faculty'}) — [Already Submitted]`;
+                    opt.className = 'text-slate-400 font-normal';
+                } else {
+                    opt.innerText = `${f.name} (${f.designation || 'Faculty'})`;
+                }
                 selectEl.appendChild(opt);
             });
             if (!isRestoringDraft) saveFormDraft();
@@ -2109,7 +2165,7 @@
             const dept = document.getElementById('deptSelect').value;
             const email = selectedOpt.dataset.email || '';
 
-            // Check duplicate submission
+            // Check duplicate submission across all devices
             if (!isRestoringDraft && checkDuplicateSubmission(name, dept, email)) {
                 document.getElementById('duplicateAlertText').innerText = `Feedback for ${name} (${dept}) has already been submitted and recorded. Multiple submissions for the same faculty profile are restricted.`;
                 document.getElementById('duplicateAlertModal').classList.remove('hidden');
@@ -2128,15 +2184,27 @@
 
         function checkDuplicateSubmission(name, dept, email) {
             let responses = [];
-            try {
-                responses = JSON.parse(localStorage.getItem("sjc_feedback_responses") || "[]");
-            } catch(e) {}
+            if (Array.isArray(window.__cloudResponses) && window.__cloudResponses.length > 0) {
+                responses = window.__cloudResponses;
+            } else {
+                try {
+                    responses = JSON.parse(localStorage.getItem("sjc_feedback_responses") || "[]");
+                } catch(e) {}
+            }
+
+            const cleanName = (name || '').trim().toLowerCase();
+            const cleanDept = (dept || '').trim().toLowerCase();
+            const cleanEmail = (email || '').trim().toLowerCase();
+
+            if (!cleanName && !cleanEmail) return false;
 
             return responses.some(r => {
-                const matchEmail = email && r.faculty_email && r.faculty_email.toLowerCase() === email.toLowerCase();
-                const matchNameDept = r.faculty_name && r.department && 
-                                      r.faculty_name.toLowerCase() === name.toLowerCase() && 
-                                      r.department.toLowerCase() === dept.toLowerCase();
+                const rEmail = (r.faculty_email || '').trim().toLowerCase();
+                const rName = (r.faculty_name || '').trim().toLowerCase();
+                const rDept = (r.department || '').trim().toLowerCase();
+
+                const matchEmail = Boolean(cleanEmail && rEmail && cleanEmail === rEmail);
+                const matchNameDept = Boolean(cleanName && cleanDept && cleanName === rName && cleanDept === rDept);
                 return matchEmail || matchNameDept;
             });
         }
@@ -2358,7 +2426,7 @@
             setTimeout(() => toast.remove(), 3500);
         }
 
-        function submitFacultyFeedback(e) {
+        async function submitFacultyFeedback(e) {
             e.preventDefault();
 
             // Guard against closed form or exceeded deadline
@@ -2377,10 +2445,42 @@
             const dept = form.department ? form.department.value : '';
             const email = form.faculty_email ? form.faculty_email.value : '';
 
+            // 1. Instant check against memory / local cache
             if (checkDuplicateSubmission(facultyName, dept, email)) {
-                document.getElementById('duplicateAlertText').innerText = `Feedback for ${facultyName} (${dept}) has already been recorded.`;
+                document.getElementById('duplicateAlertText').innerText = `Feedback for ${facultyName} (${dept}) has already been recorded. Multiple submissions for the same faculty profile are restricted.`;
                 document.getElementById('duplicateAlertModal').classList.remove('hidden');
                 return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Verifying & Submitting...';
+            }
+
+            // 2. Real-time Cloud verification to prevent cross-device duplicate submissions (Phone vs PC)
+            if (window.db && window.collection && window.getDocs) {
+                try {
+                    const snap = await window.getDocs(window.collection(window.db, "responses"));
+                    const liveRecords = [];
+                    snap.forEach(d => {
+                        const data = d.data();
+                        data._firestoreId = d.id;
+                        liveRecords.push(data);
+                    });
+                    window.__cloudResponses = liveRecords;
+                    if (checkDuplicateSubmission(facultyName, dept, email)) {
+                        document.getElementById('duplicateAlertText').innerText = `Feedback for ${facultyName} (${dept}) was already submitted and recorded from another device. Duplicate submissions are not permitted.`;
+                        document.getElementById('duplicateAlertModal').classList.remove('hidden');
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = 'Submit Teacher Feedback <i class="fa-solid fa-paper-plane text-xs"></i>';
+                        }
+                        return;
+                    }
+                } catch(e) {
+                    console.warn("Live pre-submit check error:", e);
+                }
             }
 
             const getCheckboxes = (name) => Array.from(form.querySelectorAll(`input[name="${name}"]:checked`)).map(c => c.value);
@@ -2476,18 +2576,28 @@
                 console.error("Local storage error:", ex);
             }
 
-            const submitBtn = document.getElementById('submitBtn');
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Submitting...';
-            }
+            // Save to Firestore with deterministic doc ID to prevent any duplicate document in cloud
+            const safeDocId = (email || `${facultyName}_${dept}`).toLowerCase().replace(/[^a-z0-9]/g, '_');
 
-            if (window.db && window.addDoc && window.collection) {
+            if (window.db && window.doc && window.setDoc) {
+                try {
+                    await window.setDoc(window.doc(window.db, "responses", safeDocId), payload);
+                    console.log("Firestore response saved successfully with key:", safeDocId);
+                    showSuccessView(facultyName);
+                } catch(err) {
+                    console.error("Firestore setDoc error:", err);
+                    if (window.addDoc && window.collection) {
+                        try {
+                            await window.addDoc(window.collection(window.db, "responses"), payload);
+                        } catch(e2) {
+                            console.error("Firestore addDoc fallback error:", e2);
+                        }
+                    }
+                    showSuccessView(facultyName);
+                }
+            } else if (window.db && window.addDoc && window.collection) {
                 window.addDoc(window.collection(window.db, "responses"), payload)
-                    .then(() => {
-                        console.log("Firestore response saved successfully:", payload.id);
-                        showSuccessView(facultyName);
-                    })
+                    .then(() => showSuccessView(facultyName))
                     .catch(err => {
                         console.error("Firestore save error:", err);
                         showSuccessView(facultyName);

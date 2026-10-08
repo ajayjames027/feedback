@@ -150,12 +150,16 @@
         const rDept = (r.department || '').trim().toLowerCase();
         const rId = String(r.id || '').trim();
         const rFsId = String(r._firestoreId || '').trim();
+        const rTime = r.submitted_at_epoch || r.id || 0;
 
         return deletedList.some(item => {
             if (typeof item === 'string') {
                 return (rId && rId === item) || (rFsId && rFsId === item);
             }
             if (item && typeof item === 'object') {
+                // If this is a fresh response submitted after the deletion timestamp, do not blacklist
+                if (item.deletedAt && rTime > item.deletedAt) return false;
+
                 if (rFsId && item.firestoreId && rFsId === item.firestoreId) return true;
                 if (rId && item.id && rId === item.id) return true;
                 if (item.name && item.department) {
@@ -166,6 +170,16 @@
             }
             return false;
         });
+    }
+
+    function getFacultyResponseKey(r) {
+        if (!r) return '';
+        const email = (r.faculty_email || '').trim().toLowerCase();
+        const name = (r.faculty_name || '').trim().toLowerCase();
+        const dept = (r.department || '').trim().toLowerCase();
+        if (email) return email;
+        if (name && dept) return `${name}___${dept}`;
+        return r.id ? String(r.id) : '';
     }
 
     function syncCloudResponses(cloudRecords) {
@@ -183,15 +197,21 @@
         const map = new Map();
         localRecords.forEach(r => {
             if (isResponseBlacklisted(r, deletedList)) return;
-            const key = r.id || `${(r.faculty_name||'').trim().toLowerCase()}__${(r.department||'').trim().toLowerCase()}`;
-            map.set(key, r);
+            const key = getFacultyResponseKey(r);
+            if (key) map.set(key, r);
         });
         cloudRecords.forEach(r => {
             if (isResponseBlacklisted(r, deletedList)) return;
-            const key = r.id || `${(r.faculty_name||'').trim().toLowerCase()}__${(r.department||'').trim().toLowerCase()}`;
-            // If already exists locally with same key, preserve _firestoreId if present in cloud
+            const key = getFacultyResponseKey(r);
+            if (!key) return;
             if (map.has(key)) {
-                map.set(key, { ...map.get(key), ...r });
+                const existing = map.get(key);
+                const exTime = existing.submitted_at_epoch || existing.id || 0;
+                const newTime = r.submitted_at_epoch || r.id || 0;
+                // Keep the newer submission if duplicate exists for same faculty member
+                if (newTime >= exTime) {
+                    map.set(key, { ...existing, ...r });
+                }
             } else {
                 map.set(key, r);
             }
@@ -204,7 +224,7 @@
         localStorage.setItem("sjc_faculty_feedback_records_2025", JSON.stringify(merged));
         window.__cachedAdminResponses = merged;
 
-        console.log(`[Admin Cloud Sync] Synced ${cloudRecords.length} cloud records. Active after blacklist: ${merged.length}`);
+        console.log(`[Admin Cloud Sync] Synced ${cloudRecords.length} cloud records. Active after blacklist & deduplication: ${merged.length}`);
 
         if (typeof renderRosterTable === 'function') renderRosterTable();
         if (typeof renderAnalyticsDashboard === 'function') renderAnalyticsDashboard();
@@ -252,7 +272,7 @@
 <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v11"></script>
+    <script src="faculty_roster_data.js?v=20261008_v12"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
