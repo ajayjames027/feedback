@@ -207,7 +207,7 @@
 <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v8"></script>
+    <script src="faculty_roster_data.js?v=20261008_v9"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -2522,10 +2522,21 @@
                     </div>
 
                     <!-- Overlaps & Revisions -->
-                    ${r.overlapping_details || r.overlapping_courses === 'Yes' ? `
-                        <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
-                            <div class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Redundant Content / Course Overlaps Logged</div>
-                            <div>${r.overlapping_details || 'Faculty reported overlapping course content.'}</div>
+                    ${(r.overlapping_details || r.overlapping_courses === 'YES' || r.overlapping_courses === 'Yes') ? `
+                        <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-2">
+                            <div class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Section D: Overlapping, Repeated or Outdated Courses</div>
+                            ${Array.isArray(r.overlapping_courses_list) && r.overlapping_courses_list.length > 0 ? `
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left text-xs bg-white rounded-xl overflow-hidden border border-amber-200">
+                                        <thead><tr class="bg-amber-100/70 text-amber-900 font-bold"><th class="p-2">Course</th><th class="p-2 text-center">Sem</th><th class="p-2">Unit(s)</th><th class="p-2">Recommendation</th></tr></thead>
+                                        <tbody class="divide-y divide-amber-100 text-slate-700 font-medium">
+                                            ${r.overlapping_courses_list.map(c => `<tr><td class="p-2 font-semibold text-slate-900">${c.course}</td><td class="p-2 text-center font-bold text-indigo-600">${c.sem}</td><td class="p-2">${c.unit}</td><td class="p-2">${c.recommendation}</td></tr>`).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ` : `
+                                <div class="whitespace-pre-line leading-relaxed font-medium">${r.overlapping_details || 'Faculty reported overlapping course content.'}</div>
+                            `}
                         </div>
                     ` : ''}
 
