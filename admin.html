@@ -120,7 +120,7 @@
 <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v3"></script>
+    <script src="faculty_roster_data.js?v=20261008_v4"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -533,6 +533,9 @@
                 </div>
 
                 <div class="flex flex-wrap items-center gap-3 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
+                    <select id="analyticsSchoolSelect" onchange="onAnalyticsSchoolChange()" class="bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700">
+                        <option value="All">All Schools (Deaneries)</option>
+                    </select>
                     <select id="analyticsDeptSelect" onchange="renderAnalyticsDashboard()" class="bg-white border border-slate-300 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700">
                         <option value="All">All Departments (Aggregate)</option>
                     </select>
@@ -542,7 +545,7 @@
                         <option value="PG">PG Only</option>
                         <option value="Both">Both (UG & PG)</option>
                     </select>
-                    <button onclick="renderAnalyticsDashboard()" class="p-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs transition">
+                    <button onclick="renderAnalyticsDashboard()" class="p-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-slate-700 text-xs transition" title="Refresh Analytics">
                         <i class="fa-solid fa-arrows-rotate"></i>
                     </button>
                 </div>
@@ -861,23 +864,57 @@
         let currentRosterStatus = 'ALL';
         let chartInstances = {};
 
+        const SCHOOL_NAME_MAP = {
+            "SBS": "School of Biological Sciences (SBS)",
+            "SCO": "School of Commerce Studies (SCO)",
+            "SCS": "School of Computing Sciences (SCS)",
+            "SLC": "School of Languages & Culture (SLC)",
+            "SMS": "School of Management Studies (SMS)",
+            "SPS": "School of Physical Sciences (SPS)",
+            "OTHERS": "Interdisciplinary & Others"
+        };
+
         const DEPARTMENT_SCHOOL_MAP = {
-            "Biological Sciences (SBS)": ["Biochemistry", "Biotechnology", "Botany"],
-            "Computing Sciences (SCS)": ["Computer Science", "Data Science", "Information Technology", "Software Development"],
-            "Languages & Culture (SLC)": ["English", "French", "Hindi", "History", "Sanskrit", "Tamil"],
-            "Management Studies (SMS)": ["BBA", "Counselling Psy", "Economics", "HRM", "Physical Education", "Visual Communication"],
-            "Physical Sciences (SPS)": ["Chemistry", "Electronics", "Mathematics", "Physics", "Statistics"],
-            "Commerce & Optionals (SCO)": ["Commerce", "Commerce Business Analytics", "Commerce CA"],
-            "Interdisciplinary / Others": ["Human Excellence"]
+            "School of Biological Sciences (SBS)": [
+                "Biochemistry", "Biotechnology", "Botany"
+            ],
+            "School of Commerce Studies (SCO)": [
+                "Commerce", "Commerce Business Analytics", "Commerce CA", "Commerce Honours", "Commerce Strategic Finance"
+            ],
+            "School of Computing Sciences (SCS)": [
+                "Artificial Intelligence", "B.Voc SD & SA", "Computer Science", "Data Science", "Information Technology", "Mathematics", "Statistics", "Software Development"
+            ],
+            "School of Languages & Culture (SLC)": [
+                "English", "French", "Hindi", "History", "Sanskrit", "Tamil"
+            ],
+            "School of Management Studies (SMS)": [
+                "BBA", "Counselling Psy", "Economics", "HRM", "Physical Education", "Visual Communication"
+            ],
+            "School of Physical Sciences (SPS)": [
+                "Chemistry", "Electronics", "Physics"
+            ],
+            "Interdisciplinary & Others": [
+                "Human Excellence"
+            ]
         };
 
         function getSchoolForDepartment(dept) {
             if (!dept) return "General";
-            for (const [school, depts] of Object.entries(DEPARTMENT_SCHOOL_MAP)) {
-                if (depts.some(d => d.toLowerCase() === dept.toLowerCase() || dept.toLowerCase().includes(d.toLowerCase()))) {
-                    return school;
+            const trimmed = dept.trim().toLowerCase();
+
+            // 1. Check direct match in MASTER_FACULTY_ROSTER
+            const rosterEntry = MASTER_FACULTY_ROSTER.find(f => (f.department || '').trim().toLowerCase() === trimmed);
+            if (rosterEntry && rosterEntry.school && SCHOOL_NAME_MAP[rosterEntry.school]) {
+                return SCHOOL_NAME_MAP[rosterEntry.school];
+            }
+
+            // 2. Match via DEPARTMENT_SCHOOL_MAP
+            for (const [schoolName, depts] of Object.entries(DEPARTMENT_SCHOOL_MAP)) {
+                if (depts.some(d => d.toLowerCase() === trimmed || trimmed.includes(d.toLowerCase()))) {
+                    return schoolName;
                 }
             }
+
             return "School of Arts & Sciences";
         }
 
@@ -959,9 +996,11 @@
             const depts = Array.from(new Set(MASTER_FACULTY_ROSTER.map(f => f.department))).filter(Boolean).sort();
             const rosterSelect = document.getElementById('rosterDeptSelect');
             const anaSelect = document.getElementById('analyticsDeptSelect');
+            const schoolSelect = document.getElementById('analyticsSchoolSelect');
 
             const curRosterDept = rosterSelect ? rosterSelect.value : 'All';
             const curAnaDept = anaSelect ? anaSelect.value : 'All';
+            const curSchool = schoolSelect ? schoolSelect.value : 'All';
 
             if (rosterSelect) {
                 rosterSelect.innerHTML = '<option value="All">All Departments</option>';
@@ -975,17 +1014,57 @@
                 }
             }
 
+            if (schoolSelect) {
+                schoolSelect.innerHTML = '<option value="All">All Schools (Deaneries)</option>';
+                Object.keys(DEPARTMENT_SCHOOL_MAP).forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s; opt.innerText = s;
+                    schoolSelect.appendChild(opt);
+                });
+                if (curSchool && (curSchool === 'All' || DEPARTMENT_SCHOOL_MAP[curSchool])) {
+                    schoolSelect.value = curSchool;
+                }
+            }
+
             if (anaSelect) {
-                anaSelect.innerHTML = '<option value="All">All Departments</option>';
-                depts.forEach(d => {
+                anaSelect.innerHTML = '<option value="All">All Departments (Aggregate)</option>';
+                let list = depts;
+                if (curSchool && curSchool !== 'All' && DEPARTMENT_SCHOOL_MAP[curSchool]) {
+                    list = DEPARTMENT_SCHOOL_MAP[curSchool].slice().sort();
+                }
+                list.forEach(d => {
                     const opt2 = document.createElement('option');
                     opt2.value = d; opt2.innerText = d;
                     anaSelect.appendChild(opt2);
                 });
-                if (curAnaDept && (curAnaDept === 'All' || depts.includes(curAnaDept))) {
+                if (curAnaDept && (curAnaDept === 'All' || list.includes(curAnaDept))) {
                     anaSelect.value = curAnaDept;
                 }
             }
+        }
+
+        function onAnalyticsSchoolChange() {
+            const schoolSel = document.getElementById('analyticsSchoolSelect');
+            const anaSelect = document.getElementById('analyticsDeptSelect');
+            if (!schoolSel || !anaSelect) return;
+            const selectedSchool = schoolSel.value;
+
+            anaSelect.innerHTML = '<option value="All">All Departments (Aggregate)</option>';
+
+            let depts = [];
+            if (selectedSchool === 'All') {
+                depts = Array.from(new Set(MASTER_FACULTY_ROSTER.map(f => f.department))).filter(Boolean).sort();
+            } else if (DEPARTMENT_SCHOOL_MAP[selectedSchool]) {
+                depts = DEPARTMENT_SCHOOL_MAP[selectedSchool].slice().sort();
+            }
+
+            depts.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d; opt.innerText = d;
+                anaSelect.appendChild(opt);
+            });
+
+            renderAnalyticsDashboard();
         }
 
         // Roster Table & Progress
@@ -1220,9 +1299,11 @@
         // Analytics Dashboard
         function renderAnalyticsDashboard() {
             let responses = getStoredResponses();
-            const dept = document.getElementById('analyticsDeptSelect').value;
-            const level = document.getElementById('analyticsLevelSelect').value;
+            const school = document.getElementById('analyticsSchoolSelect') ? document.getElementById('analyticsSchoolSelect').value : 'All';
+            const dept = document.getElementById('analyticsDeptSelect') ? document.getElementById('analyticsDeptSelect').value : 'All';
+            const level = document.getElementById('analyticsLevelSelect') ? document.getElementById('analyticsLevelSelect').value : 'All';
 
+            if (school !== 'All') responses = responses.filter(r => getSchoolForDepartment(r.department) === school);
             if (dept !== 'All') responses = responses.filter(r => r.department === dept);
             if (level !== 'All') responses = responses.filter(r => r.course_level === level);
 
@@ -1365,9 +1446,10 @@
             // 5. Populate School Analytics List
             const schoolStats = {};
             Object.keys(DEPARTMENT_SCHOOL_MAP).forEach(s => {
-                schoolStats["School of " + s] = { count: 0, depts: new Set() };
+                schoolStats[s] = { count: 0, depts: new Set() };
             });
-            responses.forEach(r => {
+            const allStored = getStoredResponses();
+            allStored.forEach(r => {
                 const sName = getSchoolForDepartment(r.department);
                 if (!schoolStats[sName]) schoolStats[sName] = { count: 0, depts: new Set() };
                 schoolStats[sName].count++;
@@ -1377,13 +1459,13 @@
             const schoolContainer = document.getElementById('schoolAnalyticsList');
             if (schoolContainer) {
                 schoolContainer.innerHTML = Object.entries(schoolStats).map(([sName, stat]) => `
-                    <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                    <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 hover:bg-slate-100/60 transition">
                         <div>
                             <div class="font-bold text-xs text-slate-900">${sName}</div>
-                            <div class="text-[11px] text-slate-500">${stat.depts.size} active departments responding</div>
+                            <div class="text-[11px] text-slate-500 mt-0.5">${stat.depts.size} department(s) responding: <span class="font-semibold text-slate-700">${stat.depts.size > 0 ? Array.from(stat.depts).join(', ') : 'None yet'}</span></div>
                         </div>
-                        <div class="text-right">
-                            <span class="px-2.5 py-1 rounded-full text-xs font-black ${stat.count > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}">${stat.count} Responses</span>
+                        <div class="text-right flex-shrink-0 ml-3">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-black ${stat.count > 0 ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-slate-200 text-slate-600'}">${stat.count} Responses</span>
                         </div>
                     </div>
                 `).join('');

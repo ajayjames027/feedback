@@ -159,7 +159,7 @@
     </style>
 
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v3"></script>
+    <script src="faculty_roster_data.js?v=20261008_v4"></script>
 </head>
 <body class="text-slate-800 py-8 px-4 sm:px-6 lg:px-8">
 
@@ -176,10 +176,10 @@
 
                 <!-- Center: Academic Typography & Accreditation Details -->
                 <div class="flex-grow text-center space-y-1">
-                    <div class="text-xs md:text-sm font-black tracking-widest text-amber-800 uppercase">
+                    <div class="text-lg md:text-2xl font-black tracking-wide text-amber-900 uppercase">
                         INTERNAL QUALITY ASSURANCE CELL
                     </div>
-                    <h1 class="text-xl md:text-3xl font-extrabold text-blue-900 tracking-tight font-serif">
+                    <h1 class="text-base md:text-xl font-bold text-blue-900 tracking-normal font-serif">
                         St. Joseph’s College (Autonomous)
                     </h1>
                     <div class="text-[11px] md:text-xs text-slate-700 font-medium space-y-0.5">
@@ -1506,8 +1506,10 @@
         // --- Auto-Save Form Draft (Persistence Across Refreshes) ---
         const DRAFT_STORAGE_KEY = 'sjc_feedback_draft_v2';
         let currentStepNumber = 1;
+        let isRestoringDraft = false;
 
         function saveFormDraft() {
+            if (isRestoringDraft) return;
             try {
                 const form = document.getElementById('facultyForm');
                 if (!form) return;
@@ -1521,25 +1523,34 @@
                 // Radios
                 const radios = {};
                 form.querySelectorAll('input[type="radio"]:checked').forEach(r => {
-                    radios[r.name] = r.value;
+                    if (r.name) radios[r.name] = r.value;
                 });
 
                 // Checkboxes
                 const checkboxes = {};
                 form.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
-                    if (!checkboxes[cb.name]) checkboxes[cb.name] = [];
-                    checkboxes[cb.name].push(cb.value);
+                    if (cb.name) {
+                        if (!checkboxes[cb.name]) checkboxes[cb.name] = [];
+                        checkboxes[cb.name].push(cb.value);
+                    }
                 });
 
                 // Text / Textareas
                 const textInputs = {};
-                form.querySelectorAll('input[type="text"], textarea').forEach(txt => {
+                form.querySelectorAll('input[type="text"], input[type="hidden"], textarea').forEach(txt => {
                     if (txt.name) textInputs[txt.name] = txt.value;
                 });
 
+                const coursesHandled = document.querySelector('[name="courses_handled"]');
+                if (coursesHandled) textInputs['courses_handled'] = coursesHandled.value;
+
+                // Only save if there is actual input or advanced step
+                const hasAnyContent = dept || facultyName || Object.keys(radios).length > 0 || (currentStepNumber > 1) || Object.values(textInputs).some(v => (v || '').trim().length > 0);
+                if (!hasAnyContent) return;
+
                 const draft = {
                     currentStep: currentStepNumber || 1,
-                    maxUnlocked: currentMaxStepUnlocked,
+                    maxUnlocked: currentMaxStepUnlocked || 1,
                     dept,
                     facultyName,
                     facultyEmail,
@@ -1561,11 +1572,25 @@
         function restoreFormDraft() {
             try {
                 const raw = localStorage.getItem(DRAFT_STORAGE_KEY);
-                if (!raw) return;
+                if (!raw) {
+                    showStep(1);
+                    return;
+                }
                 const draft = JSON.parse(raw);
-                if (!draft) return;
+                if (!draft) {
+                    showStep(1);
+                    return;
+                }
 
-                // Restore department & faculty
+                const hasContent = draft.dept || draft.facultyName || (draft.radios && Object.keys(draft.radios).length > 0) || (draft.currentStep && draft.currentStep > 1);
+                if (!hasContent) {
+                    showStep(1);
+                    return;
+                }
+
+                isRestoringDraft = true;
+
+                // 1. Restore department & faculty
                 if (draft.dept) {
                     const deptSelect = document.getElementById('deptSelect');
                     if (deptSelect) {
@@ -1587,7 +1612,7 @@
                     if (r) r.checked = true;
                 }
 
-                // Restore Radios
+                // 2. Restore Radios
                 if (draft.radios) {
                     Object.entries(draft.radios).forEach(([name, val]) => {
                         const r = document.querySelector(`input[name="${name}"][value="${val}"]`);
@@ -1595,17 +1620,19 @@
                     });
                 }
 
-                // Restore Checkboxes
+                // 3. Restore Checkboxes
                 if (draft.checkboxes) {
                     Object.entries(draft.checkboxes).forEach(([name, arr]) => {
-                        arr.forEach(val => {
-                            const cb = document.querySelector(`input[name="${name}"][value="${val}"]`);
-                            if (cb) cb.checked = true;
-                        });
+                        if (Array.isArray(arr)) {
+                            arr.forEach(val => {
+                                const cb = document.querySelector(`input[name="${name}"][value="${val}"]`);
+                                if (cb) cb.checked = true;
+                            });
+                        }
                     });
                 }
 
-                // Restore Text & Textareas
+                // 4. Restore Text & Textareas
                 if (draft.textInputs) {
                     Object.entries(draft.textInputs).forEach(([name, val]) => {
                         const el = document.querySelector(`[name="${name}"]`);
@@ -1613,7 +1640,7 @@
                     });
                 }
 
-                // Restore Overlap Data
+                // 5. Restore Overlap Data
                 if (draft.overlapData) {
                     overlapData = draft.overlapData;
                     if (draft.radios && draft.radios['overlapping_courses'] === 'YES') {
@@ -1621,13 +1648,13 @@
                     }
                 }
 
-                // Restore Course Revisions
+                // 6. Restore Course Revisions
                 if (Array.isArray(draft.courseRevisionsList) && draft.courseRevisionsList.length > 0) {
                     courseRevisionsList = draft.courseRevisionsList;
                     renderRevisionTable();
                 }
 
-                // Restore unlocked step & active step
+                // 7. Restore unlocked step & active step
                 if (draft.maxUnlocked) {
                     currentMaxStepUnlocked = Math.max(draft.maxUnlocked, 1);
                 }
@@ -1635,10 +1662,14 @@
                 const targetStep = draft.currentStep || 1;
                 showStep(targetStep);
 
+                isRestoringDraft = false;
+
                 // Show Draft Notification Banner
                 showDraftRestoredBanner();
             } catch (err) {
+                isRestoringDraft = false;
                 console.warn('Error restoring form draft:', err);
+                showStep(1);
             }
         }
 
@@ -1684,13 +1715,14 @@
             initDepartmentOptions();
             renderMatrixTables();
             renderEmergingCheckboxes();
-            showStep(1);
+
+            // Restore draft (or initialize step 1 if no draft)
             restoreFormDraft();
 
             const form = document.getElementById('facultyForm');
             if (form) {
                 form.addEventListener('input', debouncedSaveDraft);
-                form.addEventListener('change', saveFormDraft);
+                form.addEventListener('change', debouncedSaveDraft);
             }
         });
 
@@ -1725,7 +1757,7 @@
                 opt.innerText = `${f.name} (${f.designation || 'Faculty'})`;
                 selectEl.appendChild(opt);
             });
-            saveFormDraft();
+            if (!isRestoringDraft) saveFormDraft();
         }
 
         let currentMaxStepUnlocked = 1;
@@ -1734,14 +1766,14 @@
         function onFacultySelectChange() {
             const selectEl = document.getElementById('facultyNameSelect');
             const selectedOpt = selectEl.options[selectEl.selectedIndex];
-            if (!selectedOpt) return;
+            if (!selectedOpt || !selectedOpt.value) return;
 
             const name = selectedOpt.value;
             const dept = document.getElementById('deptSelect').value;
             const email = selectedOpt.dataset.email || '';
 
             // Check duplicate submission
-            if (checkDuplicateSubmission(name, dept, email)) {
+            if (!isRestoringDraft && checkDuplicateSubmission(name, dept, email)) {
                 document.getElementById('duplicateAlertText').innerText = `Feedback for ${name} (${dept}) has already been submitted and recorded. Multiple submissions for the same faculty profile are restricted.`;
                 document.getElementById('duplicateAlertModal').classList.remove('hidden');
                 selectEl.value = "";
@@ -1754,7 +1786,7 @@
             document.getElementById('facultyDesignation').innerText = selectedOpt.dataset.desig || '';
             document.getElementById('facultyEmailText').innerText = email || '';
             document.getElementById('facultyMetaBadge').classList.remove('hidden');
-            saveFormDraft();
+            if (!isRestoringDraft) saveFormDraft();
         }
 
         function checkDuplicateSubmission(name, dept, email) {
@@ -1885,7 +1917,7 @@
             }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            saveFormDraft();
+            if (!isRestoringDraft) saveFormDraft();
         }
 
         function goToStep(stepNum) {
