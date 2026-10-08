@@ -252,7 +252,7 @@
 <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v10"></script>
+    <script src="faculty_roster_data.js?v=20261008_v11"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -377,7 +377,7 @@
                         Faculty Submission Roster & Pending Tracker
                     </h1>
                     <p class="text-xs md:text-sm text-slate-500 mt-1">
-                        Monitor submission status for all <strong>319 teaching staff members</strong> across 33 academic departments
+                        Monitor submission status for all <strong id="lblTotalFacultyCount">317</strong> teaching staff members across 33 academic departments
                     </p>
                 </div>
 
@@ -394,6 +394,10 @@
                     <button onclick="exportPendingCSV()" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs rounded-xl shadow-sm transition flex items-center space-x-1.5">
                         <i class="fa-solid fa-file-excel text-emerald-400"></i>
                         <span>Export Pending List</span>
+                    </button>
+                    <button onclick="restoreMasterRosterUI()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl border border-slate-300 shadow-sm transition flex items-center space-x-1.5" title="Restore Master Faculty Roster back to all 317 official members">
+                        <i class="fa-solid fa-rotate-left text-indigo-600"></i>
+                        <span>Restore Master Roster (317)</span>
                     </button>
                     <button onclick="openAddFacultyModal()" class="px-4 py-2.5 bg-blue-900 hover:bg-blue-950 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center space-x-1.5 hover:shadow-md">
                         <i class="fa-solid fa-user-plus text-amber-400"></i>
@@ -451,7 +455,7 @@
                         <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-chalkboard-user"></i></div>
                     </div>
                     <div class="mt-3">
-                        <div class="text-3xl font-black text-slate-900" id="kpiTotalFaculty">319</div>
+                        <div class="text-3xl font-black text-slate-900" id="kpiTotalFaculty">317</div>
                         <div class="text-[11px] text-slate-500 mt-0.5">Faculty_2026_2027 Roster</div>
                     </div>
                     <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
@@ -475,7 +479,7 @@
                         <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm font-bold"><i class="fa-solid fa-clock"></i></div>
                     </div>
                     <div class="mt-3">
-                        <div id="kpiPending" class="text-3xl font-black text-amber-600">319</div>
+                        <div id="kpiPending" class="text-3xl font-black text-amber-600">317</div>
                         <div class="text-[11px] text-slate-500 mt-0.5">Action required</div>
                     </div>
                     <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
@@ -514,10 +518,10 @@
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-100">
                     <div class="flex items-center bg-slate-100 p-1 rounded-xl text-xs font-bold">
                         <button onclick="setRosterFilterStatus('ALL')" id="tab-all" class="px-3 py-1.5 rounded-lg bg-white shadow-sm text-slate-900 transition">
-                            All Faculty (<span id="tabCountAll">319</span>)
+                            All Faculty (<span id="tabCountAll">317</span>)
                         </button>
                         <button onclick="setRosterFilterStatus('PENDING')" id="tab-pending" class="px-3 py-1.5 rounded-lg text-amber-700 hover:text-amber-900 transition">
-                            Pending (<span id="tabCountPending">319</span>)
+                            Pending (<span id="tabCountPending">317</span>)
                         </button>
                         <button onclick="setRosterFilterStatus('SUBMITTED')" id="tab-submitted" class="px-3 py-1.5 rounded-lg text-emerald-700 hover:text-emerald-900 transition">
                             Submitted (<span id="tabCountSubmitted">0</span>)
@@ -1222,10 +1226,23 @@
 
         // Init
         document.addEventListener('DOMContentLoaded', () => {
+            // Restore Master Faculty Roster if any entries were accidentally removed during response testing
+            if (typeof window.resetFacultyRosterToMaster === 'function') {
+                window.resetFacultyRosterToMaster();
+            }
             initDropdowns();
-            
             renderRosterTable();
         });
+
+        function restoreMasterRosterUI() {
+            if (!confirm("Are you sure you want to restore the Master Faculty Roster to all 317 members from the official college data?")) return;
+            if (typeof window.resetFacultyRosterToMaster === 'function') {
+                window.resetFacultyRosterToMaster();
+            }
+            initDropdowns();
+            renderRosterTable();
+            showToast("Master Faculty Roster restored to all 317 members!", "success");
+        }
 
         function initDropdowns() {
             const depts = Array.from(new Set(MASTER_FACULTY_ROSTER.map(f => f.department))).filter(Boolean).sort();
@@ -1407,6 +1424,8 @@
             const rate = total > 0 ? Math.round((submitted / total) * 100) : 0;
 
             document.getElementById('kpiTotalFaculty').innerText = total;
+            const lblTotal = document.getElementById('lblTotalFacultyCount');
+            if (lblTotal) lblTotal.innerText = total;
             document.getElementById('kpiSubmitted').innerText = submitted;
             document.getElementById('kpiPending').innerText = pending;
             document.getElementById('kpiTurnout').innerText = rate + '%';
@@ -1521,25 +1540,18 @@
         function deleteFacultyFromRoster(encName, encDept) {
             const name = decodeURIComponent(encName);
             const dept = decodeURIComponent(encDept);
-            if (!confirm(`Are you sure you want to remove ${name} (${dept}) from the Master Roster?`)) return;
+            const msg = `WARNING: Remove from Master Roster?\n\n` +
+                        `You are about to remove ${name} (${dept}) from the Master College Faculty list.\n` +
+                        `• This will decrease the Total Faculty count.\n` +
+                        `• If you only want to delete their test feedback response, click Cancel and go to the "Response Record Explorer" tab instead.\n\n` +
+                        `Are you sure you want to remove this faculty member from the Master Roster?`;
+            if (!confirm(msg)) return;
             const idx = MASTER_FACULTY_ROSTER.findIndex(f => f.name === name && f.department === dept);
             if (idx !== -1) {
                 MASTER_FACULTY_ROSTER.splice(idx, 1);
-                try {
-                    let customList = JSON.parse(localStorage.getItem('sjc_custom_faculty_list') || '[]');
-                    customList = customList.filter(f => !(f.name.toLowerCase() === name.toLowerCase() && f.department.toLowerCase() === dept.toLowerCase()));
-                    localStorage.setItem('sjc_custom_faculty_list', JSON.stringify(customList));
-
-                    let deletedList = JSON.parse(localStorage.getItem('sjc_deleted_faculty_list') || '[]');
-                    deletedList.push({ name, department: dept });
-                    localStorage.setItem('sjc_deleted_faculty_list', JSON.stringify(deletedList));
-                } catch (e) {
-                    console.error(e);
-                }
-
                 initDropdowns();
                 renderRosterTable();
-                showToast(`Removed ${name} from Master Roster.`);
+                showToast(`Removed ${name} from Master Roster. (You can restore anytime via 'Restore Master Roster')`, 'info');
             }
         }
 
@@ -2468,7 +2480,7 @@
             const list = getStoredResponses();
             const r = list[idx];
             if (!r) return;
-            if (!confirm(`Are you sure you want to permanently delete the feedback response recorded for ${r.faculty_name} (${r.department})?`)) return;
+            if (!confirm(`Are you sure you want to permanently delete the feedback response recorded for ${r.faculty_name} (${r.department})?\n\n(Note: This only deletes this feedback submission and marks the faculty member as "Pending" in the Master Roster. It will NEVER delete the faculty member from the Master Roster.)`)) return;
 
             // 1. Immediately add to permanent blacklist in localStorage so it never re-appears
             try {

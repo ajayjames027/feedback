@@ -3488,29 +3488,32 @@ const MASTER_FACULTY_ROSTER = [
     }
 ];
 
-// Auto-sync custom added and deleted faculty from localStorage
+// Store immutable copy of original 317 faculty roster from official Excel file
+const RAW_MASTER_FACULTY_ROSTER = JSON.parse(JSON.stringify(MASTER_FACULTY_ROSTER));
+
+// Auto-sync custom added faculty and preserve master roster
 (function initFacultyStorageSync() {
     if (typeof window === 'undefined') return;
 
-    window.syncCustomFacultyFromStorage = function() {
+    // Remove any accidental deletions created during testing so all 317 members are restored
+    try {
+        if (localStorage.getItem('sjc_deleted_faculty_list')) {
+            localStorage.removeItem('sjc_deleted_faculty_list');
+        }
+    } catch(e) {}
+
+    window.resetFacultyRosterToMaster = function() {
+        try {
+            localStorage.removeItem('sjc_deleted_faculty_list');
+        } catch(e) {}
+
+        // Restore back to full original 317 roster
+        MASTER_FACULTY_ROSTER.length = 0;
+        RAW_MASTER_FACULTY_ROSTER.forEach(f => MASTER_FACULTY_ROSTER.push({ ...f }));
+
+        // Append any legitimately added custom faculty
         try {
             const custom = JSON.parse(localStorage.getItem('sjc_custom_faculty_list') || '[]');
-            const deleted = JSON.parse(localStorage.getItem('sjc_deleted_faculty_list') || '[]');
-
-            // Remove locally deleted faculty
-            if (Array.isArray(deleted) && deleted.length > 0) {
-                deleted.forEach(del => {
-                    const idx = MASTER_FACULTY_ROSTER.findIndex(f => 
-                        (f.name || '').trim().toLowerCase() === (del.name || '').trim().toLowerCase() && 
-                        (f.department || '').trim().toLowerCase() === (del.department || '').trim().toLowerCase()
-                    );
-                    if (idx !== -1) {
-                        MASTER_FACULTY_ROSTER.splice(idx, 1);
-                    }
-                });
-            }
-
-            // Append or update custom faculty
             if (Array.isArray(custom)) {
                 custom.forEach(cf => {
                     const idx = MASTER_FACULTY_ROSTER.findIndex(f => 
@@ -3527,6 +3530,10 @@ const MASTER_FACULTY_ROSTER = [
         } catch (e) {
             console.warn('Storage sync error:', e);
         }
+    };
+
+    window.syncCustomFacultyFromStorage = function() {
+        window.resetFacultyRosterToMaster();
     };
 
     window.syncCustomFacultyFromStorage();
