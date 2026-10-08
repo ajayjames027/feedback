@@ -272,7 +272,7 @@
 <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v12"></script>
+    <script src="faculty_roster_data.js?v=20261008_v13"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -1158,6 +1158,47 @@
             'Climate Change'
         ];
 
+        function getResponseRating(r, mapKey, itemName, idx) {
+            if (!r) return undefined;
+            const obj = r[mapKey];
+            if (!obj || typeof obj !== 'object') return undefined;
+            if (obj[itemName] !== undefined) return obj[itemName];
+
+            const prefixLetter = mapKey === 'overall_effectiveness' ? 'B' : (mapKey === 'obe_evaluation' ? 'C' : (mapKey === 'curriculum_structure' ? 'D' : ''));
+            const keys = Object.keys(obj);
+
+            if (prefixLetter && idx !== undefined) {
+                const expectedPrefix = `${prefixLetter}${idx + 1}.`;
+                const foundKey = keys.find(k => k.startsWith(expectedPrefix));
+                if (foundKey && obj[foundKey] !== undefined) return obj[foundKey];
+            }
+
+            const cleanItem = String(itemName || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+            for (const k of keys) {
+                const cleanK = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+                if (cleanK.includes(cleanItem.substring(0, 12)) || cleanItem.includes(cleanK.substring(0, 12))) {
+                    return obj[k];
+                }
+            }
+
+            if (idx !== undefined && keys[idx] !== undefined) {
+                return obj[keys[idx]];
+            }
+
+            return undefined;
+        }
+
+        function formatResponseMapOrString(val) {
+            if (!val) return 'None';
+            if (typeof val === 'string') return val;
+            if (typeof val === 'object') {
+                const entries = Object.entries(val).filter(([k, v]) => v);
+                if (entries.length === 0) return 'None';
+                return entries.map(([k, v]) => `${k}: ${v}`).join('; ');
+            }
+            return String(val);
+        }
+
         // Switch Tabs
         function switchTab(tabId) {
             document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
@@ -1688,16 +1729,16 @@
             };
 
             // Overall Effectiveness
-            const effMeans = effItems.map(item => {
-                const vals = responses.map(r => parseVal(r.overall_effectiveness?.[item])).filter(v => v > 0);
+            const effMeans = effItems.map((item, idx) => {
+                const vals = responses.map(r => parseVal(getResponseRating(r, 'overall_effectiveness', item, idx))).filter(v => v > 0);
                 return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
             });
             const overallEffAvg = effMeans.length ? (effMeans.reduce((a, b) => a + b, 0) / effMeans.length) : 0;
             const overallEffPct = Math.round((overallEffAvg / 5.0) * 100);
 
             // OBE
-            const obeMeans = obeItems.map(item => {
-                const vals = responses.map(r => parseVal(r.obe_evaluation?.[item])).filter(v => v > 0);
+            const obeMeans = obeItems.map((item, idx) => {
+                const vals = responses.map(r => parseVal(getResponseRating(r, 'obe_evaluation', item, idx))).filter(v => v > 0);
                 return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
             });
             const overallObeAvg = obeMeans.length ? (obeMeans.reduce((a, b) => a + b, 0) / obeMeans.length) : 0;
@@ -1761,14 +1802,14 @@
             // 3. Structure Bar
             const structMeans = structItems.map((item, idx) => {
                 const vals = responses.map(r => {
-                    const cs = r.curriculum_structure || {};
-                    let v = cs[item];
-                    if (v === undefined) v = cs[`D${idx+1}. ${item}`];
-                    if (v === undefined) {
-                        const m = Object.keys(cs).find(k => k.startsWith(`D${idx+1}.`) || k.toLowerCase().includes(item.toLowerCase().substring(0, 15)));
-                        if (m) v = cs[m];
-                    }
-                    return parseVal(v);
+                    const rawVal = getResponseRating(r, 'curriculum_structure', item, idx);
+                    const s = String(rawVal || '').trim().toLowerCase();
+                    if (s.startsWith('ad')) return 4;
+                    if (s.startsWith('ex')) return 3;
+                    if (s.startsWith('in')) return 2;
+                    if (s.startsWith('ab')) return 1;
+                    const n = parseFloat(s);
+                    return isNaN(n) ? 0 : n;
                 }).filter(v => v > 0);
                 return vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
             });
@@ -1931,7 +1972,7 @@
                 let validCount = 0;
 
                 latestAnalyticsResponses.forEach(r => {
-                    const rawVal = r[responsesMapKey]?.[itemName];
+                    const rawVal = getResponseRating(r, responsesMapKey, itemName, qIdx - 1);
                     const num = parseNum(rawVal);
                     if (num !== null && counts[num] !== undefined) {
                         counts[num]++;
@@ -2013,9 +2054,9 @@
 
             // -------------------- SECTION B -------------------- //
             const effValidScores = [];
-            effItems.forEach(item => {
+            effItems.forEach((item, idx) => {
                 latestAnalyticsResponses.forEach(r => {
-                    const n = parseNum(r.overall_effectiveness?.[item]);
+                    const n = parseNum(getResponseRating(r, 'overall_effectiveness', item, idx));
                     if (n !== null) effValidScores.push(n);
                 });
             });
@@ -2045,9 +2086,9 @@
 
             // -------------------- SECTION C -------------------- //
             const obeValidScores = [];
-            obeItems.forEach(item => {
+            obeItems.forEach((item, idx) => {
                 latestAnalyticsResponses.forEach(r => {
-                    const n = parseNum(r.obe_evaluation?.[item]);
+                    const n = parseNum(getResponseRating(r, 'obe_evaluation', item, idx));
                     if (n !== null) obeValidScores.push(n);
                 });
             });
@@ -2099,13 +2140,7 @@
                             const counts = { 'Adequate': 0, 'Inadequate': 0, 'Excess': 0, 'Absent': 0 };
                             let vCount = 0;
                             latestAnalyticsResponses.forEach(r => {
-                                const cs = r.curriculum_structure || {};
-                                let rawVal = cs[item];
-                                if (rawVal === undefined) rawVal = cs[`D${idx+1}. ${item}`];
-                                if (rawVal === undefined) {
-                                    const m = Object.keys(cs).find(k => k.startsWith(`D${idx+1}.`) || k.toLowerCase().includes(item.toLowerCase().substring(0, 15)));
-                                    if (m) rawVal = cs[m];
-                                }
+                                const rawVal = getResponseRating(r, 'curriculum_structure', item, idx);
                                 const val = parseAdequacy(rawVal);
                                 if (counts[val] !== undefined) {
                                     counts[val]++;
@@ -2793,30 +2828,59 @@
             }
 
             // Build full question key list dynamically
-            let headers = ["S.No", "Timestamp", "School", "Department", "Faculty Name", "Email", "Programme Level", "Courses Handled"];
+            let headers = [
+                "S.No", 
+                "Timestamp", 
+                "School", 
+                "Department", 
+                "Faculty Name", 
+                "Email Address", 
+                "Programme Level"
+            ];
 
-            // Add Section B headers
-            effItems.forEach(q => headers.push(`[Section B] ${q}`));
-            // Add Section C headers
-            obeItems.forEach(q => headers.push(`[Section C] ${q}`));
-            // Add Section D headers
-            structItems.forEach(q => headers.push(`[Section D] ${q}`));
+            // Add Section B headers (12 dimensions)
+            effItems.forEach((q, idx) => headers.push(`[Section B${idx+1}] ${q}`));
+
+            // Add Section C headers (8 metrics)
+            obeItems.forEach((q, idx) => headers.push(`[Section C${idx+1}] ${q}`));
+
+            // Add Section D headers (8 structure items + overlaps)
+            structItems.forEach((q, idx) => headers.push(`[Section D${idx+1}] ${q}`));
+            headers.push("[Section D9] Repeated / Overlapping / Outdated Courses Identified (Yes/No)");
+            headers.push("[Section D10] Overlapping Courses Details Logged");
+
             // Add Section E headers
-            headers.push("[Section E] Selected Emerging Areas");
-            headers.push("[Section E] Other Emerging Areas");
-            // Add Section F, G, H, I, J
-            headers.push("[Section F] Experiential Learning Rating (/5)");
-            headers.push("[Section F] Research Orientation");
-            headers.push("[Section G] NSQF Alignment");
-            headers.push("[Section H] Stakeholder Sources");
-            headers.push("[Section I] IKS Effectiveness Rating (/5)");
-            headers.push("[Section I] IKS Integration Modes");
-            headers.push("Overlapping Content Logged");
-            headers.push("Overlap Details");
-            headers.push("[Section J] Proposed Course Revisions");
-            headers.push("[Section J] General Suggestions");
+            headers.push("[Section E1] Multidisciplinary & Cross-Faculty Choice Rating (1-5)");
+            headers.push("[Section E2] Flexible Learning Paths (Selected Options)");
+            headers.push("[Section E3] Elective Courses Scope & Diversity Rating (1-5)");
+            headers.push("[Section E4] Emerging / Advanced Areas (Selected Domains)");
+            headers.push("[Section E5] Emerging Areas (Other Specific Topics)");
 
-            let csvContent = "\uFEFF" + headers.map(h => `"${h.replace(/"/g, '""')}"`).join(",") + "\n";
+            // Add Section F headers
+            headers.push("[Section F1] Experiential Learning Components Adequacy");
+            headers.push("[Section F2] Digital & Blended Learning Integration");
+            headers.push("[Section F3] Research Orientation Integration Modes");
+            headers.push("[Section F4] NEP 2020 Implementation Challenges Faced");
+
+            // Add Section G headers
+            headers.push("[Section G1] NSQF & Skill Development Alignment Rating (1-5)");
+            headers.push("[Section G2] NSQF-Aligned Job Role / Skill Courses Proposed");
+
+            // Add Section H headers
+            headers.push("[Section H1] Curricular Inputs from Stakeholders (Selected Sources)");
+            headers.push("[Section H2] Other Stakeholder Input Sources");
+            headers.push("[Section H3] Responsiveness to Stakeholder Needs");
+
+            // Add Section I headers
+            headers.push("[Section I1] Indian Knowledge Systems (IKS) Effectiveness Rating (1-5)");
+            headers.push("[Section I2] IKS Integration Modes (Selected)");
+            headers.push("[Section I3] Other IKS Integration Suggestions");
+
+            // Add Section J headers
+            headers.push("[Section J1] Specific Courses Proposed for Revision / Addition / Deletion");
+            headers.push("[Section J2] General Suggestions & Institutional Feedback");
+
+            let csvContent = "\uFEFF" + headers.map(h => `"${String(h).replace(/"/g, '""')}"`).join(",") + "\n";
 
             responses.forEach((r, idx) => {
                 let row = [
@@ -2826,45 +2890,63 @@
                     r.department || '',
                     r.faculty_name || '',
                     r.faculty_email || '',
-                    r.course_level || '',
-                    r.courses_handled || ''
+                    r.course_level || ''
                 ];
 
-                // Section B ratings
-                effItems.forEach(q => row.push(r.overall_effectiveness?.[q] || 'N/A'));
-                // Section C ratings
-                obeItems.forEach(q => row.push(r.obe_evaluation?.[q] || 'N/A'));
-                // Section D ratings
-                structItems.forEach((q, idx) => {
-                    const cs = r.curriculum_structure || {};
-                    let val = cs[q];
-                    if (val === undefined) val = cs[`D${idx+1}. ${q}`];
-                    if (val === undefined) {
-                        const m = Object.keys(cs).find(k => k.startsWith(`D${idx+1}.`) || k.toLowerCase().includes(q.toLowerCase().substring(0, 15)));
-                        if (m) val = cs[m];
-                    }
-                    row.push(val || 'N/A');
+                // Section B ratings (12 dimensions)
+                effItems.forEach((q, qIdx) => {
+                    const val = getResponseRating(r, 'overall_effectiveness', q, qIdx);
+                    row.push(val !== undefined && val !== '' ? val : 'Not Rated');
                 });
-                // Section E
-                row.push(Array.isArray(r.emerging_areas) ? r.emerging_areas.join("; ") : (r.emerging_areas || 'N/A'));
-                row.push(r.emerging_other || 'N/A');
-                // Section F
-                row.push(r.experiential_rating || 'N/A');
-                row.push(Array.isArray(r.research_orientation) ? r.research_orientation.join("; ") : (r.research_orientation || 'N/A'));
-                // Section G
-                row.push(r.nsqf_alignment || 'N/A');
-                // Section H
-                row.push(Array.isArray(r.stakeholder_sources) ? r.stakeholder_sources.join("; ") : (r.stakeholder_sources || 'N/A'));
-                // Section I
-                row.push(r.iks_effectiveness || 'N/A');
-                row.push(Array.isArray(r.iks_modes) ? r.iks_modes.join("; ") : (r.iks_modes || 'N/A'));
-                // Overlaps
+
+                // Section C ratings (8 OBE metrics)
+                obeItems.forEach((q, qIdx) => {
+                    const val = getResponseRating(r, 'obe_evaluation', q, qIdx);
+                    row.push(val !== undefined && val !== '' ? val : 'Not Rated');
+                });
+
+                // Section D ratings (8 structure components)
+                structItems.forEach((q, qIdx) => {
+                    const val = getResponseRating(r, 'curriculum_structure', q, qIdx);
+                    row.push(val !== undefined && val !== '' ? val : 'Not Rated');
+                });
                 row.push(r.overlapping_courses || 'No');
-                row.push(r.overlapping_details || '');
+                row.push(r.overlapping_details || 'None');
+
+                // Section E
+                row.push(r.multidisciplinary_rating || 'Not Rated');
+                row.push(Array.isArray(r.flexible_learning_paths) && r.flexible_learning_paths.length ? r.flexible_learning_paths.join("; ") : (r.flexible_learning_paths || 'None'));
+                row.push(r.electives_rating || 'Not Rated');
+                row.push(Array.isArray(r.emerging_areas) && r.emerging_areas.length ? r.emerging_areas.join("; ") : (r.emerging_areas || 'None'));
+                row.push(r.emerging_other || 'None');
+
+                // Section F
+                row.push(formatResponseMapOrString(r.experiential_learning));
+                row.push(formatResponseMapOrString(r.digital_learning));
+                row.push(Array.isArray(r.research_orientation) && r.research_orientation.length ? r.research_orientation.join("; ") : (r.research_orientation || 'None'));
+                row.push(r.nep_challenges || 'None');
+
+                // Section G
+                row.push(r.nsqf_alignment || 'Not Rated');
+                row.push(r.nsqf_courses || 'None');
+
+                // Section H
+                row.push(Array.isArray(r.stakeholder_sources) && r.stakeholder_sources.length ? r.stakeholder_sources.join("; ") : (r.stakeholder_sources || 'None'));
+                row.push(r.stakeholder_sources_other || 'None');
+                row.push(formatResponseMapOrString(r.stakeholder_needs));
+
+                // Section I
+                row.push(r.iks_effectiveness || 'Not Rated');
+                const iksModes = r.iks_integration_modes || r.iks_modes;
+                row.push(Array.isArray(iksModes) && iksModes.length ? iksModes.join("; ") : (iksModes || 'None'));
+                row.push(r.iks_other || 'None');
+
                 // Section J
-                const revSummary = (r.course_revisions || []).map(c => `${c.title} (Sem ${c.sem}): ${c.change} [Reason: ${c.reason}]`).join(" | ");
-                row.push(revSummary || r.courses_to_revise || 'None');
-                row.push(r.general_feedback || '');
+                const revSummary = Array.isArray(r.course_revisions) && r.course_revisions.length > 0 
+                    ? r.course_revisions.map((c, cIdx) => `[${cIdx+1}] ${c.title || 'Course'} (Sem ${c.sem || '-'}): ${c.change || 'Revise'}${c.reason ? ' [Reason: ' + c.reason + ']' : ''}`).join(" | ")
+                    : (r.courses_to_revise || 'None');
+                row.push(revSummary);
+                row.push(r.other_recommendations || r.general_feedback || 'None');
 
                 csvContent += row.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",") + "\n";
             });
@@ -2879,15 +2961,8 @@
         }
 
         function exportAllResponsesCSV() {
-            const list = getStoredResponses();
-            if (list.length === 0) { showToast("No responses to export"); return; }
-            let csv = "ID,Timestamp,School,Department,Faculty Name,Email,Level,Multidisciplinary,Overlaps,Overlapping Details,Revisions\n";
-            list.forEach((r, i) => {
-                csv += `"${i+1}","${r.timestamp}","${getSchoolForDepartment(r.department)}","${r.department}","${r.faculty_name}","${r.faculty_email}","${r.course_level}","${r.multidisciplinary_rating}","${r.overlapping_courses}","${r.overlapping_details||''}","${r.courses_to_revise||''}"\n`;
-            });
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = 'faculty_feedback_responses.csv'; a.click();
+            // Exports the complete full response matrix so CSV download is never truncated
+            exportQuestionWiseExcel();
         }
 
         function exportAllResponsesJSON() {
@@ -2909,7 +2984,7 @@
             };
 
             document.getElementById('reportEffBody').innerHTML = effItems.map((item, idx) => {
-                const vals = responses.map(r => parseVal(r.overall_effectiveness?.[item])).filter(v => v > 0);
+                const vals = responses.map(r => parseVal(getResponseRating(r, 'overall_effectiveness', item, idx))).filter(v => v > 0);
                 const mean = vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
                 const pct = Math.round((mean / 5.0) * 100);
                 return `
