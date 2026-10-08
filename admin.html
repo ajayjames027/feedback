@@ -272,7 +272,7 @@
 <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v14"></script>
+    <script src="faculty_roster_data.js?v=20261008_v15"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -2149,10 +2149,26 @@
                             <button onclick="copySingleEmail('${f.email}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold border border-slate-300 transition" title="Copy Email">
                                 <i class="fa-regular fa-copy"></i>
                             </button>
+                            <button onclick="copyPersonalizedFacultyLink('${encodeURIComponent(f.email || f.name).replace(/'/g, "%27")}', '${encodeURIComponent(f.name).replace(/'/g, "%27")}')" class="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold border border-indigo-200 transition" title="Copy Personalized Link (Pops up with their name)">
+                                <i class="fa-solid fa-link"></i>
+                            </button>
                         </div>
                     </td>
                 </tr>
             `).join('');
+        }
+
+        function copyPersonalizedFacultyLink(emailOrNameEncoded, facultyNameEncoded) {
+            const rawTarget = decodeURIComponent(emailOrNameEncoded);
+            const facultyName = decodeURIComponent(facultyNameEncoded);
+            let base = window.location.href.split('?')[0].replace('admin.html', '').replace(/\/$/, '') + '/index.html';
+            const param = rawTarget.includes('@') ? `email=${encodeURIComponent(rawTarget)}` : `faculty=${encodeURIComponent(facultyName)}`;
+            const fullUrl = `${base}?${param}`;
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                showToast(`Copied personalized link for ${facultyName}!`, 'success');
+            }).catch(() => {
+                prompt("Personalized link for " + facultyName + ":", fullUrl);
+            });
         }
 
         function copySingleEmail(email) {

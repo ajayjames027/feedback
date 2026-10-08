@@ -246,7 +246,7 @@
     </style>
 
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v14"></script>
+    <script src="faculty_roster_data.js?v=20261008_v15"></script>
 </head>
 <body class="text-slate-800 py-8 px-4 sm:px-6 lg:px-8">
 
@@ -1410,6 +1410,68 @@
     <!-- Toast Container -->
     <div id="toastContainer" class="fixed bottom-5 right-5 z-[300] space-y-2 pointer-events-none"></div>
 
+    <!-- Personalized Faculty Welcome Pop-up Modal -->
+    <div id="facultyWelcomeModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[250] flex items-center justify-center p-4 hidden animate-in fade-in duration-200">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 text-center space-y-6 shadow-2xl border-2 border-indigo-100 relative overflow-hidden">
+            <!-- Close icon button -->
+            <button type="button" onclick="dismissWelcomeModal()" class="absolute top-4 right-4 w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 transition flex items-center justify-center text-sm">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- College Crest & Institutional Header -->
+            <div class="space-y-2">
+                <img src="sjc-logo-small (1).png" alt="St. Joseph's College Crest" class="w-16 h-20 mx-auto object-contain">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-50 border border-indigo-200 rounded-full text-[10px] font-black uppercase tracking-wider text-indigo-900">
+                    <i class="fa-solid fa-award text-amber-500"></i>
+                    <span>Internal Quality Assurance Cell (IQAC)</span>
+                </div>
+                <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                    St. Joseph's College (Autonomous), Tiruchirappalli
+                </div>
+            </div>
+
+            <!-- Personalized Greeting -->
+            <div class="space-y-1.5">
+                <div class="text-xs font-bold text-indigo-600 uppercase tracking-widest flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-hand-sparkles text-amber-400"></i>
+                    <span id="welcomeGreetingPrefix">Warm Welcome</span>
+                </div>
+                <h3 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight" id="welcomeFacultyName">
+                    Faculty Member
+                </h3>
+            </div>
+
+            <!-- Faculty Profile Card -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-left text-xs space-y-2">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                    <span class="text-slate-500 font-semibold">Department:</span>
+                    <span class="font-bold text-slate-900 text-right" id="welcomeFacultyDept">—</span>
+                </div>
+                <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                    <span class="text-slate-500 font-semibold">Designation:</span>
+                    <span class="font-bold text-indigo-900 text-right" id="welcomeFacultyDesig">—</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-500 font-semibold">School:</span>
+                    <span class="font-bold text-slate-800 text-right" id="welcomeFacultySchool">—</span>
+                </div>
+            </div>
+
+            <!-- Submission Status or Prompt Note -->
+            <div id="welcomeStatusNote" class="text-xs text-slate-600 leading-relaxed">
+                Thank you for contributing to the <strong>Teacher Feedback on Curricular Design & Syllabus Revision (2025–26)</strong>. Your academic perspectives directly steer syllabus modernization and NAAC quality benchmarks.
+            </div>
+
+            <!-- Action Button -->
+            <div>
+                <button type="button" onclick="dismissWelcomeModal()" class="w-full py-3.5 bg-gradient-to-r from-blue-900 to-indigo-900 hover:from-blue-950 hover:to-indigo-950 text-white font-extrabold text-xs sm:text-sm rounded-xl shadow-lg shadow-indigo-900/25 transition flex items-center justify-center gap-2">
+                    <span>Proceed to Feedback Form</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Duplicate Submission Alert Modal -->
     <div id="duplicateAlertModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl border border-rose-100">
@@ -2081,6 +2143,9 @@
             // Restore draft (or initialize step 1 if no draft)
             restoreFormDraft();
 
+            // Check for URL parameter (e.g. ?email=... or ?faculty=...) or saved profile to pop up welcome message
+            checkUrlParametersOrStoredProfile();
+
             // Re-verify form access immediately after restoring draft
             const deadlineDate = new Date(currentSystemSettings.deadline);
             const now = new Date();
@@ -2093,6 +2158,129 @@
             if (form) {
                 form.addEventListener('input', debouncedSaveDraft);
                 form.addEventListener('change', debouncedSaveDraft);
+            }
+        });
+
+        const SCHOOL_NAME_MAP = {
+            "SBS": "School of Biological Sciences (SBS)",
+            "SCO": "School of Commerce Studies (SCO)",
+            "SCS": "School of Computing Sciences (SCS)",
+            "SLC": "School of Languages & Culture (SLC)",
+            "SMS": "School of Management Studies (SMS)",
+            "SPS": "School of Physical Sciences (SPS)",
+            "OTHERS": "Interdisciplinary & Others"
+        };
+
+        function getSchoolForDepartment(dept) {
+            if (!dept) return "General";
+            const trimmed = dept.trim().toLowerCase();
+            const rosterEntry = MASTER_FACULTY_ROSTER.find(f => (f.department || '').trim().toLowerCase() === trimmed);
+            if (rosterEntry && rosterEntry.school && SCHOOL_NAME_MAP[rosterEntry.school]) {
+                return SCHOOL_NAME_MAP[rosterEntry.school];
+            }
+            return "School of Arts & Sciences";
+        }
+
+        function showFacultyWelcomeModal(f, isReturning = false) {
+            if (!f || !f.name) return;
+            const modal = document.getElementById('facultyWelcomeModal');
+            if (!modal) return;
+
+            // Do not show if portal closed deadline modal is active
+            const closedModal = document.getElementById('closedFormModal');
+            if (closedModal && !closedModal.classList.contains('hidden')) return;
+
+            const nameEl = document.getElementById('welcomeFacultyName');
+            const deptEl = document.getElementById('welcomeFacultyDept');
+            const desigEl = document.getElementById('welcomeFacultyDesig');
+            const schoolEl = document.getElementById('welcomeFacultySchool');
+            const prefixEl = document.getElementById('welcomeGreetingPrefix');
+
+            if (prefixEl) prefixEl.innerText = isReturning ? 'Welcome Back!' : 'Warm Welcome!';
+            if (nameEl) nameEl.innerText = f.name;
+            if (deptEl) deptEl.innerText = f.department || '—';
+            if (desigEl) desigEl.innerText = f.designation || 'Faculty';
+            if (schoolEl) schoolEl.innerText = getSchoolForDepartment(f.department) || '—';
+
+            // Check if already submitted
+            const isSubmitted = checkDuplicateSubmission(f.name, f.department, f.email);
+            const statusNote = document.getElementById('welcomeStatusNote');
+            if (statusNote) {
+                if (isSubmitted) {
+                    statusNote.innerHTML = `
+                        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-900 text-xs font-semibold flex items-center gap-2 text-left">
+                            <i class="fa-solid fa-circle-check text-emerald-600 text-base shrink-0"></i>
+                            <span>Your teacher curricular feedback has already been successfully recorded in the system. Thank you for your active participation!</span>
+                        </div>
+                    `;
+                } else {
+                    statusNote.innerHTML = `
+                        Thank you for contributing to the <strong>Teacher Feedback on Curricular Design & Syllabus Revision (2025–26)</strong>. Your academic perspectives directly steer syllabus modernization and NAAC quality benchmarks.
+                    `;
+                }
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function dismissWelcomeModal() {
+            const modal = document.getElementById('facultyWelcomeModal');
+            if (modal) modal.classList.add('hidden');
+            const formSec = document.getElementById('form-section-1');
+            if (formSec) {
+                formSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function checkUrlParametersOrStoredProfile() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const queryEmail = (urlParams.get('email') || '').trim().toLowerCase();
+                const queryFaculty = (urlParams.get('faculty') || urlParams.get('name') || urlParams.get('f') || '').trim().toLowerCase();
+
+                let matched = null;
+                if (queryEmail) {
+                    matched = MASTER_FACULTY_ROSTER.find(f => (f.email || '').trim().toLowerCase() === queryEmail);
+                }
+                if (!matched && queryFaculty) {
+                    matched = MASTER_FACULTY_ROSTER.find(f => (f.name || '').trim().toLowerCase() === queryFaculty) ||
+                              MASTER_FACULTY_ROSTER.find(f => (f.name || '').trim().toLowerCase().includes(queryFaculty));
+                }
+
+                if (matched) {
+                    const deptSelect = document.getElementById('deptSelect');
+                    if (deptSelect && matched.department) {
+                        deptSelect.value = matched.department;
+                        onDepartmentChange();
+                        const facSelect = document.getElementById('facultyNameSelect');
+                        if (facSelect) {
+                            facSelect.value = matched.name;
+                            onFacultySelectChange(true);
+                        }
+                    }
+                    showFacultyWelcomeModal(matched, false);
+                    return;
+                }
+
+                // If not in URL, check stored profile
+                const savedRaw = localStorage.getItem('sjc_active_faculty');
+                if (savedRaw) {
+                    const savedFaculty = JSON.parse(savedRaw);
+                    if (savedFaculty && savedFaculty.name) {
+                        showFacultyWelcomeModal(savedFaculty, true);
+                    }
+                }
+            } catch(e) {
+                console.warn("Could not check URL or stored profile:", e);
+            }
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') {
+                const welcomeModal = document.getElementById('facultyWelcomeModal');
+                if (welcomeModal && !welcomeModal.classList.contains('hidden')) {
+                    dismissWelcomeModal();
+                }
             }
         });
 
@@ -2118,7 +2306,7 @@
                     const facSelect = document.getElementById('facultyNameSelect');
                     if (facSelect) {
                         facSelect.value = currentFacultyVal;
-                        onFacultySelectChange();
+                        onFacultySelectChange(true);
                     }
                 }
             }
@@ -2156,7 +2344,7 @@
         let currentMaxStepUnlocked = 1;
         let courseRevisionsList = [];
 
-        function onFacultySelectChange() {
+        function onFacultySelectChange(skipWelcome = false) {
             const selectEl = document.getElementById('facultyNameSelect');
             const selectedOpt = selectEl.options[selectEl.selectedIndex];
             if (!selectedOpt || !selectedOpt.value) return;
@@ -2179,6 +2367,18 @@
             document.getElementById('facultyDesignation').innerText = selectedOpt.dataset.desig || '';
             document.getElementById('facultyEmailText').innerText = email || '';
             document.getElementById('facultyMetaBadge').classList.remove('hidden');
+
+            const facultyObj = MASTER_FACULTY_ROSTER.find(f => (f.name || '').toLowerCase() === name.toLowerCase() && (f.department || '').toLowerCase() === (dept || '').toLowerCase()) || {
+                name, department: dept, email, designation: selectedOpt.dataset.desig || 'Faculty'
+            };
+            try {
+                localStorage.setItem('sjc_active_faculty', JSON.stringify(facultyObj));
+            } catch(e) {}
+
+            if (!skipWelcome && !isRestoringDraft) {
+                showFacultyWelcomeModal(facultyObj, false);
+            }
+
             if (!isRestoringDraft) saveFormDraft();
         }
 
