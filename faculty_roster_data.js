@@ -1,5 +1,16 @@
 const MASTER_FACULTY_ROSTER = [
     {
+        "s_no": 999,
+        "school": "OTHERS",
+        "department": "Human Excellence",
+        "name": "test0910",
+        "designation": "Assistant Professor",
+        "email": "test0910@mail.sjctni.edu",
+        "shift": "I",
+        "category": "Test",
+        "gender": "M"
+    },
+    {
         "s_no": 1,
         "school": "SBS",
         "department": "Biochemistry",
