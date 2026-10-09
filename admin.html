@@ -184,37 +184,18 @@
 
     function syncCloudResponses(cloudRecords) {
         if (!Array.isArray(cloudRecords)) return;
-        let localRecords = [];
-        try {
-            localRecords = JSON.parse(localStorage.getItem("sjc_feedback_responses") || "[]");
-        } catch(e) {}
-
+        
         let deletedList = [];
         try {
             deletedList = JSON.parse(localStorage.getItem("sjc_deleted_responses_list") || "[]");
         } catch(e) {}
 
         const map = new Map();
-        localRecords.forEach(r => {
-            if (isResponseBlacklisted(r, deletedList)) return;
-            const key = getFacultyResponseKey(r);
-            if (key) map.set(key, r);
-        });
+        
         cloudRecords.forEach(r => {
             if (isResponseBlacklisted(r, deletedList)) return;
             const key = getFacultyResponseKey(r);
-            if (!key) return;
-            if (map.has(key)) {
-                const existing = map.get(key);
-                const exTime = existing.submitted_at_epoch || existing.id || 0;
-                const newTime = r.submitted_at_epoch || r.id || 0;
-                // Keep the newer submission if duplicate exists for same faculty member
-                if (newTime >= exTime) {
-                    map.set(key, { ...existing, ...r });
-                }
-            } else {
-                map.set(key, r);
-            }
+            if (key) map.set(key, r);
         });
 
         const merged = Array.from(map.values());
