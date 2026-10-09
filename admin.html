@@ -359,10 +359,10 @@
     
     <!-- Admin Top Header -->
     <header class="bg-white text-slate-900 shadow-md sticky top-0 z-50 border-b border-slate-200 no-print">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 lg:py-0">
+            <div class="flex flex-col lg:flex-row items-center justify-between min-h-[5rem] gap-4 lg:gap-0">
                 <!-- Brand -->
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-4 w-full lg:w-auto overflow-hidden">
                     <img src="sjc-logo-small (1).png" alt="St. Joseph's College Logo" class="w-12 h-14 object-contain">
                     <div>
                         <div class="font-bold text-sm tracking-tight text-blue-950 font-serif flex items-center gap-2">
@@ -378,7 +378,7 @@
                 </div>
 
                 <!-- Admin Navigation Tabs (Segmented Container) -->
-                <nav class="hidden lg:flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-200/80 space-x-1">
+                <nav class="flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-200/80 space-x-1 overflow-x-auto w-full lg:w-auto scrollbar-hide">
                     <button onclick="switchTab('tracking')" id="nav-tracking" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-blue-950 shadow-sm border border-slate-200/60 flex items-center gap-2">
                         <i class="fa-solid fa-users-gear text-amber-500"></i>
                         <span>Faculty Tracker</span>
@@ -402,7 +402,7 @@
                 </nav>
 
                 <!-- Action Utilities -->
-                <div class="flex items-center space-x-2">
+                <div class="flex flex-wrap items-center justify-center gap-2">
                     <button onclick="triggerManualSync()" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold rounded-xl shadow-xs transition flex items-center gap-1.5" title="Refresh submissions from Cloud">
                         <i class="fa-solid fa-arrows-rotate text-emerald-600" id="syncSpinnerIcon"></i>
                         <span>Sync Cloud</span>
@@ -4384,7 +4384,7 @@
                     }
                 ];
 
-                vocBodyEl.innerHTML = vocRows.map((vr, idx) => `
+                vocationalBodyEl.innerHTML = vocRows.map((vr, idx) => `
                     <tr class="hover:bg-slate-50 transition">
                         <td class="p-2.5 text-center border-r border-slate-200 font-mono font-bold text-slate-700">${idx + 1}</td>
                         <td class="p-2.5 border-r border-slate-200 font-bold text-slate-900">${vr.domain}</td>
