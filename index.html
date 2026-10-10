@@ -2765,30 +2765,30 @@
                 other_recommendations: form.other_recommendations ? form.other_recommendations.value : ''
             };
 
-            // Save to localStorage as immediate offline cache
-            try {
-                const existing = JSON.parse(localStorage.getItem("sjc_feedback_responses") || "[]");
-                existing.push(payload);
-                localStorage.setItem("sjc_feedback_responses", JSON.stringify(existing));
-                // Clear active draft on successful submission
-                localStorage.removeItem(DRAFT_STORAGE_KEY);
-            } catch(ex) {
-                console.error("Local storage error:", ex);
-            }
-
             // Save to Firestore with deterministic doc ID to prevent any duplicate document in cloud
             const safeDocId = (email || `${facultyName}_${dept}`).toLowerCase().replace(/[^a-z0-9]/g, '_');
+
+            const cacheLocalResponse = () => {
+                try {
+                    const existing = JSON.parse(localStorage.getItem("sjc_feedback_responses") || "[]");
+                    existing.push(payload);
+                    localStorage.setItem("sjc_feedback_responses", JSON.stringify(existing));
+                    localStorage.removeItem(DRAFT_STORAGE_KEY);
+                } catch(ex) {}
+            };
 
             if (window.db && window.doc && window.setDoc) {
                 try {
                     await window.setDoc(window.doc(window.db, "responses", safeDocId), payload);
                     console.log("Firestore response saved successfully with key:", safeDocId);
+                    cacheLocalResponse();
                     showSuccessView(facultyName);
                 } catch(err) {
                     console.error("Firestore setDoc error:", err);
                     if (window.addDoc && window.collection) {
                         try {
                             await window.addDoc(window.collection(window.db, "responses"), payload);
+                            cacheLocalResponse();
                             showSuccessView(facultyName);
                             return;
                         } catch(e2) {
@@ -2799,7 +2799,10 @@
                 }
             } else if (window.db && window.addDoc && window.collection) {
                 window.addDoc(window.collection(window.db, "responses"), payload)
-                    .then(() => showSuccessView(facultyName))
+                    .then(() => {
+                        cacheLocalResponse();
+                        showSuccessView(facultyName);
+                    })
                     .catch(err => {
                         console.error("Firestore save error:", err);
                         alert("Network Error: Could not save response. Please try again.");
