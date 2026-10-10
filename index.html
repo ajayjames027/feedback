@@ -2859,4 +2859,4 @@
 </body>
 </html>
 
-<script>setTimeout(() => { if (!window.db) { const sb = document.getElementById('submitBtn'); if (sb && sb.innerHTML.includes('Connecting')) { sb.innerHTML = '<i class="fa-solid fa-ban"></i> Network Blocked'; alert('NETWORK BLOCKED: Your Wi-Fi network (or ISP) is completely blocking Google Firebase. Please connect to a Mobile Hotspot or different Wi-Fi and refresh.'); } } }, 6000);</script>
+<script>setTimeout(() => { if (!window.db) { const sb = document.getElementById('submitBtn'); if (sb && sb.innerHTML.includes('Connecting')) { sb.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Still Connecting...'; alert('Slow Network Detected: The database is taking a long time to load over your network connection. Please wait a few more seconds for the button to turn Green before submitting.'); } } }, 12000);</script>
