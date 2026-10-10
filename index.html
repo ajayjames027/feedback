@@ -2536,7 +2536,7 @@
             }
 
             if (stepNum > 1) {
-                const name = document.getElementById('facultyNameInput').value;
+                const name = document.getElementById('facultyNameSelect') ? document.getElementById('facultyNameSelect').value : '';
                 const dept = document.getElementById('deptSelect').value;
                 const desig = document.getElementById('facultyDesignation').innerText;
                 if (name && dept) {
@@ -2661,7 +2661,7 @@
 
             const form = document.getElementById('facultyForm');
 
-            const facultyName = form.faculty_name ? form.faculty_name.value : document.getElementById('facultyNameSelect').value;
+            const facultyName = document.getElementById('facultyNameSelect').value || (form.faculty_name ? form.faculty_name.value : '');
             const dept = form.department ? form.department.value : '';
             const email = form.faculty_email ? form.faculty_email.value : '';
 
