@@ -2789,21 +2789,23 @@
                     if (window.addDoc && window.collection) {
                         try {
                             await window.addDoc(window.collection(window.db, "responses"), payload);
+                            showSuccessView(facultyName);
+                            return;
                         } catch(e2) {
                             console.error("Firestore addDoc fallback error:", e2);
                         }
                     }
-                    showSuccessView(facultyName);
+                    alert("Network Error: Could not connect to the database. Please check your internet connection or disable adblockers and click Submit again.");
                 }
             } else if (window.db && window.addDoc && window.collection) {
                 window.addDoc(window.collection(window.db, "responses"), payload)
                     .then(() => showSuccessView(facultyName))
                     .catch(err => {
                         console.error("Firestore save error:", err);
-                        showSuccessView(facultyName);
+                        alert("Network Error: Could not save response. Please try again.");
                     });
             } else {
-                showSuccessView(facultyName);
+                alert("Critical Error: Database connection blocked. Please try using a different browser or disable adblockers.");
             }
         }
 
