@@ -2391,9 +2391,11 @@
 
         function checkDuplicateSubmission(name, dept, email) {
             let responses = [];
-            if (Array.isArray(window.__cloudResponses) && window.__cloudResponses.length > 0) {
+            // If cloud responses array exists (even if empty, meaning cloud is connected and has 0 records), use it!
+            if (Array.isArray(window.__cloudResponses)) {
                 responses = window.__cloudResponses;
             } else {
+                // Only fallback to local storage if cloud is not connected yet (undefined)
                 try {
                     responses = JSON.parse(localStorage.getItem("sjc_feedback_responses") || "[]");
                 } catch(e) {}
