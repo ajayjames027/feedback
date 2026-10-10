@@ -43,7 +43,16 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        let db;
+        try {
+            db = getFirestore(app);
+        } catch (e) {
+            alert("Database Error: " + e.message + "\n\nYour browser's privacy settings are blocking the database (IndexedDB). Please enable cookies or try a different device.");
+            const sb = document.getElementById('submitBtn');
+            if (sb) sb.innerHTML = 'Database Blocked by Browser';
+            throw e;
+        }
+        
         window.db = db;
         window.addDoc = addDoc;
         window.collection = collection;
@@ -2849,3 +2858,5 @@
     </script>
 </body>
 </html>
+
+<script>setTimeout(() => { if (!window.db) { const sb = document.getElementById('submitBtn'); if (sb && sb.innerHTML.includes('Connecting')) { sb.innerHTML = '<i class="fa-solid fa-ban"></i> Network Blocked'; alert('NETWORK BLOCKED: Your Wi-Fi network (or ISP) is completely blocking Google Firebase. Please connect to a Mobile Hotspot or different Wi-Fi and refresh.'); } } }, 6000);</script>
