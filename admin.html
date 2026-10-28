@@ -1324,6 +1324,35 @@
             'Text and Reference Books are included within the period of last 5 years'
         ];
 
+        // Global Numerical Rating Parser
+        const parseNum = v => {
+            if (v === undefined || v === null || v === '' || v === 'N.A.' || v === 'N/A') return 0;
+            if (typeof v === 'number') return isNaN(v) ? 0 : v;
+            const s = String(v).trim();
+            const m = s.match(/^([0-9]+(\.[0-9]+)?)/);
+            if (m) return parseFloat(m[1]);
+            const lower = s.toLowerCase();
+            if (lower.includes('strongly agree') || lower.includes('highly effective') || lower.includes('very adequate') || lower.includes('excellent')) return 5;
+            if (lower.includes('agree') || lower.includes('effective') || lower.includes('adequate') || lower.includes('good')) return 4;
+            if (lower.includes('neutral') || lower.includes('moderately') || lower.includes('moderate') || lower.includes('somewhat')) return 3;
+            if (lower.includes('disagree') || lower.includes('less effective') || lower.includes('inadequate') || lower.includes('fair')) return 2;
+            if (lower.includes('strongly disagree') || lower.includes('not effective') || lower.includes('poor')) return 1;
+            return 0;
+        };
+
+        const getBenchmarkBadge = pct => {
+            if (pct >= 90) return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">Exemplary (&ge;90%)</span>`;
+            if (pct >= 80) return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300">Commendable (80-89%)</span>`;
+            if (pct >= 70) return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Satisfactory (70-79%)</span>`;
+            if (pct >= 60) return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-100 text-orange-800 border border-orange-300">Moderate (60-69%)</span>`;
+            return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">Needs Review (&lt;60%)</span>`;
+        };
+
+        if (typeof window !== 'undefined') {
+            window.parseNum = parseNum;
+            window.getBenchmarkBadge = getBenchmarkBadge;
+        }
+
         const effInsights = [
             "Strong alignment with core disciplinary competencies and UGC model curriculum standards.",
             "Direct responsiveness to contemporary corporate standards, placement demands and internship requirements.",
@@ -3578,6 +3607,30 @@
 
             const now = new Date();
             const dateStr = now.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+
+            // Robust numerical rating parser for audit metrics
+            const parseNum = v => {
+                if (v === undefined || v === null || v === '' || v === 'N.A.' || v === 'N/A') return 0;
+                if (typeof v === 'number') return isNaN(v) ? 0 : v;
+                const s = String(v).trim();
+                const m = s.match(/^([0-9]+(\.[0-9]+)?)/);
+                if (m) return parseFloat(m[1]);
+                const lower = s.toLowerCase();
+                if (lower.includes('strongly agree') || lower.includes('highly effective') || lower.includes('very adequate') || lower.includes('excellent')) return 5;
+                if (lower.includes('agree') || lower.includes('effective') || lower.includes('adequate') || lower.includes('good')) return 4;
+                if (lower.includes('neutral') || lower.includes('moderately') || lower.includes('moderate') || lower.includes('somewhat')) return 3;
+                if (lower.includes('disagree') || lower.includes('less effective') || lower.includes('inadequate') || lower.includes('fair')) return 2;
+                if (lower.includes('strongly disagree') || lower.includes('not effective') || lower.includes('poor')) return 1;
+                return 0;
+            };
+
+            const getBenchmarkBadge = pct => {
+                if (pct >= 90) return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">Exemplary (&ge;90%)</span>`;
+                if (pct >= 80) return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300">Commendable (80-89%)</span>`;
+                if (pct >= 70) return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Satisfactory (70-79%)</span>`;
+                if (pct >= 60) return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-orange-100 text-orange-800 border border-orange-300">Moderate (60-69%)</span>`;
+                return `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-300">Needs Review (&lt;60%)</span>`;
+            };
 
             let scopedResponses = [];
             let scopedRoster = [];
