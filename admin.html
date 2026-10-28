@@ -1294,8 +1294,11 @@
             if (!dept) return "General";
             const trimmed = dept.trim().toLowerCase();
 
-            // 1. Check direct match in MASTER_FACULTY_ROSTER
-            const rosterEntry = MASTER_FACULTY_ROSTER.find(f => (f.department || '').trim().toLowerCase() === trimmed);
+            // 1. Check direct match in MASTER_FACULTY_ROSTER safely
+            const roster = (typeof MASTER_FACULTY_ROSTER !== 'undefined' && Array.isArray(MASTER_FACULTY_ROSTER)) 
+                ? MASTER_FACULTY_ROSTER 
+                : ((typeof window !== 'undefined' && Array.isArray(window.MASTER_FACULTY_ROSTER)) ? window.MASTER_FACULTY_ROSTER : []);
+            const rosterEntry = roster.find(f => (f.department || '').trim().toLowerCase() === trimmed);
             if (rosterEntry && rosterEntry.school && SCHOOL_NAME_MAP[rosterEntry.school]) {
                 return SCHOOL_NAME_MAP[rosterEntry.school];
             }
@@ -1319,6 +1322,21 @@
             'Content is appropriately distributed across semesters',
             'Provides opportunities for interdisciplinary learning',
             'Text and Reference Books are included within the period of last 5 years'
+        ];
+
+        const effInsights = [
+            "Strong alignment with core disciplinary competencies and UGC model curriculum standards.",
+            "Direct responsiveness to contemporary corporate standards, placement demands and internship requirements.",
+            "Substantial enhancement of graduate employability and diversified professional career pathways.",
+            "Curricular depth systematically prepares students for CSIR/UGC-NET, GATE, UPSC & higher degree entrance exams.",
+            "Fosters foundational scientific inquiry, research methodology, literature review and paper publication skills.",
+            "Nurtures entrepreneurial acumen, business ideation, student startup culture and incubation exposure.",
+            "Continuous infusion of emerging interdisciplinary trends, modern tools and cutting-edge paradigms.",
+            "Adequate laboratory hours, industrial site visits, case studies and hands-on applied training.",
+            "Pedagogical construct promotes analytical rigor, problem-solving, cognitive creativity and lateral thinking.",
+            "Curriculum content is logically sequenced with well-distributed prerequisite credits across semesters.",
+            "Provides robust interdisciplinary horizons through generic electives, SECs and cross-school courses.",
+            "Syllabus references and recommended readings strictly maintain current editions published within the 5-year cycle."
         ];
 
         const obeItems = [
@@ -3645,7 +3663,7 @@
                 const mean = n > 0 ? (vals.reduce((a, b) => a + b, 0) / n) : 0;
                 const pct = Math.round((mean / 5.0) * 100);
                 if (n > 0) { secBSum += mean; secBCount++; }
-                return { item, idx, n, mean, pct, insight: effInsights[idx] || "Curricular metric verified against academic standards." };
+                return { item, idx, n, mean, pct, insight: (typeof effInsights !== 'undefined' && effInsights[idx]) ? effInsights[idx] : "Curricular metric verified against academic standards." };
             });
             const secBMean = secBCount > 0 ? (secBSum / secBCount) : 0;
             const secBPct = Math.round((secBMean / 5.0) * 100);
@@ -4715,43 +4733,94 @@
             }
         }
 
-        function executeBatchPrint(batchHTML, docTitle) {
+        let batchPrintOriginalHTML = null;
+        let batchPrintOriginalTitle = null;
+
+        function cleanupBatchPrint() {
+            const area = document.getElementById('reportPrintableArea');
+            if (area && batchPrintOriginalHTML !== null) {
+                area.innerHTML = batchPrintOriginalHTML;
+                batchPrintOriginalHTML = null;
+            }
+            if (batchPrintOriginalTitle !== null) {
+                document.title = batchPrintOriginalTitle;
+                batchPrintOriginalTitle = null;
+            }
+            const banner = document.getElementById('batchPrintBanner');
+            if (banner) banner.remove();
+            showToast("Restored normal single report view", "info");
+        }
+
+        function executeBatchPrint(batchHTML, docTitle, description) {
             const area = document.getElementById('reportPrintableArea');
             if (!area) return;
-            const origHTML = area.innerHTML;
-            const origTitle = document.title;
 
-            area.innerHTML = batchHTML;
+            batchPrintOriginalHTML = area.innerHTML;
+            batchPrintOriginalTitle = document.title;
+
+            const noticeBar = `
+                <div id="batchPrintBanner" class="no-print bg-slate-900 text-white p-4 rounded-2xl shadow-2xl border border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3 mb-6">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </span>
+                        <div>
+                            <div class="font-bold text-sm text-slate-100">${description || "Combined Report Ready"}</div>
+                            <div class="text-xs text-slate-400">Save as PDF by setting Printer destination to "Save as PDF" in your print window</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="window.print()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition flex items-center space-x-1.5 shadow-md">
+                            <i class="fa-solid fa-print"></i>
+                            <span>Print / Save as PDF</span>
+                        </button>
+                        <button onclick="cleanupBatchPrint()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 rounded-xl text-xs font-bold transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-xmark"></i>
+                            <span>Close Combined View</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            area.innerHTML = noticeBar + batchHTML;
             document.title = docTitle;
 
+            showToast("Combined document ready! Opening print dialog...", "success");
+
             setTimeout(() => {
-                window.print();
-                const cleanup = () => {
-                    area.innerHTML = origHTML;
-                    document.title = origTitle;
-                    window.removeEventListener('afterprint', cleanup);
-                };
-                window.addEventListener('afterprint', cleanup, { once: true });
-                setTimeout(cleanup, 2500);
-            }, 200);
+                try {
+                    window.print();
+                } catch(e) {
+                    console.error("Print dialog invocation:", e);
+                }
+            }, 350);
         }
 
         function batchPrintAllSchools() {
             closeBatchPrintMenu();
             showToast("Compiling Combined PDF for All 6 Schools...", "info");
 
-            const allResponses = getStoredResponses();
-            const allRoster = (typeof MASTER_FACULTY_ROSTER !== 'undefined' && MASTER_FACULTY_ROSTER.length) ? MASTER_FACULTY_ROSTER : [];
-            const schoolKeys = ['SBS', 'SCO', 'SCS', 'SLC', 'SMS', 'SPS'];
+            setTimeout(() => {
+                try {
+                    const allResponses = getStoredResponses();
+                    const allRoster = (typeof MASTER_FACULTY_ROSTER !== 'undefined' && MASTER_FACULTY_ROSTER.length) 
+                        ? MASTER_FACULTY_ROSTER 
+                        : ((typeof window !== 'undefined' && Array.isArray(window.MASTER_FACULTY_ROSTER)) ? window.MASTER_FACULTY_ROSTER : []);
+                    const schoolKeys = ['SBS', 'SCO', 'SCS', 'SLC', 'SMS', 'SPS'];
 
-            const reportsHTML = schoolKeys.map(k => {
-                return buildAuditReportHTML({
-                    classification: 'school',
-                    schoolName: SCHOOL_NAME_MAP[k]
-                }, allResponses, allRoster);
-            }).join('<div class="page-break" style="break-before: page; page-break-before: always; height: 0; margin: 0; padding: 0;"></div>');
+                    const reportsHTML = schoolKeys.map(k => {
+                        return buildAuditReportHTML({
+                            classification: 'school',
+                            schoolName: SCHOOL_NAME_MAP[k]
+                        }, allResponses, allRoster);
+                    }).join('<div class="page-break" style="break-before: page; page-break-before: always; height: 0; margin: 0; padding: 0;"></div>');
 
-            executeBatchPrint(reportsHTML, "SJC_IQAC_Audit_Reports_All_6_Schools_2025-26");
+                    executeBatchPrint(reportsHTML, "SJC_IQAC_Audit_Reports_All_6_Schools_2025-26", "Combined PDF: All 6 Schools");
+                } catch (err) {
+                    console.error("Batch print error:", err);
+                    showToast("Error generating report: " + err.message, "error");
+                }
+            }, 50);
         }
 
         function batchPrintCurrentSchoolDepts() {
@@ -4760,52 +4829,81 @@
             const shortSchoolName = schoolFullName.replace(/\s*\([^\)]*\)/g, '').trim();
             showToast(`Compiling Combined PDF for departments in ${shortSchoolName}...`, "info");
 
-            const allResponses = getStoredResponses();
-            const allRoster = (typeof MASTER_FACULTY_ROSTER !== 'undefined' && MASTER_FACULTY_ROSTER.length) ? MASTER_FACULTY_ROSTER : [];
+            setTimeout(() => {
+                try {
+                    const allResponses = getStoredResponses();
+                    const allRoster = (typeof MASTER_FACULTY_ROSTER !== 'undefined' && MASTER_FACULTY_ROSTER.length) 
+                        ? MASTER_FACULTY_ROSTER 
+                        : ((typeof window !== 'undefined' && Array.isArray(window.MASTER_FACULTY_ROSTER)) ? window.MASTER_FACULTY_ROSTER : []);
 
-            const schoolKeyEntry = Object.entries(SCHOOL_NAME_MAP).find(([k, v]) => v === schoolFullName);
-            const schKey = schoolKeyEntry ? schoolKeyEntry[0] : "";
-            const schoolFaculty = allRoster.filter(f => (f.school && f.school === schKey) || getSchoolForDepartment(f.department) === schoolFullName);
-            let constituentDepts = Array.from(new Set(schoolFaculty.map(f => f.department))).filter(Boolean).sort();
+                    const schoolKeyEntry = Object.entries(SCHOOL_NAME_MAP).find(([k, v]) => v === schoolFullName);
+                    const schKey = schoolKeyEntry ? schoolKeyEntry[0] : "";
+                    const schoolFaculty = allRoster.filter(f => (f.school && f.school === schKey) || getSchoolForDepartment(f.department) === schoolFullName);
+                    let constituentDepts = Array.from(new Set(schoolFaculty.map(f => f.department))).filter(Boolean).sort();
 
-            if (constituentDepts.length === 0 && DEPARTMENT_SCHOOL_MAP[schoolFullName]) {
-                constituentDepts = DEPARTMENT_SCHOOL_MAP[schoolFullName];
-            }
+                    if (constituentDepts.length === 0 && DEPARTMENT_SCHOOL_MAP[schoolFullName]) {
+                        constituentDepts = DEPARTMENT_SCHOOL_MAP[schoolFullName];
+                    }
 
-            if (constituentDepts.length === 0) {
-                showToast("No constituent departments found for this school.", "warning");
-                return;
-            }
+                    if (constituentDepts.length === 0) {
+                        showToast("No constituent departments found for this school.", "warning");
+                        return;
+                    }
 
-            const reportsHTML = constituentDepts.map(d => {
-                return buildAuditReportHTML({
-                    classification: 'department',
-                    deptName: d,
-                    schoolName: schoolFullName
-                }, allResponses, allRoster);
-            }).join('<div class="page-break" style="break-before: page; page-break-before: always; height: 0; margin: 0; padding: 0;"></div>');
+                    const reportsHTML = constituentDepts.map(d => {
+                        return buildAuditReportHTML({
+                            classification: 'department',
+                            deptName: d,
+                            schoolName: schoolFullName
+                        }, allResponses, allRoster);
+                    }).join('<div class="page-break" style="break-before: page; page-break-before: always; height: 0; margin: 0; padding: 0;"></div>');
 
-            const cleanSchoolSlug = schoolFullName.replace(/[^a-zA-Z0-9]/g, '_');
-            executeBatchPrint(reportsHTML, `SJC_IQAC_Departments_${cleanSchoolSlug}_2025-26`);
+                    const cleanSchoolSlug = schoolFullName.replace(/[^a-zA-Z0-9]/g, '_');
+                    executeBatchPrint(reportsHTML, `SJC_IQAC_Departments_${cleanSchoolSlug}_2025-26`, `Combined PDF: ${shortSchoolName} Departments`);
+                } catch (err) {
+                    console.error("Batch print error:", err);
+                    showToast("Error generating report: " + err.message, "error");
+                }
+            }, 50);
         }
 
         function batchPrintAllDepts() {
             closeBatchPrintMenu();
             showToast("Compiling Master College PDF for All 33 Departments...", "info");
 
-            const allResponses = getStoredResponses();
-            const allRoster = (typeof MASTER_FACULTY_ROSTER !== 'undefined' && MASTER_FACULTY_ROSTER.length) ? MASTER_FACULTY_ROSTER : [];
+            setTimeout(() => {
+                try {
+                    const allResponses = getStoredResponses();
+                    const allRoster = (typeof MASTER_FACULTY_ROSTER !== 'undefined' && MASTER_FACULTY_ROSTER.length) 
+                        ? MASTER_FACULTY_ROSTER 
+                        : ((typeof window !== 'undefined' && Array.isArray(window.MASTER_FACULTY_ROSTER)) ? window.MASTER_FACULTY_ROSTER : []);
 
-            const allDepts = Array.from(new Set(allRoster.map(f => (f.department || '').trim()))).filter(Boolean).sort();
+                    let allDepts = Array.from(new Set(allRoster.map(f => (f.department || '').trim()))).filter(Boolean);
+                    if (typeof DEPARTMENT_SCHOOL_MAP !== 'undefined') {
+                        Object.values(DEPARTMENT_SCHOOL_MAP).flat().forEach(d => {
+                            if (d && !allDepts.includes(d)) allDepts.push(d);
+                        });
+                    }
+                    allDepts.sort();
 
-            const reportsHTML = allDepts.map(d => {
-                return buildAuditReportHTML({
-                    classification: 'department',
-                    deptName: d
-                }, allResponses, allRoster);
-            }).join('<div class="page-break" style="break-before: page; page-break-before: always; height: 0; margin: 0; padding: 0;"></div>');
+                    if (allDepts.length === 0) {
+                        showToast("No academic departments found to compile.", "warning");
+                        return;
+                    }
 
-            executeBatchPrint(reportsHTML, "SJC_IQAC_Master_All_33_Departments_Audit_2025-26");
+                    const reportsHTML = allDepts.map(d => {
+                        return buildAuditReportHTML({
+                            classification: 'department',
+                            deptName: d
+                        }, allResponses, allRoster);
+                    }).join('<div class="page-break" style="break-before: page; page-break-before: always; height: 0; margin: 0; padding: 0;"></div>');
+
+                    executeBatchPrint(reportsHTML, "SJC_IQAC_Master_All_33_Departments_Audit_2025-26", `Master Combined PDF: All ${allDepts.length} Departments`);
+                } catch (err) {
+                    console.error("Batch print error:", err);
+                    showToast("Error generating report: " + err.message, "error");
+                }
+            }, 50);
         }
 
         // Question Manager JS Logic
