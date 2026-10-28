@@ -992,25 +992,62 @@
         <!-- ==================== TAB 4: IQAC REPORT ==================== -->
         <section id="tab-content-report" class="tab-pane max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 hidden">
             <!-- Action Toolbar (No Print) -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm no-print">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-lg border border-rose-200">
-                        <i class="fa-solid fa-file-invoice"></i>
+            <div class="flex flex-col gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm no-print">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-lg border border-rose-200">
+                            <i class="fa-solid fa-file-invoice"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-sm font-extrabold text-slate-900 uppercase tracking-tight" id="reportToolbarTitle">Institution Report &bull; IQAC Curricular Audit</h2>
+                            <p class="text-xs text-slate-500 font-medium" id="reportToolbarSubtitle">Record-Grade Accreditation Report for NAAC, CDC & Academic Council Archival</p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 class="text-sm font-extrabold text-slate-900 uppercase tracking-tight">Institutional Audit & Syllabi Evaluation Document</h2>
-                        <p class="text-xs text-slate-500 font-medium">Record-Grade Accreditation Report for NAAC, CDC & Academic Council Archival</p>
+                    <div class="flex items-center space-x-3 w-full md:w-auto">
+                        <button onclick="renderReportTable(); showToast('Audit Report metrics refreshed successfully!', 'info');" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 border border-slate-300">
+                            <i class="fa-solid fa-arrows-rotate"></i>
+                            <span>Recalculate Metrics</span>
+                        </button>
+                        <button onclick="printCurrentReport()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center space-x-1.5">
+                            <i class="fa-solid fa-print"></i>
+                            <span>Print / Save PDF Report</span>
+                        </button>
                     </div>
                 </div>
-                <div class="flex items-center space-x-3 w-full sm:w-auto">
-                    <button onclick="renderReportTable(); showToast('Audit Report metrics refreshed successfully!', 'info');" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 border border-slate-300">
-                        <i class="fa-solid fa-arrows-rotate"></i>
-                        <span>Recalculate Metrics</span>
-                    </button>
-                    <button onclick="window.print()" class="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center space-x-1.5">
-                        <i class="fa-solid fa-print"></i>
-                        <span>Print / Save PDF Report</span>
-                    </button>
+
+                <!-- Classification Selector Bar -->
+                <div class="pt-3 border-t border-slate-200 flex flex-wrap items-center gap-3">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-layer-group text-slate-400"></i> Report Classification:
+                    </span>
+                    <div class="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200 shadow-inner">
+                        <button id="btnReportScopeInstitution" onclick="setReportClassification('institution')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-sm border border-slate-200">
+                            <i class="fa-solid fa-building-columns text-rose-600"></i>
+                            <span>Institution Report</span>
+                        </button>
+                        <button id="btnReportScopeSchool" onclick="setReportClassification('school')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+                            <i class="fa-solid fa-graduation-cap text-indigo-600"></i>
+                            <span>School Wise</span>
+                        </button>
+                        <button id="btnReportScopeDept" onclick="setReportClassification('department')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+                            <i class="fa-solid fa-users-rectangle text-emerald-600"></i>
+                            <span>Department Wise</span>
+                        </button>
+                    </div>
+
+                    <!-- School Dropdown (Visible for School-wise) -->
+                    <div id="reportSchoolFilterContainer" class="hidden flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-600">Select School:</span>
+                        <select id="reportSchoolSelect" onchange="onReportSchoolChange()" class="px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 outline-none focus:ring-2 focus:ring-indigo-300">
+                        </select>
+                    </div>
+
+                    <!-- Department Dropdown (Visible for Department-wise) -->
+                    <div id="reportDeptFilterContainer" class="hidden flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-600">Select Department:</span>
+                        <select id="reportDeptSelect" onchange="onReportDeptChange()" class="px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 outline-none focus:ring-2 focus:ring-emerald-300 max-w-xs truncate">
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -1040,19 +1077,25 @@
                             </div>
                         </div>
                         <div class="text-center md:text-right border-t md:border-t-0 md:border-l border-slate-200 pt-4 md:pt-0 md:pl-6 text-xs text-slate-600 space-y-1 min-w-[200px]">
-                            <div><span class="font-bold text-slate-800">Doc Ref:</span> SJC/IQAC-CDC/AUDIT-2025-26</div>
-                            <div><span class="font-bold text-slate-800">Audit Scope:</span> Syllabus Revision 2025–26</div>
+                            <div><span class="font-bold text-slate-800">Doc Ref:</span> <span id="reportDocRef" class="font-mono font-bold text-slate-900">SJC/IQAC-CDC/AUDIT-2025-26-INSTITUTION</span></div>
+                            <div><span class="font-bold text-slate-800">Audit Scope:</span> <span id="reportAuditScopeText" class="font-semibold text-slate-900">Institution Report (All 33 Departments)</span></div>
                             <div><span class="font-bold text-slate-800">Academic Level:</span> UG & PG Programmes</div>
                             <div><span class="font-bold text-slate-800">Report Date:</span> <span id="reportAuditDate" class="font-semibold text-slate-900">Live</span></div>
-                            <div><span class="inline-block px-2 py-0.5 rounded text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">Official Record</span></div>
+                            <div><span id="reportBadgeCategory" class="inline-block px-2.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">Official Institution Record</span></div>
                         </div>
                     </div>
 
                     <div class="pt-4 text-center border-t border-slate-200">
-                        <h2 class="text-lg md:text-xl font-black uppercase tracking-tight text-slate-900">
-                            COMPREHENSIVE TEACHER FEEDBACK & CURRICULAR AUDIT REPORT
+                        <div class="inline-block px-3.5 py-1 bg-slate-900 text-white rounded-lg text-xs font-black uppercase tracking-wider mb-2" id="reportHeaderBadge">
+                            INSTITUTION REPORT
+                        </div>
+                        <h2 class="text-lg md:text-2xl font-black uppercase tracking-tight text-slate-950 font-serif" id="reportMainTitle">
+                            INSTITUTION REPORT
                         </h2>
-                        <p class="text-xs font-bold text-slate-600 uppercase tracking-wider mt-0.5">
+                        <h3 class="text-xs md:text-sm font-extrabold uppercase text-slate-700 tracking-wide mt-1" id="reportSubTitle">
+                            COMPREHENSIVE TEACHER FEEDBACK & CURRICULAR AUDIT REPORT
+                        </h3>
+                        <p class="text-xs font-bold text-slate-600 uppercase tracking-wider mt-0.5" id="reportTagline">
                             ANALYTICAL EVALUATION OF CURRICULAR DESIGN, OUTCOME-BASED EDUCATION (OBE), NEP 2020 COMPLIANCE & SYLLABI EFFECTIVENESS
                         </p>
                     </div>
@@ -1071,9 +1114,9 @@
                     <!-- KPI Cards Grid -->
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                         <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Faculty Roster</div>
+                            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider" id="reportRosterLabel">Faculty Roster</div>
                             <div class="text-2xl font-black text-slate-900 mt-1" id="reportTotalFaculty">317</div>
-                            <div class="text-[10px] font-semibold text-slate-500 mt-0.5">33 Departments / 6 Schools</div>
+                            <div class="text-[10px] font-semibold text-slate-500 mt-0.5" id="reportRosterSub">33 Departments / 6 Schools</div>
                         </div>
                         <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
                             <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Audit Responses</div>
@@ -1086,7 +1129,7 @@
                             <div class="text-[10px] font-bold text-emerald-700 mt-0.5"><span id="reportOverallAttainment">0%</span> Attainment</div>
                         </div>
                         <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Institutional Rating</div>
+                            <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider" id="reportGradeLabel">Institutional Rating</div>
                             <div class="text-base font-black text-slate-900 mt-2 uppercase tracking-wide" id="reportInstitutionalGrade">Evaluating</div>
                             <div class="text-[10px] font-semibold text-slate-500 mt-0.5">NAAC Benchmark Scale</div>
                         </div>
@@ -1157,11 +1200,11 @@
 
                     <!-- School-wise Breakdown Table -->
                     <div class="space-y-2">
-                        <h4 class="font-extrabold text-slate-900 uppercase tracking-wide text-xs">School-Wise Participation & Curricular Quality Index</h4>
+                        <h4 class="font-extrabold text-slate-900 uppercase tracking-wide text-xs" id="reportSec2TableHeading">School-Wise Participation & Curricular Quality Index</h4>
                         <div class="overflow-x-auto border border-slate-300 rounded-xl">
                             <table class="w-full text-left text-xs border-collapse">
                                 <thead>
-                                    <tr class="bg-slate-100 font-bold border-b border-slate-300 text-slate-900">
+                                    <tr class="bg-slate-100 font-bold border-b border-slate-300 text-slate-900" id="reportSec2TableThead">
                                         <th class="p-2.5 border-r border-slate-300 w-12 text-center">S.No</th>
                                         <th class="p-2.5 border-r border-slate-300">Constituent School</th>
                                         <th class="p-2.5 text-center border-r border-slate-300 w-24">Faculty Roster</th>
@@ -1461,7 +1504,7 @@
                         <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">Curricular Action Plan</span>
                     </div>
 
-                    <p class="text-xs text-slate-700 leading-relaxed">
+                    <p class="text-xs text-slate-700 leading-relaxed" id="reportDirectivesIntro">
                         Pursuant to Section 1.4 of NAAC guidelines and autonomous governance standards of St. Joseph's College (Autonomous), the following strategic directives are officially issued to all Department Chairpersons and Boards of Studies (BoS):
                     </p>
 
@@ -1556,7 +1599,7 @@
                     </div>
 
                     <div class="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-2">
-                        <div>Document Code: <span class="font-mono font-bold text-slate-700">SJC-IQAC-CDC-AUDIT-2025-26-VER14</span></div>
+                        <div>Document Code: <span class="font-mono font-bold text-slate-700" id="reportFooterDocCode">SJC-IQAC-CDC-AUDIT-2025-26-INSTITUTION</span></div>
                         <div class="font-semibold text-slate-600">Archival Copy &bull; St. Joseph's College (Autonomous), Tiruchirappalli &bull; All Rights Reserved</div>
                     </div>
                 </div>
@@ -1874,6 +1917,7 @@
         }
 
         function initDropdowns() {
+            initReportDropdowns();
             const depts = Array.from(new Set(MASTER_FACULTY_ROSTER.map(f => f.department))).filter(Boolean).sort();
             const rosterSelect = document.getElementById('rosterDeptSelect');
             const anaSelect = document.getElementById('analyticsDeptSelect');
@@ -3812,12 +3856,130 @@
             const a = document.createElement('a'); a.href = url; a.download = 'faculty_feedback_raw.json'; a.click();
         }
 
+        // Report Classification State
+        let currentReportClassification = 'institution'; // 'institution' | 'school' | 'department'
+        let currentReportSchool = 'School of Computing Sciences (SCS)';
+        let currentReportDept = 'Computer Science';
+
+        function setReportClassification(scope) {
+            currentReportClassification = scope;
+            
+            const btnInst = document.getElementById('btnReportScopeInstitution');
+            const btnSchool = document.getElementById('btnReportScopeSchool');
+            const btnDept = document.getElementById('btnReportScopeDept');
+            
+            const activeClass = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-white text-slate-900 shadow-sm border border-slate-200";
+            const inactiveClass = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 text-slate-600 hover:text-slate-900";
+            
+            if (btnInst) btnInst.className = scope === 'institution' ? activeClass : inactiveClass;
+            if (btnSchool) btnSchool.className = scope === 'school' ? activeClass : inactiveClass;
+            if (btnDept) btnDept.className = scope === 'department' ? activeClass : inactiveClass;
+            
+            const schoolWrap = document.getElementById('reportSchoolFilterContainer');
+            const deptWrap = document.getElementById('reportDeptFilterContainer');
+            
+            if (schoolWrap) {
+                if (scope === 'school') schoolWrap.classList.remove('hidden');
+                else schoolWrap.classList.add('hidden');
+            }
+            if (deptWrap) {
+                if (scope === 'department') deptWrap.classList.remove('hidden');
+                else deptWrap.classList.add('hidden');
+            }
+
+            initReportDropdowns();
+            renderReportTable();
+        }
+
+        function onReportSchoolChange() {
+            const sel = document.getElementById('reportSchoolSelect');
+            if (sel && sel.value) {
+                currentReportSchool = sel.value;
+                renderReportTable();
+            }
+        }
+
+        function onReportDeptChange() {
+            const sel = document.getElementById('reportDeptSelect');
+            if (sel && sel.value) {
+                currentReportDept = sel.value;
+                renderReportTable();
+            }
+        }
+
+        function initReportDropdowns() {
+            const schoolSel = document.getElementById('reportSchoolSelect');
+            if (schoolSel && schoolSel.children.length === 0) {
+                schoolSel.innerHTML = '';
+                Object.entries(SCHOOL_NAME_MAP).forEach(([key, fullName]) => {
+                    const opt = document.createElement('option');
+                    opt.value = fullName;
+                    opt.innerText = fullName;
+                    if (fullName === currentReportSchool) opt.selected = true;
+                    schoolSel.appendChild(opt);
+                });
+            }
+
+            const deptSel = document.getElementById('reportDeptSelect');
+            if (deptSel && deptSel.children.length === 0) {
+                deptSel.innerHTML = '';
+                const allDepts = (typeof MASTER_FACULTY_ROSTER !== 'undefined') 
+                    ? Array.from(new Set(MASTER_FACULTY_ROSTER.map(f => (f.department || '').trim()))).filter(Boolean).sort()
+                    : [];
+
+                // Group by School using optgroup
+                Object.entries(DEPARTMENT_SCHOOL_MAP).forEach(([schoolName, depts]) => {
+                    const group = document.createElement('optgroup');
+                    group.label = schoolName;
+                    depts.sort().forEach(d => {
+                        if (allDepts.includes(d)) {
+                            const opt = document.createElement('option');
+                            opt.value = d;
+                            opt.innerText = d;
+                            if (d === currentReportDept) opt.selected = true;
+                            group.appendChild(opt);
+                        }
+                    });
+                    if (group.children.length > 0) deptSel.appendChild(group);
+                });
+
+                // Any departments not in DEPARTMENT_SCHOOL_MAP
+                const mappedDepts = new Set(Object.values(DEPARTMENT_SCHOOL_MAP).flat());
+                const otherDepts = allDepts.filter(d => !mappedDepts.has(d));
+                if (otherDepts.length > 0) {
+                    const group = document.createElement('optgroup');
+                    group.label = "Other Programmes";
+                    otherDepts.forEach(d => {
+                        const opt = document.createElement('option');
+                        opt.value = d;
+                        opt.innerText = d;
+                        if (d === currentReportDept) opt.selected = true;
+                        group.appendChild(opt);
+                    });
+                    deptSel.appendChild(group);
+                }
+            }
+        }
+
+        function printCurrentReport() {
+            const origTitle = document.title;
+            let fileSuffix = "Institution_Report";
+            if (currentReportClassification === 'school') {
+                fileSuffix = `School_Report_${(currentReportSchool || 'School').replace(/[^a-zA-Z0-9]/g, '_')}`;
+            } else if (currentReportClassification === 'department') {
+                fileSuffix = `Department_Report_${(currentReportDept || 'Department').replace(/[^a-zA-Z0-9]/g, '_')}`;
+            }
+            document.title = `SJC_IQAC_${fileSuffix}_2025-26`;
+            window.print();
+            setTimeout(() => { document.title = origTitle; }, 1000);
+        }
+
         // Comprehensive Curricular Audit Report Generator
         function renderReportTable() {
-            const responses = getStoredResponses();
-            const totalFaculty = (typeof MASTER_FACULTY_ROSTER !== 'undefined' && MASTER_FACULTY_ROSTER.length) ? MASTER_FACULTY_ROSTER.length : 317;
-            const totalResp = responses.length;
-            const turnoutPct = totalFaculty > 0 ? ((totalResp / totalFaculty) * 100).toFixed(1) : '0.0';
+            initReportDropdowns();
+
+            const allResponses = getStoredResponses();
+            const allRoster = (typeof MASTER_FACULTY_ROSTER !== 'undefined' && MASTER_FACULTY_ROSTER.length) ? MASTER_FACULTY_ROSTER : [];
 
             // Set Live Audit Date
             const now = new Date();
@@ -3825,13 +3987,133 @@
             const dateEl = document.getElementById('reportAuditDate');
             if (dateEl) dateEl.innerText = dateStr;
 
-            // Update Top Scorecard Elements
+            // Determine Scope
+            let scopedResponses = [];
+            let scopedRoster = [];
+            let scopeTitle = "";
+            let scopeSubtitle = "";
+            let scopeTagline = "";
+            let docRefCode = "";
+            let auditScopeText = "";
+            let badgeText = "";
+            let headerBadgeText = "";
+            let toolbarTitleText = "";
+            let toolbarSubtitleText = "";
+            let rosterLabelText = "";
+            let rosterSubText = "";
+            let gradeLabelText = "";
+            let directivesIntroText = "";
+
+            if (currentReportClassification === 'school') {
+                const schoolFullName = currentReportSchool || "School of Computing Sciences (SCS)";
+                scopedResponses = allResponses.filter(r => getSchoolForDepartment(r.department) === schoolFullName);
+                scopedRoster = allRoster.filter(f => (f.school && SCHOOL_NAME_MAP[f.school] === schoolFullName) || getSchoolForDepartment(f.department) === schoolFullName);
+                
+                const schoolKeyEntry = Object.entries(SCHOOL_NAME_MAP).find(([k, v]) => v === schoolFullName);
+                const schKey = schoolKeyEntry ? schoolKeyEntry[0] : "SCH";
+                const constituentDepts = Array.from(new Set(scopedRoster.map(f => f.department))).filter(Boolean).sort();
+                
+                scopeTitle = `SCHOOL REPORT: ${schoolFullName.toUpperCase()}`;
+                scopeSubtitle = `TEACHER FEEDBACK & CURRICULAR AUDIT REPORT`;
+                scopeTagline = `ANALYTICAL EVALUATION OF CURRICULAR DESIGN, OBE, NEP 2020 COMPLIANCE & SYLLABI EFFECTIVENESS (${constituentDepts.length} CONSTITUENT DEPARTMENTS)`;
+                docRefCode = `SJC/IQAC-CDC/AUDIT-2025-26-${schKey}`;
+                auditScopeText = `${schoolFullName} • ${constituentDepts.length} Departments`;
+                badgeText = `Official School Audit Record`;
+                headerBadgeText = `SCHOOL-WISE AUDIT REPORT`;
+                toolbarTitleText = `School Report &bull; ${schoolFullName}`;
+                toolbarSubtitleText = `Record-Grade Accreditation Report for NAAC, CDC & School BoS Archival`;
+                rosterLabelText = `School Faculty Roster`;
+                rosterSubText = `${constituentDepts.length} Constituent Departments`;
+                gradeLabelText = `School Quality Rating`;
+                directivesIntroText = `Pursuant to Section 1.4 of NAAC guidelines and autonomous governance standards of St. Joseph's College (Autonomous), the following strategic directives are officially issued to the Dean and all Boards of Studies (BoS) within ${schoolFullName}:`;
+
+            } else if (currentReportClassification === 'department') {
+                const deptName = currentReportDept || "Computer Science";
+                const parentSchool = getSchoolForDepartment(deptName);
+                scopedResponses = allResponses.filter(r => (r.department || '').trim().toLowerCase() === deptName.trim().toLowerCase());
+                scopedRoster = allRoster.filter(f => (f.department || '').trim().toLowerCase() === deptName.trim().toLowerCase());
+                
+                const deptSlug = deptName.toUpperCase().replace(/[^A-Z0-9]/g, '').substring(0, 8);
+                
+                scopeTitle = `DEPARTMENT REPORT: DEPARTMENT OF ${deptName.toUpperCase()}`;
+                scopeSubtitle = `TEACHER FEEDBACK & CURRICULAR AUDIT REPORT`;
+                scopeTagline = `${parentSchool.toUpperCase()} • ANALYTICAL EVALUATION OF CURRICULAR DESIGN, OBE & SYLLABI EFFECTIVENESS`;
+                docRefCode = `SJC/IQAC-CDC/AUDIT-2025-26-DEPT-${deptSlug}`;
+                auditScopeText = `Department of ${deptName} • ${parentSchool}`;
+                badgeText = `Official Department Audit Record`;
+                headerBadgeText = `DEPARTMENT-WISE AUDIT REPORT`;
+                toolbarTitleText = `Department Report &bull; Department of ${deptName}`;
+                toolbarSubtitleText = `Record-Grade Accreditation Report for NAAC, CDC & Department BoS Archival`;
+                rosterLabelText = `Department Faculty Roster`;
+                rosterSubText = parentSchool;
+                gradeLabelText = `Department Quality Rating`;
+                directivesIntroText = `Pursuant to Section 1.4 of NAAC guidelines and autonomous governance standards of St. Joseph's College (Autonomous), the following strategic directives are officially issued to the Head of the Department and Board of Studies (BoS) for ${deptName}:`;
+
+            } else {
+                // Institution Report (Default)
+                scopedResponses = allResponses;
+                scopedRoster = allRoster;
+                
+                scopeTitle = `INSTITUTION REPORT`;
+                scopeSubtitle = `COMPREHENSIVE TEACHER FEEDBACK & CURRICULAR AUDIT REPORT`;
+                scopeTagline = `ANALYTICAL EVALUATION OF CURRICULAR DESIGN, OUTCOME-BASED EDUCATION (OBE), NEP 2020 COMPLIANCE & SYLLABI EFFECTIVENESS (ALL 33 DEPARTMENTS / 6 SCHOOLS)`;
+                docRefCode = `SJC/IQAC-CDC/AUDIT-2025-26-INSTITUTION`;
+                auditScopeText = `Institution Report (All 33 Departments / 6 Schools)`;
+                badgeText = `Official Institution Record`;
+                headerBadgeText = `INSTITUTION REPORT`;
+                toolbarTitleText = `Institution Report &bull; IQAC Curricular Audit`;
+                toolbarSubtitleText = `Record-Grade Accreditation Report for NAAC, CDC & Academic Council Archival`;
+                rosterLabelText = `Faculty Roster`;
+                rosterSubText = `33 Departments / 6 Schools`;
+                gradeLabelText = `Institutional Rating`;
+                directivesIntroText = `Pursuant to Section 1.4 of NAAC guidelines and autonomous governance standards of St. Joseph's College (Autonomous), the following strategic directives are officially issued to all Department Chairpersons and Boards of Studies (BoS):`;
+            }
+
+            // Update UI Header & Scope Text Elements
+            const elToolbarTitle = document.getElementById('reportToolbarTitle');
+            if (elToolbarTitle) elToolbarTitle.innerHTML = toolbarTitleText;
+            const elToolbarSubtitle = document.getElementById('reportToolbarSubtitle');
+            if (elToolbarSubtitle) elToolbarSubtitle.innerText = toolbarSubtitleText;
+
+            const elMainTitle = document.getElementById('reportMainTitle');
+            if (elMainTitle) elMainTitle.innerText = scopeTitle;
+            const elSubTitle = document.getElementById('reportSubTitle');
+            if (elSubTitle) elSubTitle.innerText = scopeSubtitle;
+            const elTagline = document.getElementById('reportTagline');
+            if (elTagline) elTagline.innerText = scopeTagline;
+
+            const elDocRef = document.getElementById('reportDocRef');
+            if (elDocRef) elDocRef.innerText = docRefCode;
+            const elAuditScope = document.getElementById('reportAuditScopeText');
+            if (elAuditScope) elAuditScope.innerText = auditScopeText;
+            const elBadgeCategory = document.getElementById('reportBadgeCategory');
+            if (elBadgeCategory) elBadgeCategory.innerText = badgeText;
+            const elHeaderBadge = document.getElementById('reportHeaderBadge');
+            if (elHeaderBadge) elHeaderBadge.innerText = headerBadgeText;
+
+            const elFooterDocCode = document.getElementById('reportFooterDocCode');
+            if (elFooterDocCode) elFooterDocCode.innerText = docRefCode;
+            const elDirectivesIntro = document.getElementById('reportDirectivesIntro');
+            if (elDirectivesIntro) elDirectivesIntro.innerText = directivesIntroText;
+
+            // Update Scorecard KPIs
+            const totalFaculty = scopedRoster.length;
+            const totalResp = scopedResponses.length;
+            const turnoutPct = totalFaculty > 0 ? ((totalResp / totalFaculty) * 100).toFixed(1) : '0.0';
+
             const elTotalFaculty = document.getElementById('reportTotalFaculty');
             if (elTotalFaculty) elTotalFaculty.innerText = totalFaculty;
             const elTotalResp = document.getElementById('reportTotalResponses');
             if (elTotalResp) elTotalResp.innerText = totalResp;
             const elTurnoutPct = document.getElementById('reportTurnoutPct');
             if (elTurnoutPct) elTurnoutPct.innerText = `${turnoutPct}%`;
+
+            const elRosterLabel = document.getElementById('reportRosterLabel');
+            if (elRosterLabel) elRosterLabel.innerText = rosterLabelText;
+            const elRosterSub = document.getElementById('reportRosterSub');
+            if (elRosterSub) elRosterSub.innerText = rosterSubText;
+            const elGradeLabel = document.getElementById('reportGradeLabel');
+            if (elGradeLabel) elGradeLabel.innerText = gradeLabelText;
 
             // Robust numerical rating parser
             const parseNum = v => {
@@ -3876,7 +4158,7 @@
             let secBSum = 0;
             let secBCount = 0;
             const secBResults = effItems.map((item, idx) => {
-                const vals = responses.map(r => parseNum(getResponseRating(r, 'overall_effectiveness', item, idx))).filter(v => v > 0);
+                const vals = scopedResponses.map(r => parseNum(getResponseRating(r, 'overall_effectiveness', item, idx))).filter(v => v > 0);
                 const n = vals.length;
                 const mean = n > 0 ? (vals.reduce((a, b) => a + b, 0) / n) : 0;
                 const pct = Math.round((mean / 5.0) * 100);
@@ -3912,15 +4194,17 @@
             const secBStatusNoteEl = document.getElementById('reportSecBStatusNote');
             if (secBStatusNoteEl) {
                 secBStatusNoteEl.innerHTML = secBPct >= 85 
-                    ? `<span class="font-bold text-emerald-800">Commendable Institutional Attainment:</span> Curricular objectives strongly satisfy NAAC Criterion 1 benchmarks across all 12 dimensions.`
-                    : `<span class="font-bold text-blue-800">Satisfactory Standard:</span> Core parameters established; continuous refinement recommended in Board of Studies.`;
+                    ? `<span class="font-bold text-emerald-800">Commendable Attainment:</span> Curricular objectives strongly satisfy NAAC Criterion 1 benchmarks across all 12 dimensions.`
+                    : (secBPct >= 70 
+                        ? `<span class="font-bold text-blue-800">Satisfactory Standard:</span> Core parameters established; continuous refinement recommended in Board of Studies.`
+                        : `<span class="font-bold text-slate-600">Audit Status:</span> ${totalResp > 0 ? 'Evaluating dimension metrics.' : 'Awaiting feedback survey data.'}`);
             }
 
             // 2. SECTION C: OUTCOME-BASED EDUCATION (OBE) (8 Items)
             let secCSum = 0;
             let secCCount = 0;
             const secCResults = obeItems.map((item, idx) => {
-                const vals = responses.map(r => parseNum(getResponseRating(r, 'obe_evaluation', item, idx))).filter(v => v > 0);
+                const vals = scopedResponses.map(r => parseNum(getResponseRating(r, 'obe_evaluation', item, idx))).filter(v => v > 0);
                 const n = vals.length;
                 const mean = n > 0 ? (vals.reduce((a, b) => a + b, 0) / n) : 0;
                 const pct = Math.round((mean / 5.0) * 100);
@@ -3958,7 +4242,7 @@
             if (secCTotalPctEl) secCTotalPctEl.innerText = `${secCPct}%`;
             const secCOBEStatusEl = document.getElementById('reportSecCOBEStatus');
             if (secCOBEStatusEl) {
-                secCOBEStatusEl.innerText = secCPct >= 85 ? 'Level 4 (Optimized)' : (secCPct >= 75 ? 'Level 3 (Established)' : 'Level 2 (Developing)');
+                secCOBEStatusEl.innerText = secCPct >= 85 ? 'Level 4 (Optimized)' : (secCPct >= 75 ? 'Level 3 (Established)' : (secCPct > 0 ? 'Level 2 (Developing)' : 'Evaluating'));
             }
 
             // Update Section C KPI
@@ -3971,7 +4255,7 @@
             let secDSum = 0;
             let secDCount = 0;
             const secDResults = structItems.map((item, idx) => {
-                const vals = responses.map(r => parseNum(getResponseRating(r, 'curriculum_structure', item, idx))).filter(v => v > 0);
+                const vals = scopedResponses.map(r => parseNum(getResponseRating(r, 'curriculum_structure', item, idx))).filter(v => v > 0);
                 const n = vals.length;
                 const mean = n > 0 ? (vals.reduce((a, b) => a + b, 0) / n) : 0;
                 const pct = Math.round((mean / 5.0) * 100);
@@ -4009,7 +4293,7 @@
             if (secDTotalPctEl) secDTotalPctEl.innerText = `${secDPct}%`;
             const secDStatusEl = document.getElementById('reportSecDStatus');
             if (secDStatusEl) {
-                secDStatusEl.innerText = secDPct >= 80 ? 'Optimal Architecture' : 'Balanced (Minor BoS Tweaks)';
+                secDStatusEl.innerText = secDPct >= 80 ? 'Optimal Architecture' : (secDPct > 0 ? 'Balanced (Minor BoS Tweaks)' : 'Evaluating');
             }
 
             // Update Section D KPI
@@ -4039,15 +4323,18 @@
                 } else if (overallAttainment >= 70) {
                     reportInstitutionalGradeEl.innerText = 'Satisfactory (A)';
                     reportInstitutionalGradeEl.className = 'text-base font-black text-amber-700 mt-2 uppercase tracking-wide';
-                } else {
+                } else if (overallAttainment > 0) {
                     reportInstitutionalGradeEl.innerText = 'Moderate / Action Plan';
                     reportInstitutionalGradeEl.className = 'text-base font-black text-orange-700 mt-2 uppercase tracking-wide';
+                } else {
+                    reportInstitutionalGradeEl.innerText = 'Awaiting Data';
+                    reportInstitutionalGradeEl.className = 'text-base font-black text-slate-500 mt-2 uppercase tracking-wide';
                 }
             }
 
             // 5. REGISTRY OF OVERLAPPING, REDUNDANT OR OUTDATED COURSES
             const overlapList = [];
-            responses.forEach(r => {
+            scopedResponses.forEach(r => {
                 if (Array.isArray(r.overlapping_courses_list) && r.overlapping_courses_list.length > 0) {
                     r.overlapping_courses_list.forEach(item => {
                         overlapList.push({
@@ -4093,11 +4380,12 @@
                         </tr>
                     `).join('');
                 } else {
+                    const scopeName = currentReportClassification === 'school' ? currentReportSchool : (currentReportClassification === 'department' ? `Department of ${currentReportDept}` : 'the institution');
                     overlapBodyEl.innerHTML = `
                         <tr>
                             <td colspan="5" class="p-4 text-center text-slate-500 font-medium italic">
                                 <i class="fa-solid fa-circle-check text-emerald-600 mr-1.5"></i>
-                                No redundant, overlapping, or outdated course units were flagged across audited submissions. Modular curriculum progression is maintained with zero cross-semester duplication.
+                                No redundant, overlapping, or outdated course units were flagged across audited submissions in ${scopeName}. Modular curriculum progression is maintained with zero cross-semester duplication.
                             </td>
                         </tr>
                     `;
@@ -4106,7 +4394,7 @@
 
             // 6. MASTER ACTION REGISTRY OF SPECIFIC COURSE REVISION PROPOSALS (Section J)
             const revisionList = [];
-            responses.forEach(r => {
+            scopedResponses.forEach(r => {
                 if (Array.isArray(r.course_revisions) && r.course_revisions.length > 0) {
                     r.course_revisions.forEach(rev => {
                         revisionList.push({
@@ -4146,84 +4434,193 @@
                         </tr>
                     `).join('');
                 } else {
+                    const scopeName = currentReportClassification === 'school' ? currentReportSchool : (currentReportClassification === 'department' ? `Department of ${currentReportDept}` : 'this audit cycle');
                     revisionsBodyEl.innerHTML = `
                         <tr>
                             <td colspan="5" class="p-4 text-center text-slate-500 font-medium italic">
                                 <i class="fa-solid fa-file-circle-check text-blue-600 mr-1.5"></i>
-                                No specific individual course deletion or unit addition petitions were submitted in this audit cycle. General syllabus structures remain affirmed by course teachers.
+                                No specific individual course deletion or unit addition petitions were submitted by faculty in ${scopeName}. General syllabus structures remain affirmed by course teachers.
                             </td>
                         </tr>
                     `;
                 }
             }
 
-            // 7. SCHOOL-WISE PARTICIPATION & DEMOGRAPHIC DISTRIBUTION TABLE
+            // 7. PARTICIPATION & DEMOGRAPHIC DISTRIBUTION TABLE (Section 2)
+            const sec2HeadingEl = document.getElementById('reportSec2TableHeading');
+            const sec2TheadEl = document.getElementById('reportSec2TableThead');
             const schoolsBodyEl = document.getElementById('reportSchoolsBody');
-            if (schoolsBodyEl) {
-                const schoolKeys = Object.keys(SCHOOL_NAME_MAP);
-                schoolsBodyEl.innerHTML = schoolKeys.map((schKey, idx) => {
-                    const schFullName = SCHOOL_NAME_MAP[schKey];
-                    // Count roster faculty for this school
-                    const rosterFaculty = (typeof MASTER_FACULTY_ROSTER !== 'undefined') 
-                        ? MASTER_FACULTY_ROSTER.filter(f => (f.school === schKey || getSchoolForDepartment(f.department) === schFullName))
-                        : [];
-                    const schRosterCount = rosterFaculty.length;
 
-                    // Count submissions for this school
-                    const schResponses = responses.filter(r => getSchoolForDepartment(r.department) === schFullName);
-                    const schRespCount = schResponses.length;
-                    const schTurnout = schRosterCount > 0 ? Math.round((schRespCount / schRosterCount) * 100) : (schRespCount > 0 ? 100 : 0);
-
-                    // Compute school quality mean
-                    let schScoreSum = 0;
-                    let schScoreCount = 0;
-                    schResponses.forEach(r => {
-                        effItems.forEach((it, iIdx) => {
-                            const val = parseNum(getResponseRating(r, 'overall_effectiveness', it, iIdx));
-                            if (val > 0) { schScoreSum += val; schScoreCount++; }
-                        });
-                    });
-                    const schMean = schScoreCount > 0 ? (schScoreSum / schScoreCount) : 0;
-                    const schPct = Math.round((schMean / 5.0) * 100);
-
-                    const statusBadge = schTurnout >= 90 
-                        ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">Exemplary Turnout</span>`
-                        : (schTurnout >= 70 
-                            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300">Robust Participation</span>`
-                            : (schRespCount > 0 
-                                ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Active Intake</span>`
-                                : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-300">Awaiting Submission</span>`));
-
-                    return `
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="p-2.5 text-center border-r border-slate-200 font-mono font-bold text-slate-700">${idx + 1}</td>
-                            <td class="p-2.5 border-r border-slate-200 font-bold text-slate-900">${schFullName}</td>
-                            <td class="p-2.5 text-center border-r border-slate-200 font-mono text-slate-700">${schRosterCount}</td>
-                            <td class="p-2.5 text-center border-r border-slate-200 font-mono font-bold text-blue-900">${schRespCount}</td>
-                            <td class="p-2.5 text-center border-r border-slate-200 font-bold ${schTurnout >= 80 ? 'text-emerald-700' : 'text-slate-700'}">${schTurnout}%</td>
-                            <td class="p-2.5 text-center border-r border-slate-200 font-black text-slate-900">${schMean > 0 ? schMean.toFixed(2) : '—'}</td>
-                            <td class="p-2.5 text-center">${statusBadge}</td>
-                        </tr>
+            if (currentReportClassification === 'school') {
+                const schoolFullName = currentReportSchool;
+                if (sec2HeadingEl) sec2HeadingEl.innerHTML = `Constituent Department Participation & Curricular Quality Index &bull; <span class="text-indigo-900">${schoolFullName}</span>`;
+                if (sec2TheadEl) {
+                    sec2TheadEl.innerHTML = `
+                        <th class="p-2.5 border-r border-slate-300 w-12 text-center">S.No</th>
+                        <th class="p-2.5 border-r border-slate-300">Constituent Department</th>
+                        <th class="p-2.5 text-center border-r border-slate-300 w-24">Faculty Roster</th>
+                        <th class="p-2.5 text-center border-r border-slate-300 w-24">Submissions</th>
+                        <th class="p-2.5 text-center border-r border-slate-300 w-24">Turnout %</th>
+                        <th class="p-2.5 text-center border-r border-slate-300 w-24">Quality Mean</th>
+                        <th class="p-2.5 text-center w-28">Status</th>
                     `;
-                }).join('');
+                }
+                if (schoolsBodyEl) {
+                    const constituentDepts = Array.from(new Set(scopedRoster.map(f => f.department))).filter(Boolean).sort();
+                    schoolsBodyEl.innerHTML = constituentDepts.map((dept, idx) => {
+                        const deptRoster = scopedRoster.filter(f => f.department === dept);
+                        const deptResp = scopedResponses.filter(r => r.department === dept);
+                        const rCount = deptRoster.length;
+                        const sCount = deptResp.length;
+                        const turnout = rCount > 0 ? Math.round((sCount / rCount) * 100) : (sCount > 0 ? 100 : 0);
+
+                        let dSum = 0; let dCnt = 0;
+                        deptResp.forEach(r => {
+                            effItems.forEach((it, iIdx) => {
+                                const val = parseNum(getResponseRating(r, 'overall_effectiveness', it, iIdx));
+                                if (val > 0) { dSum += val; dCnt++; }
+                            });
+                        });
+                        const dMean = dCnt > 0 ? (dSum / dCnt) : 0;
+
+                        const statusBadge = turnout >= 90 
+                            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">Exemplary Turnout</span>`
+                            : (turnout >= 70 
+                                ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300">Robust Participation</span>`
+                                : (sCount > 0 
+                                    ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Active Intake</span>`
+                                    : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-300">Awaiting Submissions</span>`));
+
+                        return `
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="p-2.5 text-center border-r border-slate-200 font-mono font-bold text-slate-700">${idx + 1}</td>
+                                <td class="p-2.5 border-r border-slate-200 font-bold text-slate-900">${dept}</td>
+                                <td class="p-2.5 text-center border-r border-slate-200 font-mono text-slate-700">${rCount}</td>
+                                <td class="p-2.5 text-center border-r border-slate-200 font-mono font-bold text-blue-900">${sCount}</td>
+                                <td class="p-2.5 text-center border-r border-slate-200 font-bold ${turnout >= 80 ? 'text-emerald-700' : 'text-slate-700'}">${turnout}%</td>
+                                <td class="p-2.5 text-center border-r border-slate-200 font-black text-slate-900">${dMean > 0 ? dMean.toFixed(2) : '—'}</td>
+                                <td class="p-2.5 text-center">${statusBadge}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+
+            } else if (currentReportClassification === 'department') {
+                const deptName = currentReportDept;
+                if (sec2HeadingEl) sec2HeadingEl.innerHTML = `Faculty Participation & Audit Demographics &bull; <span class="text-emerald-900">Department of ${deptName}</span>`;
+                if (sec2TheadEl) {
+                    sec2TheadEl.innerHTML = `
+                        <th class="p-2.5 border-r border-slate-300 w-12 text-center">S.No</th>
+                        <th class="p-2.5 border-r border-slate-300">Faculty Member Name</th>
+                        <th class="p-2.5 border-r border-slate-300 w-36">Designation</th>
+                        <th class="p-2.5 text-center border-r border-slate-300 w-20">Shift</th>
+                        <th class="p-2.5 text-center border-r border-slate-300 w-24">Level</th>
+                        <th class="p-2.5 text-center border-r border-slate-300 w-32">Audit Status</th>
+                        <th class="p-2.5 text-left">Submission Evidence / Timestamp</th>
+                    `;
+                }
+                if (schoolsBodyEl) {
+                    schoolsBodyEl.innerHTML = scopedRoster.map((f, idx) => {
+                        const resp = scopedResponses.find(r => 
+                            ((r.faculty_email && f.email && r.faculty_email.trim().toLowerCase() === f.email.trim().toLowerCase()) ||
+                             ((r.faculty_name || '').trim().toLowerCase() === (f.name || '').trim().toLowerCase()))
+                        );
+                        const isSubmitted = !!resp;
+                        const statusBadge = isSubmitted 
+                            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center justify-center gap-1"><i class="fa-solid fa-circle-check text-emerald-600"></i> Recorded</span>`
+                            : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 flex items-center justify-center gap-1"><i class="fa-solid fa-clock text-amber-600"></i> Awaiting</span>`;
+
+                        const timeStr = resp ? (resp.timestamp || resp.received_date || 'Recorded in Cloud') : '—';
+                        const levelStr = resp ? (resp.course_level || 'UG/PG') : (f.category || 'Shift ' + (f.shift || 'I'));
+
+                        return `
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="p-2.5 text-center border-r border-slate-200 font-mono font-bold text-slate-700">${idx + 1}</td>
+                                <td class="p-2.5 border-r border-slate-200 font-bold text-slate-900">${f.name}</td>
+                                <td class="p-2.5 border-r border-slate-200 text-slate-700">${f.designation || 'Faculty'}</td>
+                                <td class="p-2.5 text-center border-r border-slate-200 font-mono text-slate-700">Shift ${f.shift || 'I'}</td>
+                                <td class="p-2.5 text-center border-r border-slate-200 uppercase font-semibold text-indigo-900">${levelStr}</td>
+                                <td class="p-2.5 text-center border-r border-slate-200">${statusBadge}</td>
+                                <td class="p-2.5 text-left text-[11px] text-slate-600 font-mono">${timeStr}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+
+            } else {
+                // Institution Report (School table)
+                if (sec2HeadingEl) sec2HeadingEl.innerText = "School-Wise Participation & Curricular Quality Index";
+                if (sec2TheadEl) {
+                    sec2TheadEl.innerHTML = `
+                        <th class="p-2.5 border-r border-slate-300 w-12 text-center">S.No</th>
+                        <th class="p-2.5 border-r border-slate-300">Constituent School</th>
+                        <th class="p-2.5 text-center border-r border-slate-300 w-24">Faculty Roster</th>
+                        <th class="p-2.5 text-center border-r border-slate-300 w-24">Submissions</th>
+                        <th class="p-2.5 text-center border-r border-slate-300 w-24">Turnout %</th>
+                        <th class="p-2.5 text-center border-r border-slate-300 w-24">Quality Mean</th>
+                        <th class="p-2.5 text-center w-28">Status</th>
+                    `;
+                }
+                if (schoolsBodyEl) {
+                    const schoolKeys = Object.keys(SCHOOL_NAME_MAP);
+                    schoolsBodyEl.innerHTML = schoolKeys.map((schKey, idx) => {
+                        const schFullName = SCHOOL_NAME_MAP[schKey];
+                        const rosterFaculty = (typeof MASTER_FACULTY_ROSTER !== 'undefined') 
+                            ? MASTER_FACULTY_ROSTER.filter(f => (f.school === schKey || getSchoolForDepartment(f.department) === schFullName))
+                            : [];
+                        const schRosterCount = rosterFaculty.length;
+                        const schResponses = allResponses.filter(r => getSchoolForDepartment(r.department) === schFullName);
+                        const schRespCount = schResponses.length;
+                        const schTurnout = schRosterCount > 0 ? Math.round((schRespCount / schRosterCount) * 100) : (schRespCount > 0 ? 100 : 0);
+
+                        let schScoreSum = 0; let schScoreCount = 0;
+                        schResponses.forEach(r => {
+                            effItems.forEach((it, iIdx) => {
+                                const val = parseNum(getResponseRating(r, 'overall_effectiveness', it, iIdx));
+                                if (val > 0) { schScoreSum += val; schScoreCount++; }
+                            });
+                        });
+                        const schMean = schScoreCount > 0 ? (schScoreSum / schScoreCount) : 0;
+
+                        const statusBadge = schTurnout >= 90 
+                            ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">Exemplary Turnout</span>`
+                            : (schTurnout >= 70 
+                                ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300">Robust Participation</span>`
+                                : (schRespCount > 0 
+                                    ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">Active Intake</span>`
+                                    : `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-300">Awaiting Submission</span>`));
+
+                        return `
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="p-2.5 text-center border-r border-slate-200 font-mono font-bold text-slate-700">${idx + 1}</td>
+                                <td class="p-2.5 border-r border-slate-200 font-bold text-slate-900">${schFullName}</td>
+                                <td class="p-2.5 text-center border-r border-slate-200 font-mono text-slate-700">${schRosterCount}</td>
+                                <td class="p-2.5 text-center border-r border-slate-200 font-mono font-bold text-blue-900">${schRespCount}</td>
+                                <td class="p-2.5 text-center border-r border-slate-200 font-bold ${schTurnout >= 80 ? 'text-emerald-700' : 'text-slate-700'}">${schTurnout}%</td>
+                                <td class="p-2.5 text-center border-r border-slate-200 font-black text-slate-900">${schMean > 0 ? schMean.toFixed(2) : '—'}</td>
+                                <td class="p-2.5 text-center">${statusBadge}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
             }
 
             // 8. SECTION E & F: NEP 2020 PEDAGOGY METRICS TABLE
             const nepBodyEl = document.getElementById('reportNEPBody');
             if (nepBodyEl) {
                 // Multidisciplinary
-                const multiVals = responses.map(r => parseNum(r.multidisciplinary_rating)).filter(v => v > 0);
+                const multiVals = scopedResponses.map(r => parseNum(r.multidisciplinary_rating)).filter(v => v > 0);
                 const multiMean = multiVals.length > 0 ? (multiVals.reduce((a, b) => a + b, 0) / multiVals.length) : 0;
                 const multiPct = Math.round((multiMean / 5.0) * 100);
 
                 // Electives Choice
-                const elecVals = responses.map(r => parseNum(r.electives_rating)).filter(v => v > 0);
+                const elecVals = scopedResponses.map(r => parseNum(r.electives_rating)).filter(v => v > 0);
                 const elecMean = elecVals.length > 0 ? (elecVals.reduce((a, b) => a + b, 0) / elecVals.length) : 0;
                 const elecPct = Math.round((elecMean / 5.0) * 100);
 
                 // Experiential Learning
                 let expSum = 0; let expCount = 0;
-                responses.forEach(r => {
+                scopedResponses.forEach(r => {
                     if (r.experiential_learning && typeof r.experiential_learning === 'object') {
                         Object.values(r.experiential_learning).forEach(v => {
                             const n = parseNum(v);
@@ -4236,7 +4633,7 @@
 
                 // Digital Learning & JosTEL LMS
                 let digSum = 0; let digCount = 0;
-                responses.forEach(r => {
+                scopedResponses.forEach(r => {
                     if (r.digital_learning && typeof r.digital_learning === 'object') {
                         Object.values(r.digital_learning).forEach(v => {
                             const n = parseNum(v);
@@ -4249,7 +4646,7 @@
 
                 // Research Orientation
                 let resHits = 0;
-                responses.forEach(r => {
+                scopedResponses.forEach(r => {
                     if (Array.isArray(r.research_orientation) && r.research_orientation.length > 0) resHits++;
                     else if (typeof r.research_orientation === 'string' && r.research_orientation.length > 2) resHits++;
                 });
@@ -4281,7 +4678,7 @@
             if (emergingRankingBodyEl) {
                 const emergingTally = {};
                 emergingPool.forEach(area => { emergingTally[area] = 0; });
-                responses.forEach(r => {
+                scopedResponses.forEach(r => {
                     const areas = r.emerging_areas;
                     if (Array.isArray(areas)) {
                         areas.forEach(a => {
@@ -4322,13 +4719,13 @@
             const vocationalBodyEl = document.getElementById('reportVocationalBody');
             if (vocationalBodyEl) {
                 // NSQF
-                const nsqfVals = responses.map(r => parseNum(r.nsqf_alignment)).filter(v => v > 0);
+                const nsqfVals = scopedResponses.map(r => parseNum(r.nsqf_alignment)).filter(v => v > 0);
                 const nsqfMean = nsqfVals.length > 0 ? (nsqfVals.reduce((a, b) => a + b, 0) / nsqfVals.length) : 0;
                 const nsqfPct = Math.round((nsqfMean / 5.0) * 100);
 
                 // Stakeholders Needs
                 let stkSum = 0; let stkCount = 0;
-                responses.forEach(r => {
+                scopedResponses.forEach(r => {
                     if (r.stakeholder_needs && typeof r.stakeholder_needs === 'object') {
                         Object.values(r.stakeholder_needs).forEach(v => {
                             const n = parseNum(v);
@@ -4340,26 +4737,26 @@
                 const stkPct = Math.round((stkMean / 5.0) * 100);
 
                 // IKS Effectiveness
-                const iksVals = responses.map(r => parseNum(r.iks_effectiveness)).filter(v => v > 0);
+                const iksVals = scopedResponses.map(r => parseNum(r.iks_effectiveness)).filter(v => v > 0);
                 const iksMean = iksVals.length > 0 ? (iksVals.reduce((a, b) => a + b, 0) / iksVals.length) : 0;
                 const iksPct = Math.round((iksMean / 5.0) * 100);
 
                 const vocRows = [
                     {
                         domain: "National Skills Qualifications Framework (NSQF) Alignment",
-                        score: nsqfMean > 0 ? `${nsqfMean.toFixed(2)} / 5.0` : "Assessed",
+                        score: nsqfMean > 0 ? `${nsqfMean.toFixed(2)} / 5.0` : (totalResp > 0 ? "Assessed" : "—"),
                         pct: `${nsqfPct}%`,
                         notes: `Skill Enhancement Courses (SECs) exhibit strong vocational competency mapping. Key NSQF-aligned courses identified across Commerce, Computing, Biological and Physical Sciences.`
                     },
                     {
                         domain: "Curricular Responsiveness to Stakeholder Feedback",
-                        score: stkMean > 0 ? `${stkMean.toFixed(2)} / 5.0` : "Active",
+                        score: stkMean > 0 ? `${stkMean.toFixed(2)} / 5.0` : (totalResp > 0 ? "Active" : "—"),
                         pct: `${stkPct}%`,
                         notes: `Structured feedback from Alumni, Employers, Students and Academic Peers systematically integrated into curriculum design before Board of Studies approval.`
                     },
                     {
                         domain: "Indian Knowledge Systems (IKS) Integration",
-                        score: iksMean > 0 ? `${iksMean.toFixed(2)} / 5.0` : "Functional",
+                        score: iksMean > 0 ? `${iksMean.toFixed(2)} / 5.0` : (totalResp > 0 ? "Functional" : "—"),
                         pct: `${iksPct}%`,
                         notes: `IKS pedagogical modules integrated primarily through dedicated units in Languages, History, Chemistry, Botany, and Value-Added Courses.`
                     }
@@ -4379,9 +4776,20 @@
             // 11. SYNTHESIZED EXECUTIVE NARRATIVE
             const summaryParaEl = document.getElementById('reportSummaryParagraph');
             if (summaryParaEl) {
-                summaryParaEl.innerHTML = `
-                    This comprehensive analytical audit synthesizes structured feedback collected from <strong>${totalResp} teaching faculty members</strong> across <strong>33 academic departments</strong> under 6 constituent Schools of <em>St. Joseph's College (Autonomous), Tiruchirappalli</em>. The overall Curricular Quality Index (CQI) stands at <strong>${overallCQI > 0 ? overallCQI.toFixed(2) : '—'} out of 5.00</strong>, reflecting a high institutional attainment level of <strong>${overallAttainment}%</strong>.
-                `;
+                if (currentReportClassification === 'school') {
+                    const constituentDepts = Array.from(new Set(scopedRoster.map(f => f.department))).filter(Boolean);
+                    summaryParaEl.innerHTML = `
+                        This analytical audit synthesizes structured feedback collected from <strong>${totalResp} teaching faculty members</strong> (out of <strong>${totalFaculty}</strong> on the roster, <strong>${turnoutPct}% turnout</strong>) across <strong>${constituentDepts.length} constituent academic departments</strong> in the <em>${currentReportSchool}</em> in St. Joseph's College (Autonomous), Tiruchirappalli. The overall School Curricular Quality Index (CQI) stands at <strong>${overallCQI > 0 ? overallCQI.toFixed(2) : '—'} out of 5.00</strong>, reflecting a quality attainment level of <strong>${overallAttainment}%</strong>.
+                    `;
+                } else if (currentReportClassification === 'department') {
+                    summaryParaEl.innerHTML = `
+                        This analytical audit synthesizes structured feedback collected from <strong>${totalResp} teaching faculty members</strong> (out of <strong>${totalFaculty}</strong> on the roster, <strong>${turnoutPct}% turnout</strong>) in the <strong>Department of ${currentReportDept}</strong> (${getSchoolForDepartment(currentReportDept)}) in St. Joseph's College (Autonomous), Tiruchirappalli. The Department Curricular Quality Index (CQI) stands at <strong>${overallCQI > 0 ? overallCQI.toFixed(2) : '—'} out of 5.00</strong>, reflecting a departmental quality attainment level of <strong>${overallAttainment}%</strong>.
+                    `;
+                } else {
+                    summaryParaEl.innerHTML = `
+                        This comprehensive analytical audit synthesizes structured feedback collected from <strong>${totalResp} teaching faculty members</strong> across <strong>33 academic departments</strong> under 6 constituent Schools of <em>St. Joseph's College (Autonomous), Tiruchirappalli</em>. The overall Curricular Quality Index (CQI) stands at <strong>${overallCQI > 0 ? overallCQI.toFixed(2) : '—'} out of 5.00</strong>, reflecting a high institutional attainment level of <strong>${overallAttainment}%</strong>.
+                    `;
+                }
             }
 
             const summaryExtendedEl = document.getElementById('reportSummaryParagraphExtended');
