@@ -1,16 +1,5 @@
 const MASTER_FACULTY_ROSTER = [
     {
-        "s_no": 999,
-        "school": "OTHERS",
-        "department": "Human Excellence",
-        "name": "test0910",
-        "designation": "Assistant Professor",
-        "email": "test0910@mail.sjctni.edu",
-        "shift": "I",
-        "category": "Test",
-        "gender": "M"
-    },
-    {
         "s_no": 1,
         "school": "SBS",
         "department": "Biochemistry",
@@ -2368,17 +2357,6 @@ const MASTER_FACULTY_ROSTER = [
         "s_no": 215,
         "school": "SLC",
         "department": "Tamil",
-        "name": "Ms. A. G.Umamaheswari",
-        "designation": "Assistant Professor",
-        "email": "umamaheswari_ta2@mail.sjctni.edu",
-        "shift": "II",
-        "category": "Secretary",
-        "gender": "F"
-    },
-    {
-        "s_no": 216,
-        "school": "SLC",
-        "department": "Tamil",
         "name": "Mr.M.Raja",
         "designation": "Assistant Professor",
         "email": "raja_ta1@mail.sjctni.edu",
@@ -2387,7 +2365,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 217,
+        "s_no": 216,
         "school": "SMS",
         "department": "BBA",
         "name": "MR. S. ARPUTHA RAJ",
@@ -2398,7 +2376,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 218,
+        "s_no": 217,
         "school": "SMS",
         "department": "BBA",
         "name": "MS. C.F. OCTOVIA ANTONY SESSAMMAL",
@@ -2409,7 +2387,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 219,
+        "s_no": 218,
         "school": "SMS",
         "department": "BBA",
         "name": "MR. D. RINALDO DE DAVID",
@@ -2420,7 +2398,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 220,
+        "s_no": 219,
         "school": "SMS",
         "department": "BBA",
         "name": "MR. J. INIGO PAPU VINODHAN",
@@ -2431,7 +2409,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 221,
+        "s_no": 220,
         "school": "SMS",
         "department": "BBA",
         "name": "Mr. B. Ananda Raj",
@@ -2442,7 +2420,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 222,
+        "s_no": 221,
         "school": "SMS",
         "department": "BBA",
         "name": "Mr.K.Radhakrishnan",
@@ -2453,7 +2431,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 223,
+        "s_no": 222,
         "school": "SMS",
         "department": "Counselling Psy",
         "name": "Dr. A. John Balaiah",
@@ -2464,7 +2442,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 224,
+        "s_no": 223,
         "school": "SMS",
         "department": "Counselling Psy",
         "name": "Dr. V. Suganthi",
@@ -2475,7 +2453,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 225,
+        "s_no": 224,
         "school": "SMS",
         "department": "Counselling Psy",
         "name": "Ms. F. M. Christeeba",
@@ -2486,7 +2464,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 226,
+        "s_no": 225,
         "school": "SMS",
         "department": "Economics",
         "name": "Dr. M. Suvakkin",
@@ -2497,7 +2475,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 227,
+        "s_no": 226,
         "school": "SMS",
         "department": "Economics",
         "name": "Dr. G. Iruthayaraj",
@@ -2508,7 +2486,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 228,
+        "s_no": 227,
         "school": "SMS",
         "department": "Economics",
         "name": "Dr. A. Justin Thiraviam",
@@ -2519,7 +2497,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 229,
+        "s_no": 228,
         "school": "SMS",
         "department": "Economics",
         "name": "Dr. K. A. Michael",
@@ -2530,7 +2508,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 230,
+        "s_no": 229,
         "school": "SMS",
         "department": "Economics",
         "name": "Dr. S. P. Robert",
@@ -2541,7 +2519,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 231,
+        "s_no": 230,
         "school": "SMS",
         "department": "Economics",
         "name": "Dr. J. Vasantha Arockiaselvi",
@@ -2552,7 +2530,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 232,
+        "s_no": 231,
         "school": "SMS",
         "department": "Economics",
         "name": "Ms. P. Prarthna",
@@ -2563,7 +2541,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 233,
+        "s_no": 232,
         "school": "SMS",
         "department": "Economics",
         "name": "Dr. R. Ganesasubramanian",
@@ -2574,7 +2552,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 234,
+        "s_no": 233,
         "school": "SMS",
         "department": "Economics",
         "name": "Dr. P. Jayakumar",
@@ -2585,7 +2563,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 235,
+        "s_no": 234,
         "school": "SMS",
         "department": "Economics",
         "name": "Ms. J. Jayashree Naiken",
@@ -2596,7 +2574,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 236,
+        "s_no": 235,
         "school": "SMS",
         "department": "HRM",
         "name": "Rev. Dr. K. Arockiam, SJ",
@@ -2607,7 +2585,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 237,
+        "s_no": 236,
         "school": "SMS",
         "department": "HRM",
         "name": "Mr. G. Louis Victor",
@@ -2618,7 +2596,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 238,
+        "s_no": 237,
         "school": "SMS",
         "department": "HRM",
         "name": "Dr. J. Michael Raj",
@@ -2629,7 +2607,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 239,
+        "s_no": 238,
         "school": "SMS",
         "department": "HRM",
         "name": "Dr. J. Wilfred Angello Gerald",
@@ -2640,7 +2618,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 240,
+        "s_no": 239,
         "school": "SMS",
         "department": "HRM",
         "name": "Dr. Y. Vijila",
@@ -2651,7 +2629,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 241,
+        "s_no": 240,
         "school": "SMS",
         "department": "HRM",
         "name": "Dr. J. Vincent Xavier",
@@ -2662,7 +2640,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 242,
+        "s_no": 241,
         "school": "SMS",
         "department": "HRM",
         "name": "Ms. C. Annie Jane",
@@ -2673,7 +2651,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 243,
+        "s_no": 242,
         "school": "SMS",
         "department": "HRM",
         "name": "Dr. V.  Udhaya Geetha",
@@ -2684,7 +2662,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 244,
+        "s_no": 243,
         "school": "SMS",
         "department": "Physical Education",
         "name": "Dr. A. Prem Edwin",
@@ -2695,7 +2673,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 245,
+        "s_no": 244,
         "school": "SMS",
         "department": "Physical Education",
         "name": "Mr. S. Sriram",
@@ -2706,7 +2684,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 246,
+        "s_no": 245,
         "school": "SMS",
         "department": "Physical Education",
         "name": "Dr. P. Ramesh",
@@ -2717,7 +2695,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 247,
+        "s_no": 246,
         "school": "SMS",
         "department": "Visual Communication",
         "name": "Dr. S.Tamilarasi",
@@ -2728,7 +2706,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 248,
+        "s_no": 247,
         "school": "SMS",
         "department": "Visual Communication",
         "name": "Ms. K. Ramya",
@@ -2739,7 +2717,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 249,
+        "s_no": 248,
         "school": "SMS",
         "department": "Visual Communication",
         "name": "Dr. E. V. Prabha",
@@ -2750,7 +2728,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 250,
+        "s_no": 249,
         "school": "SMS",
         "department": "Visual Communication",
         "name": "Ms.N.Srimohanapriya",
@@ -2761,7 +2739,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 251,
+        "s_no": 250,
         "school": "SMS",
         "department": "Visual Communication",
         "name": "Mr. G. Sathish",
@@ -2772,7 +2750,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 252,
+        "s_no": 251,
         "school": "SMS",
         "department": "Visual Communication",
         "name": "Mr. C .Naveen Kumar",
@@ -2783,7 +2761,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 253,
+        "s_no": 252,
         "school": "SMS",
         "department": "Visual Communication",
         "name": "Mr. X. Maria Bastin",
@@ -2794,7 +2772,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 254,
+        "s_no": 253,
         "school": "SMS",
         "department": "Visual Communication",
         "name": "Mr. C. Jawahar",
@@ -2805,7 +2783,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 255,
+        "s_no": 254,
         "school": "SMS",
         "department": "Visual Communication",
         "name": "Ms.T.Deepa",
@@ -2816,7 +2794,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 256,
+        "s_no": 255,
         "school": "SMS",
         "department": "Visual Communication",
         "name": "Rev. Dr. Xavier Antony, SJ",
@@ -2827,7 +2805,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 257,
+        "s_no": 256,
         "school": "SMS",
         "department": "Visual Communication",
         "name": "Mr. A. Kingsly",
@@ -2838,7 +2816,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 258,
+        "s_no": 257,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. A. Rose Venis",
@@ -2849,7 +2827,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 259,
+        "s_no": 258,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. A. Irudaya Jothi",
@@ -2860,7 +2838,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 260,
+        "s_no": 259,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. S. Antony Sakthi",
@@ -2871,7 +2849,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 261,
+        "s_no": 260,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. A. Edwin Vasu",
@@ -2882,7 +2860,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 262,
+        "s_no": 261,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. A. S. Stella Shalini",
@@ -2893,7 +2871,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 263,
+        "s_no": 262,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. A. Simi",
@@ -2904,7 +2882,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 264,
+        "s_no": 263,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. S. Britto",
@@ -2915,7 +2893,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 265,
+        "s_no": 264,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. A. Ceril Jeoffrey",
@@ -2926,7 +2904,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 266,
+        "s_no": 265,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. C. Rajarathinam",
@@ -2937,7 +2915,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 267,
+        "s_no": 266,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. S. Mangalaraj",
@@ -2948,7 +2926,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 268,
+        "s_no": 267,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. A. Leostandly",
@@ -2959,7 +2937,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 269,
+        "s_no": 268,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. A. Arun Viveke",
@@ -2970,7 +2948,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 270,
+        "s_no": 269,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. I. Arockiaraj",
@@ -2981,7 +2959,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 271,
+        "s_no": 270,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Rev. Dr. A. Sebastin Thangadurai, SJ",
@@ -2992,7 +2970,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 272,
+        "s_no": 271,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Rev. Fr. A.I. Rajasekaran SJ",
@@ -3003,7 +2981,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 273,
+        "s_no": 272,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. A. Arun Joseph Rosario",
@@ -3014,7 +2992,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 274,
+        "s_no": 273,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. P. Arockia Doss",
@@ -3025,7 +3003,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 275,
+        "s_no": 274,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. JK. Alphonsa Juliet Helina",
@@ -3036,7 +3014,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 276,
+        "s_no": 275,
         "school": "SPS",
         "department": "Chemistry",
         "name": "Dr. S. Celestina",
@@ -3047,7 +3025,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 277,
+        "s_no": 276,
         "school": "SPS",
         "department": "Electronics",
         "name": "Dr. P. Subbuthai",
@@ -3058,7 +3036,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 278,
+        "s_no": 277,
         "school": "SPS",
         "department": "Electronics",
         "name": "Dr. V. Manickam",
@@ -3069,7 +3047,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 279,
+        "s_no": 278,
         "school": "SPS",
         "department": "Electronics",
         "name": "Rev. Fr. J. John Wilson, SJ",
@@ -3080,7 +3058,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 280,
+        "s_no": 279,
         "school": "SPS",
         "department": "Electronics",
         "name": "Dr. A. Arputharaj",
@@ -3091,7 +3069,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 281,
+        "s_no": 280,
         "school": "SPS",
         "department": "Electronics",
         "name": "Dr. S. Mary  Margaret",
@@ -3102,7 +3080,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 282,
+        "s_no": 281,
         "school": "SPS",
         "department": "Electronics",
         "name": "Dr. K. Priya Dharshini",
@@ -3113,7 +3091,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 283,
+        "s_no": 282,
         "school": "SPS",
         "department": "Electronics",
         "name": "Dr. M. Sappani Muthu",
@@ -3124,7 +3102,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 284,
+        "s_no": 283,
         "school": "SPS",
         "department": "Electronics",
         "name": "Dr. K. Karuppasamy",
@@ -3135,7 +3113,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 285,
+        "s_no": 284,
         "school": "SPS",
         "department": "Electronics",
         "name": "Mr. V. Victor Remy",
@@ -3146,7 +3124,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 286,
+        "s_no": 285,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. I. Johnson",
@@ -3157,7 +3135,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 287,
+        "s_no": 286,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. B. Kanickairaj",
@@ -3168,7 +3146,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 288,
+        "s_no": 287,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. J. Charles",
@@ -3179,7 +3157,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 289,
+        "s_no": 288,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. P. Christuraj",
@@ -3190,7 +3168,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 290,
+        "s_no": 289,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. A. Maggie Dayana",
@@ -3201,7 +3179,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 291,
+        "s_no": 290,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. M.M. Armstrong Arasu",
@@ -3212,7 +3190,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 292,
+        "s_no": 291,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. A. J. Clement Lourduraj",
@@ -3223,7 +3201,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 293,
+        "s_no": 292,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. M. Antony Arockiaraj",
@@ -3234,7 +3212,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 294,
+        "s_no": 293,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. R. Jerald Vijay",
@@ -3245,7 +3223,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 295,
+        "s_no": 294,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. S. Dinakaran",
@@ -3256,7 +3234,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 296,
+        "s_no": 295,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. S. Anbarasu",
@@ -3267,7 +3245,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 297,
+        "s_no": 296,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. A. Antony Raj",
@@ -3278,7 +3256,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 298,
+        "s_no": 297,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. G. Samuel",
@@ -3289,7 +3267,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 299,
+        "s_no": 298,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. H. Joy Prabu",
@@ -3300,7 +3278,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 300,
+        "s_no": 299,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. R. Thomas",
@@ -3311,7 +3289,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 301,
+        "s_no": 300,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. S. Prathap",
@@ -3322,7 +3300,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 302,
+        "s_no": 301,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. A. Alexandar",
@@ -3333,7 +3311,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 303,
+        "s_no": 302,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. S. Lourduraj",
@@ -3344,7 +3322,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 304,
+        "s_no": 303,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. P. Adal Arasu",
@@ -3355,7 +3333,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 305,
+        "s_no": 304,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. A. Sinthiya",
@@ -3366,7 +3344,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 306,
+        "s_no": 305,
         "school": "SPS",
         "department": "Physics",
         "name": "Ms. B. Mary Dayana",
@@ -3377,7 +3355,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 307,
+        "s_no": 306,
         "school": "SPS",
         "department": "Physics",
         "name": "Mr. G. Novin Senetra Roy",
@@ -3388,7 +3366,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 308,
+        "s_no": 307,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. M. Augustin",
@@ -3399,7 +3377,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 309,
+        "s_no": 308,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. G. Genifer Silvena",
@@ -3410,7 +3388,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 310,
+        "s_no": 309,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. S. Rex Rosario",
@@ -3421,7 +3399,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 311,
+        "s_no": 310,
         "school": "SPS",
         "department": "Physics",
         "name": "Dr. T. Kaviya",
@@ -3432,7 +3410,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 312,
+        "s_no": 311,
         "school": "OTHERS",
         "department": "Human Excellence",
         "name": "Mr. K. Michael Raj",
@@ -3443,7 +3421,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 313,
+        "s_no": 312,
         "school": "OTHERS",
         "department": "Human Excellence",
         "name": "Dr. A. Saran Raj",
@@ -3454,7 +3432,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 314,
+        "s_no": 313,
         "school": "OTHERS",
         "department": "Human Excellence",
         "name": "Mr. A. Philip Arun Kennedy",
@@ -3465,7 +3443,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 315,
+        "s_no": 314,
         "school": "OTHERS",
         "department": "Human Excellence",
         "name": "Ms. R. Kavitha",
@@ -3476,7 +3454,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "F"
     },
     {
-        "s_no": 316,
+        "s_no": 315,
         "school": "OTHERS",
         "department": "Human Excellence",
         "name": "Mr. J. Rajesh Kumar",
@@ -3487,7 +3465,7 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     },
     {
-        "s_no": 317,
+        "s_no": 316,
         "school": "OTHERS",
         "department": "Human Excellence",
         "name": "Mr. B. Sushvinth",
@@ -3498,54 +3476,3 @@ const MASTER_FACULTY_ROSTER = [
         "gender": "M"
     }
 ];
-
-// Store immutable copy of original 317 faculty roster from official Excel file
-const RAW_MASTER_FACULTY_ROSTER = JSON.parse(JSON.stringify(MASTER_FACULTY_ROSTER));
-
-// Auto-sync custom added faculty and preserve master roster
-(function initFacultyStorageSync() {
-    if (typeof window === 'undefined') return;
-
-    // Remove any accidental deletions created during testing so all 317 members are restored
-    try {
-        if (localStorage.getItem('sjc_deleted_faculty_list')) {
-            localStorage.removeItem('sjc_deleted_faculty_list');
-        }
-    } catch(e) {}
-
-    window.resetFacultyRosterToMaster = function() {
-        try {
-            localStorage.removeItem('sjc_deleted_faculty_list');
-        } catch(e) {}
-
-        // Restore back to full original 317 roster
-        MASTER_FACULTY_ROSTER.length = 0;
-        RAW_MASTER_FACULTY_ROSTER.forEach(f => MASTER_FACULTY_ROSTER.push({ ...f }));
-
-        // Append any legitimately added custom faculty
-        try {
-            const custom = JSON.parse(localStorage.getItem('sjc_custom_faculty_list') || '[]');
-            if (Array.isArray(custom)) {
-                custom.forEach(cf => {
-                    const idx = MASTER_FACULTY_ROSTER.findIndex(f => 
-                        (f.name || '').trim().toLowerCase() === (cf.name || '').trim().toLowerCase() && 
-                        (f.department || '').trim().toLowerCase() === (cf.department || '').trim().toLowerCase()
-                    );
-                    if (idx !== -1) {
-                        MASTER_FACULTY_ROSTER[idx] = { ...MASTER_FACULTY_ROSTER[idx], ...cf };
-                    } else {
-                        MASTER_FACULTY_ROSTER.push(cf);
-                    }
-                });
-            }
-        } catch (e) {
-            console.warn('Storage sync error:', e);
-        }
-    };
-
-    window.syncCustomFacultyFromStorage = function() {
-        window.resetFacultyRosterToMaster();
-    };
-
-    window.syncCustomFacultyFromStorage();
-})();

@@ -114,13 +114,28 @@
 
     window.loadFirebaseCustomFaculty = async function() {
         try {
+            // First purge removed test or deleted faculty from local storage
+            let localCustom = JSON.parse(localStorage.getItem('sjc_custom_faculty_list') || '[]');
+            localCustom = localCustom.filter(f => {
+                const name = (f.name || '').trim().toLowerCase();
+                const email = (f.email || '').trim().toLowerCase();
+                if (name === 'test0910' || email.includes('test0910') || email.includes('ajay@mail')) return false;
+                if (email.includes('umamaheswari_ta2') || (name.includes('umamaheswari') && (f.department || '').toLowerCase().includes('tamil'))) return false;
+                return true;
+            });
+            localStorage.setItem('sjc_custom_faculty_list', JSON.stringify(localCustom));
+
             const querySnapshot = await getDocs(collection(db, "custom_faculty"));
             let cloudFaculty = [];
             querySnapshot.forEach((doc) => {
-                cloudFaculty.push(doc.data());
+                const data = doc.data();
+                const name = (data.name || '').trim().toLowerCase();
+                const email = (data.email || '').trim().toLowerCase();
+                if (name !== 'test0910' && !email.includes('test0910') && !email.includes('ajay@mail') && !email.includes('umamaheswari_ta2')) {
+                    cloudFaculty.push(data);
+                }
             });
             if (cloudFaculty.length > 0) {
-                let localCustom = JSON.parse(localStorage.getItem('sjc_custom_faculty_list') || '[]');
                 let updated = false;
                 cloudFaculty.forEach(cf => {
                     const exists = localCustom.some(f => 
@@ -135,10 +150,10 @@
                 if (updated) {
                     localStorage.setItem('sjc_custom_faculty_list', JSON.stringify(localCustom));
                 }
-                if (window.syncCustomFacultyFromStorage) window.syncCustomFacultyFromStorage();
-                if (typeof initDropdowns === 'function') initDropdowns();
-                if (typeof renderRosterTable === 'function') renderRosterTable();
             }
+            if (window.syncCustomFacultyFromStorage) window.syncCustomFacultyFromStorage();
+            if (typeof initDropdowns === 'function') initDropdowns();
+            if (typeof renderRosterTable === 'function') renderRosterTable();
         } catch (e) {
             console.warn("Could not sync custom faculty from cloud:", e);
         }
@@ -253,7 +268,7 @@
 <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Master Roster Data -->
-    <script src="faculty_roster_data.js?v=20261008_v15"></script>
+    <script src="faculty_roster_data.js?v=20261028_v16"></script>
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
